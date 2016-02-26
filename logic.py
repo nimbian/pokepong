@@ -212,22 +212,20 @@ def pop_ball(name):
 
 def draw_all_me(pkmn):
     x = []
-    x.extend(write_btm('test1','test2'))
-    x.extend(draw_my_hp_bar())
-    x.extend(draw_my_lvl(pkmn))
-    x.extend(draw_my_hp(pkmn))
     x.extend(draw_my_pkmn_sprite(pkmn))
     x.extend(draw_my_pkmn_name(pkmn))
-    x.extend(draw_my_pkmn_name(pkmn))
+    x.extend(draw_my_hp_bar())
+    x.extend(draw_my_hp(pkmn))
+    x.extend(draw_my_lvl(pkmn))
     display.update(x)
 
 def draw_all_opp(pkmn):
     x = []
-    x.extend(draw_opp_hp_bar())
-    x.extend(draw_opp_lvl(pkmn))
-    x.extend(draw_opp_hp(pkmn))
     x.extend(draw_opp_pkmn_sprite(pkmn))
     x.extend(draw_opp_pkmn_name(pkmn))
+    x.extend(draw_opp_hp_bar())
+    x.extend(draw_opp_hp(pkmn))
+    x.extend(draw_opp_lvl(pkmn))
     display.update(x)
 
 def intro(current):
@@ -392,35 +390,18 @@ def new_game_start(me, opp, mode):
         move_opp_trainer_in()
         #sleep(2)
         move_opp_trainer_out()
-        dirty = []
-        dirty.extend(draw_opp_pkmn_sprite(opp.current))
-        dirty.extend(draw_opp_hp(opp.current))
-        dirty.extend(draw_opp_hp_bar())
-        dirty.extend(draw_opp_pkmn_name(opp.current))
-        dirty.extend(draw_opp_hp(opp.current))
-        dirty.extend(draw_opp_lvl(opp.current))
+        draw_all_opp(opp.current)
         dirty.extend(write_btm(opp.name + ' sent', 'out ' + opp.current.name + '!'))
-        display.update(dirty)
     else:
-        dirty.extend(draw_opp_pkmn_sprite(opp.current))
-        dirty.extend(draw_opp_hp(opp.current))
-        dirty.extend(draw_opp_hp_bar())
-        dirty.extend(draw_opp_pkmn_name(opp.current))
-        dirty.extend(draw_opp_hp(opp.current))
-        dirty.extend(draw_opp_lvl(opp.current))
+        draw_all_opp(opp.current)
+        move_opp_trainer_out()
         dirty.extend(write_btm('A wild ' + opp.current.name, 'has appeard!'))
-        display.update(dirty)
+    display.update(dirty)
 
 
     move_my_trainer()
     pop_ball(me.current.name)
-    dirty = []
-    dirty.extend(draw_my_pkmn_sprite(me.current))
-    dirty.extend(draw_my_pkmn_name(me.current))
-    dirty.extend(draw_my_hp_bar())
-    dirty.extend(draw_my_hp(me.current))
-    dirty.extend(draw_my_lvl(me.current))
-    display.update(dirty)
+    draw_all_me(me.current)
 
 def attacking(me):
     dirty = []
@@ -452,11 +433,7 @@ def clean_me_up(me):
     dirty = []
     dirty.append(clearbtm())
     dirty.append(draw.rect(SCREEN, WHITE, [0, 442 ,695,300]))
-    dirty.extend(draw_my_pkmn_sprite(me.current))
-    dirty.extend(draw_my_pkmn_name(me.current))
-    dirty.extend(draw_my_hp_bar())
-    dirty.extend(draw_my_lvl(me.current))
-    dirty.extend(draw_my_hp(me.current))
+    draw_all_me(me.current)
     display.update(dirty)
 
 def run_me_faint(me):
@@ -600,46 +577,20 @@ def draw_choose_pkmn(me, opp, oppdeath = False, mydeath = False):
                     clear()
                     pygame.display.flip()
                     if not oppdeath:
-                        dirty = []
-                        dirty.extend(draw_opp_pkmn_sprite(opp.current))
-                        dirty.extend(draw_opp_hp(opp.current))
-                        dirty.extend(draw_opp_hp_bar())
-                        dirty.extend(draw_opp_pkmn_name(opp.current))
-                        dirty.extend(draw_opp_hp(opp.current))
-                        dirty.extend(draw_opp_lvl(opp.current))
-                        display.update(dirty)
+                        draw_all_opp(opp.current)
                     else:
-                        dirty = []
-                        dirty.extend(draw_my_pkmn_sprite(me.current))
-                        dirty.extend(draw_my_pkmn_name(me.current))
-                        dirty.extend(draw_my_hp_bar())
-                        dirty.extend(draw_my_hp(me.current))
-                        dirty.extend(draw_my_lvl(me.current))
-                        display.update(dirty)
+                        draw_all_me(me.current)
                         return_my_pokemon(me)
                     if mydeath or oppdeath:
                         me.set_current(select)
                         pop_ball(me.current.name)
-                        dirty = []
-                        dirty.extend(draw_my_pkmn_sprite(me.current))
-                        dirty.extend(draw_my_pkmn_name(me.current))
-                        dirty.extend(draw_my_hp_bar())
-                        dirty.extend(draw_my_hp(me.current))
-                        dirty.extend(draw_my_lvl(me.current))
-                        display.update(dirty)
+                        draw_all_me(me.current)
                         sleep(.5)
                     return select
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_x:
                 if not mydeath:
                     clear()
-                    dirty = []
-                    dirty.extend(draw_opp_pkmn_sprite(opp.current))
-                    dirty.extend(draw_opp_hp(opp.current))
-                    dirty.extend(draw_opp_hp_bar())
-                    dirty.extend(draw_opp_pkmn_name(opp.current))
-                    dirty.extend(draw_opp_hp(opp.current))
-                    dirty.extend(draw_opp_lvl(opp.current))
-                    display.update(dirty)
+                    draw_all_opp(opp.current)
                     return False
 
         sleep(.1)
@@ -717,6 +668,9 @@ def change_pokemon(me, opp):
                 return False
             if event.type == pygame.KEYDOWN and event.key == pygame.K_z:
                 draw_choose_pkmn(me, opp, oppdeath = True)
+                clear()
+                display.flip()
+                draw_all_me(me.current)
                 return True
 
 
@@ -846,26 +800,12 @@ def run_game(me, opp, mode):
                     select = draw_choose_pkmn(me,opp)
                     clear()
                     pygame.display.flip()
-                    dirty = []
-                    dirty.extend(draw_opp_pkmn_sprite(opp.current))
-                    dirty.extend(draw_opp_hp(opp.current))
-                    dirty.extend(draw_opp_hp_bar())
-                    dirty.extend(draw_opp_pkmn_name(opp.current))
-                    dirty.extend(draw_opp_hp(opp.current))
-                    dirty.extend(draw_opp_lvl(opp.current))
-                    display.update(dirty)
+                    draw_all_opp(opp.current)
                     if type(select) == int:
                         opp_move = wait_for_opp_move(opp, mode)
-                        dirty = []
-                        dirty.extend(draw_my_pkmn_sprite(me.current))
-                        dirty.extend(draw_my_pkmn_name(me.current))
-                        dirty.extend(draw_my_hp_bar())
-                        dirty.extend(draw_my_hp(me.current))
-                        dirty.extend(draw_my_lvl(me.current))
-                        display.update(dirty)
+                        draw_all_me(me.current)
                         if opp_move.__class__.__name__ == 'move':
                             if opp_move.name == 'Quick Attack' or opp.current.calc_speed() > me.current.calc_speed():
-                                print 'test1'
                                 run_opp_move(me,opp,opp_move)
                                 sleep(2)
                                 if not me.current.alive:
@@ -873,32 +813,16 @@ def run_game(me, opp, mode):
                                 return_my_pokemon(me)
                                 me.set_current(select)
                                 pop_ball(me.current.name)
-                                dirty = []
-                                dirty.extend(draw_my_pkmn_sprite(me.current))
-                                dirty.extend(draw_my_pkmn_name(me.current))
-                                dirty.extend(draw_my_hp_bar())
-                                dirty.extend(draw_my_hp(me.current))
-                                dirty.extend(draw_my_lvl(me.current))
-                                display.update(dirty)
+                                draw_all_me(me.current)
                             else:
                                 return_my_pokemon(me)
                                 me.set_current(select)
                                 pop_ball(me.current.name)
-                                dirty = []
-                                dirty.extend(draw_my_pkmn_sprite(me.current))
-                                dirty.extend(draw_my_pkmn_name(me.current))
-                                dirty.extend(draw_my_hp_bar())
-                                dirty.extend(draw_my_hp(me.current))
-                                dirty.extend(draw_my_lvl(me.current))
-                                display.update(dirty)
+                                draw_all_me(me.current)
                                 run_opp_move(me,opp,opp_move)
-                    dirty = []
-                    dirty.extend(draw_my_pkmn_sprite(me.current))
-                    dirty.extend(draw_my_pkmn_name(me.current))
-                    dirty.extend(draw_my_hp_bar())
-                    dirty.extend(draw_my_hp(me.current))
-                    dirty.extend(draw_my_lvl(me.current))
-                    display.update(dirty)
+                                if not me.current.alive:
+                                    return 1
+                    draw_all_me(me.current)
                     clearbtm()
                     selector = 0
                     draw_choice(0)
