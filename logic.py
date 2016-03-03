@@ -3,7 +3,6 @@ import pygame
 from util import loadimg, loadalphaimg, alphabet
 from random import choice, randint
 from time import sleep
-from classes import pokemon
 from math import ceil,floor
 from sqlite3 import connect
 
@@ -15,6 +14,7 @@ YELLOW = (255,228,104)
 RED = (209,71,40)
 GREY = (108,108,108)
 BLACK = (0,0,0)
+
 SCREEN = display.set_mode(SIZE)
 
 BTM = loadalphaimg('btmclean.png')
@@ -36,8 +36,8 @@ POKE1 = loadalphaimg('poke1.png')
 POKE2 = loadalphaimg('poke2.png')
 
 SSIZE = [392,392]
-
 BTM_TUPLE = (10, SIZE[1]-340)
+
 MYHPBAR_RECT = [SIZE[0] - 700, SIZE[1]-505, MYHP.get_width(), MYHP.get_height()]
 MYHP_RECT = [SIZE[0]-532, SIZE[1]-486, 399, 14]
 MYPKMN = [59,SIZE[1]-740]
@@ -45,6 +45,7 @@ MYPKMN = [59,SIZE[1]-740]
 OPPHPBAR_RECT = [80, 120, 602, 91]
 OPPHP_RECT = [227,141,399,15]
 OPPPKMN = [SIZE[0]-500,0]
+
 ALPHA_DICT = alphabet()
 
 def clear():
@@ -58,17 +59,18 @@ def word_builder(word,start_x, start_y):
         start_x+=56
     return [x, start_y, len(word)*56,60]
 
+
 def write_btm(*args):
     clearbtm()
-    SCREEN.blit(BTM, BTM_TUPLE)
     retval = []
-    retval.append([BTM_TUPLE[0], BTM_TUPLE[1], BTM.get_width(), BTM.get_height()])
+    retval.append(SCREEN.blit(BTM, BTM_TUPLE))
     retval.append(word_builder(args[0], 50, SIZE[1]-250))
     try:
         retval.append(word_builder(args[1], 50, SIZE[1]-130))
     except:
         pass
     return retval
+
 
 def clearbtm():
     draw.rect(SCREEN, WHITE, [0,SIZE[1]-340,SIZE[0],340])
@@ -410,9 +412,18 @@ def attacking(me):
     dirty.append(draw.rect(SCREEN, WHITE, [0, 442 ,695,300]))
     dirty.append(SCREEN.blit(ATTACK, (10, SIZE[1]-577)))
     dirty.append(word_builder(['>',' ',' ',' '][selector] + me.current.moves[0].name.upper(),300, SIZE[1]-285))
-    dirty.append(word_builder([' ','>',' ',' '][selector] + me.current.moves[1].name.upper(),300, SIZE[1]-225))
-    dirty.append(word_builder([' ',' ','>',' '][selector] + me.current.moves[2].name.upper(),300, SIZE[1]-165))
-    dirty.append(word_builder([' ',' ',' ','>'][selector] + me.current.moves[3].name.upper(),300, SIZE[1]-105))
+    if len(me.current.moves) > 1:
+        dirty.append(word_builder([' ','>',' ',' '][selector] + me.current.moves[1].name.upper(),300, SIZE[1]-225))
+    else:
+        dirty.append(word_builder([' ','>',' ',' '][selector] + ' -',300, SIZE[1]-225))
+    if len(me.current.moves) > 2:
+        dirty.append(word_builder([' ',' ','>',' '][selector] + me.current.moves[2].name.upper(),300, SIZE[1]-165))
+    else:
+        dirty.append(word_builder([' ',' ','>',' '][selector] + ' -',300, SIZE[1]-165))
+    if len(me.current.moves) > 3:
+        dirty.append(word_builder([' ',' ',' ','>'][selector] + me.current.moves[3].name.upper(),300, SIZE[1]-105))
+    else:
+        dirty.append(word_builder([' ',' ',' ','>'][selector] + ' -',300, SIZE[1]-105))
     dirty.append(word_builder('TYPE/',60, SIZE[1]-530))
     dirty.extend(draw_move(me.current.moves[selector]))
     display.update(dirty)
@@ -460,23 +471,36 @@ def dmg_pkmn(pkmn, dmg, me = False):
             display.update(draw_opp_hp(pkmn))
         if pkmn.hp == 0:
             return True
-        sleep(.01)
+        sleep(.02)
     return False
 
-def run_move(me, opp, move):
-    if move.pp > 0:
-        move.usepp()
-        if me.current.hit_or_miss(opp.current, move):
-            crit, type_, dmg = me.current.calc_dmg(me.current, move)
-            display.update(write_btm(me.current.name, 'used {0}'.format(move.name.upper())))
-            #sleep(1)
-            #TODO CRIT/SUPER EFFECTIVE
-            return dmg_pkmn(opp.current, dmg)
-        else:
-            display.update(write_btm(me.current.name, 'used {0}'.format(move.name.upper())))
-            sleep(1)
-            display.update(write_btm(me.current.name + "'s", 'attack missed!'))
-            sleep(1)
+def run_move(me, opp, move, first):
+    me.current.attempt_move(True)
+    retval = do_move(me.current, opp.current, move, 'tmp', True, first)
+    me.current.do_status(opp.current, True)
+    return retval
+    #if move.pp > 0:
+    #    move.usepp()
+    #    if me.current.hit_or_miss(opp.current, move):
+    #        crit, type_, dmg = me.current.calc_dmg(opp.current, move)
+    #        display.update(write_btm(me.current.name, 'used {0}'.format(move.name.upper())))
+    #        sleep(1)
+    #        if crit:
+    #            display.update(write_btm('Critical Hit!'))
+    #            sleep(1)
+    #        if type_ > 1:
+    #            display.update(write_btm("It's Super Effective!"))
+    #        elif 0 < type_ < 1:
+    #            display.update(write_btm("It wasn't", "very effective!"))
+    #        elif type_ == 0:
+    #            display.update(write_btm("It had no effect"))
+    #        sleep(1)
+    #        return dmg_pkmn(opp.current, dmg)
+    #    else:
+    #        display.update(write_btm(me.current.name, 'used {0}'.format(move.name.upper())))
+    #        sleep(1)
+    #        display.update(write_btm(me.current.name + "'s", 'attack missed!'))
+    #        sleep(1)
 
 
 
@@ -613,7 +637,7 @@ def draw_choose_pkmn(me, opp, oppdeath = False, mydeath = False):
 def wait_for_opp_move(opp,mode):
     if mode == 'random' or mode == 'wild':
         #TODO PP check
-        return opp.current.moves[randint(0,3)]
+        return opp.current.moves[randint(0,len(opp.current.moves)-1)]
     else:
         #TODO OPP wait
         pass
@@ -622,19 +646,32 @@ def wait_for_opp_next_mon():
     #TODO waiting for opp
     pass
 
-def run_opp_move(me, opp, move):
-    move.usepp()
-    if opp.current.hit_or_miss(me.current, move):
-        crit, type_, dmg = opp.current.calc_dmg(opp.current, move)
-        display.update(write_btm('Enemy ' + opp.current.name, 'used {0}'.format(move.name.upper())))
-        #sleep(1)
-        #TODO CRIT/SUPER EFFECTIVE
-        return dmg_pkmn(me.current, dmg, me = True)
-    else:
-        display.update(write_btm('Enemy ' + opp.current.name, 'used {0}'.format(move.name.upper())))
-        sleep(1)
-        display.update(write_btm('Enemy ' + opp.current.name + "'s", 'attack missed'))
-        sleep(1)
+def run_opp_move(me, opp, move, first):
+    opp.current.attempt_move(False)
+    retval = do_move(opp.current, me.current, move, 'tmp', False, first)
+    opp.current.do_status(me.current, False)
+    return retval
+    #move.usepp()
+    #if opp.current.hit_or_miss(me.current, move):
+    #    crit, type_, dmg = opp.current.calc_dmg(opp.current, move)
+    #    display.update(write_btm('Enemy ' + opp.current.name, 'used {0}'.format(move.name.upper())))
+    #    sleep(1)
+    #    if crit:
+    #        display.update(write_btm('Critical Hit!'))
+    #        sleep(1)
+    #    if type_ > 1:
+    #        display.update(write_btm("It's Super Effective!"))
+    #    elif 0 < type_ < 1:
+    #        display.update(write_btm("It wasn't", "very effective!"))
+    #    elif type_ == 0:
+    #        display.update(write_btm("It had no effect"))
+    #    sleep(1)
+    #    return dmg_pkmn(me.current, dmg, me = True)
+    #else:
+    #    display.update(write_btm('Enemy ' + opp.current.name, 'used {0}'.format(move.name.upper())))
+    #    sleep(1)
+    #    display.update(write_btm('Enemy ' + opp.current.name + "'s", 'attack missed'))
+    #    sleep(1)
 
 
 
@@ -674,7 +711,7 @@ def change_pokemon(me, opp):
                 return True
 
 
-def run_attack(me, opp):
+def run_attack(me, opp, mode):
     attacking(me)
     select = 0
     pygame.event.clear()
@@ -692,18 +729,19 @@ def run_attack(me, opp):
                     draw_choice(0)
                     return False
                 elif event.type == pygame.KEYDOWN and event.key == pygame.K_z:
-                    if me.current.moves[select].has_pp():
-                        return me.current.moves[select]
-                    else:
+                    if mode != 'pong':
                         clean_me_up(me)
-                        display.update(write_btm('No PP!'))
-                        wait_for_button()
-                        attacking(me)
+                        if usable_move(me.current.moves[select], mode):
+                            return me.current.moves[select]
+                        else:
+                            attacking(me)
+                    else:
+                        return me.current.moves[select]
 
                 update_attacking(me, select)
         else:
-            #TODO NO PP
-            return False
+            #TODO struggle text
+            return me.struggle()
 
 def draw_move(move):
     retval = []
@@ -758,7 +796,10 @@ def run_game(me, opp, mode):
                     selector -= 1
             elif ev.type == pygame.KEYDOWN and ev.key == pygame.K_z:
                 if selector == 0:
-                    my_move = run_attack(me, opp)
+                    if me.current.controllable:
+                        my_move = run_attack(me, opp, mode)
+                    else:
+                        my_move = me.current.lastmove
                     if my_move:
                         opp_move = wait_for_opp_move(opp, mode)
                         if my_move.name == 'Quick Attack' != opp_move.name == 'Quick Attack':
@@ -767,12 +808,12 @@ def run_game(me, opp, mode):
                                 clean_me_up(me)
                                 if not opp.current.alive():
                                     return 0
-                                run_opp_move(me, opp, opp_move)
+                                run_opp_move(me, opp, opp_move, False)
                                 if not me.current.alive():
                                     return 1
                             else:
                                 clean_me_up(me)
-                                run_opp_move(me, opp, opp_move)
+                                run_opp_move(me, opp, opp_move, True)
                                 if not me.current.alive():
                                     return 1
                                 run_move(me, opp, my_move)
@@ -780,22 +821,22 @@ def run_game(me, opp, mode):
                                     return 0
                         else:
                             if me.current.calc_speed() > opp.current.calc_speed():
-                                run_move(me, opp, my_move)
+                                run_move(me, opp, my_move, True)
                                 clean_me_up(me)
                                 if not opp.current.alive():
                                     return 0
-                                run_opp_move(me, opp, opp_move)
+                                run_opp_move(me, opp, opp_move, False)
                                 if not me.current.alive():
                                     return 1
                             else:
                                 clean_me_up(me)
-                                run_opp_move(me, opp, opp_move)
+                                run_opp_move(me, opp, opp_move, True)
                                 if not me.current.alive():
                                     return 1
-                                run_move(me, opp, my_move)
+                                run_move(me, opp, my_move, False)
                                 if not opp.current.alive():
                                     return 0
-                        return 3
+                        return 4
                 if selector == 2:
                     select = draw_choose_pkmn(me,opp)
                     clear()
@@ -834,9 +875,22 @@ def run_game(me, opp, mode):
                         selector = 0
                         draw_choice(0)
                     else:
-                        #TODO ESCAPE!
+                        F = (me.calc_speed() * 32)/(opp.calc_speed()/4) + 30 * me.fleecount
+                        if random.randint(0,255) < F:
+                            return 3
+                        else:
+                            display.update(write_btm("Failed to escape~"))
+                            sleep(2)
+                            run_opp_move(me, opp, opp_move)
+                            if not me.current.alive():
+                                return 1
+                            clearbtm()
+                            selector = 0
+                            draw_choice(0)
                         pass
             update_choice(selector)
     sleep(.1)
 
 
+from domove import do_move, usable_move
+from classes import pokemon

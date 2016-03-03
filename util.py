@@ -1,5 +1,7 @@
 from pygame.image import load
+from pygame import display
 images = 'images/'
+
 
 def loadalphaimg(img):
     return loadimg(img).convert_alpha()

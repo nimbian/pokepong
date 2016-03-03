@@ -63,15 +63,28 @@ def dmg_pkmn(pkmn, dmg, me):
     if pkmn.substitute == 0:
         if 'BIDE' in pkmn.buffs:
             pkmn.bidedmg += dmg * 2
-        for d in range(dmg):
-            pkmn.sethp(pkmn.hp-1)
-            if not me:
-                display.update(draw_my_hp(pkmn))
-            else:
-                display.update(draw_opp_hp(pkmn))
-            if pkmn.hp == 0:
-                return 1
-            sleep(.02)
+        if dmg > 0:
+            for d in range(dmg):
+                pkmn.sethp(pkmn.hp-1)
+                if not me:
+                    display.update(draw_my_hp(pkmn))
+                else:
+                    display.update(draw_opp_hp(pkmn))
+                if pkmn.hp == 0:
+                    return 1
+                sleep(.02)
+        else:
+            for d in range(0,dmg,-1):
+                if pkmn.maxhp == pkmn.hp:
+                    break
+                pkmn.sethp(pkmn.hp+1)
+                if not me:
+                    display.update(draw_my_hp(pkmn))
+                else:
+                    display.update(draw_opp_hp(pkmn))
+                sleep(.02)
+        print pkmn.hp
+
         return 0
     else:
         pkmn.substitute -= dmg
@@ -127,7 +140,7 @@ def do_move(attack, defend, move, mode, me, first):
                 elif move.name in RECOIL:
                     return recoil(attack,defend,move,me)
                 elif move.name in PROC:
-                    return proc(attack,defend,move,me)
+                    return proc(attack,defend,move,me,first)
                 elif move.name in ['Seismic Toss', 'Night Shade']:
                     return dmg_pkmn(defend, attack.lvl, me)
                 elif move.name == 'Psywave':
@@ -188,22 +201,22 @@ def do_move(attack, defend, move, mode, me, first):
             if move.name in RAISEABILITY:
                 raiseability(attack, move)
             elif move.name == 'Focus Energy':
-                attack.buffs += 'FCS'
+                attack.buffs.append('FCS')
             elif move.name == 'Splash':
                 write_btm('It had no effect')
             elif move.name == 'Haze':
                 attack.haze()
                 defend.haze()
             elif move.name == 'Reflect':
-                attack.buffs += 'REFL'
+                attack.buffs.append('REFL')
             elif move.name == 'Light Screen':
-                attack.buffs += 'SCREEN'
+                attack.buffs.append('SCREEN')
             elif move.name == 'Rest':
                 attack.buffs = ['SLP']
                 attack.sleep = 2
                 return dmg_pkmn(attack, dmg * -1, not me)
             elif move.name in HEAL:
-                return dmg_pkmn(attack, int(attack.hp/2) * -1, not me)
+                return dmg_pkmn(attack, int(attack.maxhp/2) * -1, not me)
             elif move.name == 'Substitute':
                 hp = int(attack.maxhp/4)
                 if hp > attack.hp:
@@ -225,7 +238,7 @@ def do_move(attack, defend, move, mode, me, first):
             elif move.name == 'Conversion':
                 convert(attack)
             elif move.name == 'Mist':
-                attack.buffs += 'MIST'
+                attack.buffs.append('MIST')
             elif move.name == 'Mirror Move':
                 if not first and defend.lastmove and defend.lastmove.name != 'Mirror Move':
                     return do_move(attack, defend, defend.lastmove, mode, me, first)
@@ -507,7 +520,7 @@ def burn(pokemon):
     if 'BRN' in pokemon.buffs:
         return
     else:
-        pokemon.buffs += 'BRN'
+        pokemon.buffs.append('BRN')
         display.update(write_btm(pokemon.name, 'was burned!'))
         sleep(1)
 
@@ -515,15 +528,17 @@ def freeze(pokemon):
     if 'FRZ' in pokemon.buffs:
         return
     else:
-        pokemon.buffs += 'FRZ'
+        pokemon.buffs.append('FRZ')
         display.update(write_btm(pokemon.name, 'has been frozen!'))
         sleep(1)
 
 def paralyze(pokemon):
     if 'PAR' in pokemon.buffs:
+        display.update(write_btm('but it failed'))
+        sleep(1)
         return
     else:
-        pokemon.buffs += 'PAR'
+        pokemon.buffs.append('PAR')
         display.update(write_btm(pokemon.name, 'was paralyzed!'))
         sleep(1)
 
@@ -531,7 +546,7 @@ def poisoned(pokemon):
     if 'PSN' in pokemon.buffs:
         return
     else:
-        pokemon.buffs += 'PSN'
+        pokemon.buffs.append('PSN')
         display.update(write_btm(pokemon.name, 'was poisoned!'))
         sleep(1)
 
@@ -540,7 +555,7 @@ def flinch(pokemon):
     if 'FLINCH' in pokemon.buffs:
         return
     else:
-        pokemon.buffs += 'FLINCH'
+        pokemon.buffs.append('FLINCH')
 
 def confuse(pokemon):
     if pokemon.confused > 0:
@@ -552,27 +567,33 @@ def confuse(pokemon):
 
 def sleeper(pokemon):
     if 'SLP' in pokemon.buffs:
+        display.update(write_btm('but it failed'))
+        sleep(1)
         return
     else:
         pokemon.sleep = randint(1,7)
-        pokemon.buffs += 'SLP'
+        pokemon.buffs.append('SLP')
         display.update(write_btm(pokemon.name, 'fell asleep!'))
         sleep(1)
 
 
 def poisoned(pokemon):
     if 'TOXIC' in pokemon.buffs:
+        display.update(write_btm('but it failed'))
+        sleep(1)
         return
     else:
-        pokemon.buffs += 'TOXIC'
+        pokemon.buffs.append('TOXIC')
         display.update(write_btm(pokemon.name, 'was badly poisoned!'))
         sleep(1)
 
 def leech(pokemon):
     if 'SEED' in pokemon.buffs:
+        display.update(write_btm('but it failed'))
+        sleep(1)
         return
     else:
-        pokemon.buffs += 'SEED'
+        pokemon.buffs.append('SEED')
         display.update(write_btm(pokemon.name, 'was seeded!'))
         sleep(1)
 
@@ -587,10 +608,10 @@ def preping(attack, move):
     elif move.name == 'Sky Attack':
         display.update(write_btm(pokemon.name, "started to glow"))
     elif move.name == 'Fly':
-        attack.buffs += 'Fly'
+        attack.buffs.append('Fly')
         display.update(write_btm(pokemon.name, "flew up high"))
     elif move.name == 'Dig':
-        attack.buffs += 'DIG'
+        attack.buffs.append('DIG')
         display.update(write_btm(pokemon.name, "dug underground"))
     sleep(1)
 

@@ -30,8 +30,8 @@ if __name__ == '__main__':
     #        count += 1
     #    current = scrolling(current, possible)
     #    sleep(5)
-    mypkmn = [9,150,149,6,25,100]
-    opppkmn = [9,150,149,6,25,100]
+    mypkmn = [1,150,149,6,25,100]
+    opppkmn = [7,150,149,6,25,100]
     myname = 'ASD'
     oppname = 'TEst2'
     mypkmn = build_team(mypkmn, me = True)
@@ -66,6 +66,9 @@ if __name__ == '__main__':
                 me_next_mon(me, opp, mode)
             else:
                 lost(me,mode)
+        elif tmp == 3:
+            pass
+            #TODO escape
 
 
 

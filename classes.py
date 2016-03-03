@@ -1,9 +1,13 @@
 from sqlite3 import connect
 from random import randint,random
 from util import loadalphaimg
+from logic import write_btm
+from pygame import display
+from time import sleep
 
-normal=['Bug','Dragon','Fighting','Flying','Grass','Ground','Normal','Rock']
-special=['Electric','Fire','Ghost','Ice','Poison','Psychic','Water']
+normal=['Normal','Fighting','Poison','Ground','Flying','Bug','Rock','Ghost']
+special=['Fire','Water','Electric','Grass','Ice','Psychic','Dragon']
+
 stat_stages=[1/4., 2/7., 2/6., 2/5., 1/2., 2/3., 1, 3/2., 2, 5/2., 3, 7/2., 4]
 
 from math import floor
@@ -16,20 +20,41 @@ class pokemon:
         self.sleep = -1
         conn = connect('shawn')
         c = conn.cursor()
-        tmp = c.execute("SELECT * from pkmn where id = '{0}'".format(number)).fetchone()
+        tmp = c.execute("SELECT * from pokemon where id = '{0}'".format(number)).fetchone()
+        self.lvl = 10
         self.name = tmp[1]
-        self.hp = self.calchp(tmp[2])
+        self.hp = self.calchp(int(tmp[2]))
         self.maxhp = self.hp
-        self.attack = tmp[3]
-        self.defense = tmp[4]
-        self.speed = tmp[5]
-        self.special = tmp[6]
-        self.lvl = 50
-        self.type1 = 'Normal'
-        self.type2 = None
-        self.moves = [move('Tackle'),move('Water Gun'),move('Hydro Pump'),move('Bubblebeam')]
+        self.attack = int(tmp[3])
+        self.defense = int(tmp[4])
+        self.speed = int(tmp[5])
+        self.special = int(tmp[6])
+        self.exptogain = int(tmp[7])
+        self.type1 = tmp[8]
+        self.type2 = tmp[9]
+        cmd = "SELECT move from learnablemoves where id = '{0}' and learnedat < {1} order by rowid".format(number, self.lvl)
+        tmp = c.execute(cmd).fetchall()
+        self.moves = []
+        for i in tmp[-4:]:
+            self.moves.append(move(i[0]))
         self.sprite1 = self.set_sprite1()
         self.sprite2 = self.set_sprite2()
+        self.fleecount = 0
+        self.lastmove = ''
+        self.lastcount = 0
+        self.controllable = True
+        self.disabled = 0
+        self.substitute = 0
+        self.struggle = move('Struggle')
+        self.bidecnt = -1
+        self.bidedmg = 0
+        self.wrapped = 0
+        self.thrashing = -1
+        self.rage = False
+        #TODO what to do with payday
+        self.payday = 0
+        self.confused = 0
+
 
 
     def set_sprite1(self):
@@ -38,8 +63,8 @@ class pokemon:
     def set_sprite2(self):
         return loadalphaimg('mon2.png')
 
-    def calchp(self, hp, lvl = 50, E = 0, I = randint(0,15)):
-        hp = floor((2 * hp + I + E) * lvl / 100. + lvl + 10)
+    def calchp(self, hp, E = 0, I = randint(0,15)):
+        hp = floor((2 * hp + I + E) * self.lvl / 100. + self.lvl + 10)
         return int(hp)
 
     def calcstat(self, stat, lvl = 50, E = 0, I = randint(0,15)):
@@ -81,47 +106,48 @@ class pokemon:
 
     def raise_attack(self, diff):
         new_attack = self.attack_stage + diff
-        if valid_stat(new_attack):
+        if self.valid_stat(new_attack):
             return False
         self.attack_stage = new_attack
         return True
 
     def raise_defense(self, diff):
         new_defense = self.defense_stage + diff
-        if valid_stat(new_defense):
+        if self.valid_stat(new_defense):
             return False
         self.defense_stage = new_defense
         return True
 
     def raise_speed(self, diff):
         new_speed = self.speed_stage + diff
-        if valid_stat(new_speed):
+        if self.valid_stat(new_speed):
             return False
         self.speed_stage = new_speed
         return True
 
     def raise_special(self, diff):
         new_special = self.special_stage + diff
-        if valid_stat(new_special):
+        if self.valid_stat(new_special):
             return False
         self.special_stage = new_special
         return True
 
     def raise_accuracy(self, diff):
         new_accuracy = self.accuracy_stage + diff
-        if valid_stat(new_accuracy):
+        if self.valid_stat(new_accuracy):
             return False
         self.accuracy_stage = new_accuracy
         return True
 
     def raise_evasion(self, diff):
         new_evasion = self.evasion_stage + diff
-        if valid_stat(new_evasion):
+        if self.valid_stat(new_evasion):
             return False
         self.evasion_stage = new_evasion
         return True
 
     def haze(self):
+        #TODO TOXIC to PSN?
         self.attack_stage = 0
         self.defense_stage = 0
         self.speed_stage = 0
@@ -134,20 +160,53 @@ class pokemon:
     def heal(self, amount):
         self.hp += amount
 
-    def do_status(self, opppkmn):
+    def do_status(self, opppkmn, me):
+        from domove import dmg_pkmn
         if 'BRN' in self.buffs:
-            self.hp -= self.maxhp*(1/8.)
+            retval = dmg_pkmn(self, int(self.maxhp*(1/8.)), not me)
+            if me:
+                display.update(write_btm(self.name + 'was', 'hurt by the burn'))
+            else:
+                display.update(write_btm('Enemy' + self.name + 'was', 'hurt by the burn'))
+            sleep(1)
+            if retval:
+                return 1
         if 'PSN' in self.buffs:
-            self.hp -= self.maxhp*(1/8.)
-        if 'seed' in self.buffs:
-            opppkmn.heal(max(self.hp, self.maxhp*(1/16.)))
-            self.hp -= self.maxhp*(1/16.)
-        if 'toxic' in self.buffs:
+            retval = dmg_pkmn(self, int(self.maxhp*(1/8.)), not me)
+            if me:
+                display.update(write_btm(self.name + 'was', 'hurt by the poison'))
+            else:
+                display.update(write_btm('Enemy' + self.name + 'was', 'hurt by the poison'))
+            sleep(1)
+            if retval:
+                return 1
+        if 'SEED' in self.buffs:
+            retval = dmg_pkmn(self, int(self.maxhp*(1/16.)), not me)
+            dmg_pkmn(opppkmn, (int(self.maxhp*(1/16.)) * -1), me)
+            #TODO leech words
+            display.update(write_btm('Leeched'))
+            sleep(1)
+            if retval:
+                return 1
+        if 'TOXIC' in self.buffs:
             self.hp -= self.maxhp*(tticks/8.)
+            retval = dmg_pkmn(self, int(self.maxhp*(1/8.)), not me)
+            if me:
+                display.update(write_btm(self.name + 'was', 'hurt by the poison'))
+            else:
+                display.update(write_btm('Enemy' + self.name + 'was', 'hurt by the poison'))
             tticks += 1
+            sleep(1)
+            if retval:
+                return 1
+        if self.disabled > 0:
+            self.disabled -= 1
 
-    def attempt_move(self):
+    def attempt_move(self, me):
+        from domove import dmg_pkmn
         #TODO keep sleep a bit OP?
+        #TODO handle words here
+        #TODO finish confusion
         if 'FRZ' in self.buffs:
             return 'FRZ'
         if 'PAR' in self.buffs:
@@ -163,6 +222,18 @@ class pokemon:
             else:
                 self.sleep -= 1
                 return 'SLP'
+        if self.confused > 0:
+            display.update(write_btm(self.name, 'is confused'))
+            self.confused -= 1
+            if choice([True, False]):
+                display.update(write_btm(self.name + 'hurt itself', "in it's confusion"))
+                return dmg_pkmn(self, self.calc_dmg(self, 'CNF'))
+            else:
+                return True
+        elif self.confused == 0:
+            display.update(write_btm(self.name, 'is confused no more'))
+            self.confused -= 1
+            return True
         return True
 
 
@@ -262,19 +333,22 @@ class pokemon:
             dmg *= .5
         if move.type_ in normal and 'SCREEN' in opppkmn.buffs:
             dmg *= .5
-        return [crit, type_ > 1, int(dmg)]
+        return [crit, type_, int(dmg)]
 
 
     def hit_or_miss(self, opppkmn, move):
-        if move.name == 'Swift':
-            return random() < move.acc/256.
-        if 'fly' in opppkmn.buffs or 'dig' in opppkmn.buffs:
-            return False
-        acc = move.acc * self.calc_accuracy() * opppkmn.calc_evasion()
-        chance = acc/256.
-        if chance > 255/256.:
-            chance = 255/256.
-        return random() < chance
+        if move.acc:
+            if move.name == 'Swift':
+                return random() < move.acc/256.
+            if 'FLY' in opppkmn.buffs or 'DIG' in opppkmn.buffs:
+                return False
+            acc = move.acc * self.calc_accuracy() * opppkmn.calc_evasion()
+            chance = acc/256.
+            if chance > 255/256.:
+                chance = 255/256.
+            return random() < (chance / [1,2][self.confused >= 0])
+        else:
+            return True
 
     def pp_left(self):
         return sum(i.pp for i in self.moves) > 0
@@ -282,20 +356,58 @@ class pokemon:
     def alive(self):
         return self.hp > 0
 
+    def inc_flee(self):
+        self.fleecount += 1
+
+    def list_moves(self):
+        moves = []
+        for i in self.moves:
+            moves += i.name
+        return moves
+
+    def transform(self, defend):
+        self.attack = defend.attack
+        self.defense = defend.defense
+        self.speed = defend.speed
+        self.special = defend.special
+        self.type1 = defend.type1
+        self.type2 = defend.type2
+        self.moves = defend.moves
+        self.attack_stage = defend.attack_stage
+        self.defense_stage = defend.defense_stage
+        self.speed_stage = defend.speed_stage
+        self.special_stage = defend.special_stage
+        self.accuracy_stage = defend.accuracy_stage
+        self.evasion_stage = defend.evasion_stage
+        for i in self.move:
+            self.pp = 5
+            self.maxpp = 5
+
+
 
 
 class move:
     def __init__(self,name):
-        conn = connect('/home/brian.j.ramsel/shawn/shawn')
+        conn = connect('shawn')
         c = conn.cursor()
         tmp = c.execute("SELECT * from moves where move = '{0}'".format(name)).fetchone()
-        self.name = name
-        self.type_ = tmp[1]
-        self.pp = tmp[2]
-        self.maxpp = tmp[2]
-        self.power = tmp[3]
-        self.acc = tmp[4]
+        self.name = str(name)
+        self.type_ = str(tmp[1])
+        self.pp = int(tmp[2])
+        self.maxpp = int(tmp[2])
+        try:
+            self.power = int(tmp[3])
+        except ValueError:
+            self.power = None
+        try:
+            self.acc = int(tmp[4])
+        except ValueError:
+            self.acc = None
+
         self.high_crit = False
+        if self.name in ['Crabhammer','Slash','Karate Chop','Razor lear']:
+            self.high_crit = True
+        self.disabled = False
 
     def usepp(self):
         self.pp -= 1
@@ -327,3 +439,8 @@ class trainer:
 
     def get_current_index(self):
         return self.pkmn.index(self.current)
+
+    def get_payday(self):
+        cash = 0
+        for i in pkmn:
+            cash += i.payday
