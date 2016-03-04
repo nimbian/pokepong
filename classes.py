@@ -4,6 +4,7 @@ from util import loadalphaimg
 from logic import write_btm
 from pygame import display
 from time import sleep
+from math import ceil
 
 normal=['Normal','Fighting','Poison','Ground','Flying','Bug','Rock','Ghost']
 special=['Fire','Water','Electric','Grass','Ice','Psychic','Dragon']
@@ -12,7 +13,7 @@ stat_stages=[1/4., 2/7., 2/6., 2/5., 1/2., 2/3., 1, 3/2., 2, 5/2., 3, 7/2., 4]
 
 from math import floor
 class pokemon:
-    def __init__(self, number, owned = False):
+    def __init__(self, number, moveset = None):
         self.attack_stage = self.defense_stage = self.speed_stage = self.special_stage = 0
         self.accuracy_stage = self.evasion_stage = 0
         self.buffs = []
@@ -20,8 +21,9 @@ class pokemon:
         self.sleep = -1
         conn = connect('shawn')
         c = conn.cursor()
+    
         tmp = c.execute("SELECT * from pokemon where id = '{0}'".format(number)).fetchone()
-        self.lvl = 10
+        self.lvl = 50
         self.name = tmp[1]
         self.hp = self.calchp(int(tmp[2]))
         self.maxhp = self.hp
@@ -32,11 +34,20 @@ class pokemon:
         self.exptogain = int(tmp[7])
         self.type1 = tmp[8]
         self.type2 = tmp[9]
-        cmd = "SELECT move from learnablemoves where id = '{0}' and learnedat < {1} order by rowid".format(number, self.lvl)
-        tmp = c.execute(cmd).fetchall()
+        if moveset:
+            tmp = c.execute("SELECT * from tmp where rowid = '{0}'".format(int(ceil(int(moveset)*2))- 1)).fetchone()
+
+            
+        else:
+            
+            cmd = "SELECT move from learnablemoves where id = '{0}' and learnedat < {1} order by rowid".format(number, self.lvl)
+            tmp2 = c.execute(cmd).fetchall()
+            tmp = []
+            for x in tmp2[-4:]:
+                tmp.append(x[0])
         self.moves = []
         for i in tmp[-4:]:
-            self.moves.append(move(i[0]))
+            self.moves.append(move(i))
         self.sprite1 = self.set_sprite1()
         self.sprite2 = self.set_sprite2()
         self.fleecount = 0
@@ -54,6 +65,7 @@ class pokemon:
         #TODO what to do with payday
         self.payday = 0
         self.confused = 0
+        self.bide = False
 
 
 
@@ -308,7 +320,7 @@ class pokemon:
     def calc_dmg(self, opppkmn, move):
         stab = [1,1.5][self.type1 == move.type_ or self.type2 == move.type_]
         crit = self.crit_hit(move.high_crit)
-        conn = connect('/home/brian.j.ramsel/shawn/shawn')
+        conn = connect('shawn')
         c = conn.cursor()
         type_ = 1
         if opppkmn.type2:

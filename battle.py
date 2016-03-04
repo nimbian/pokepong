@@ -1,6 +1,7 @@
 from logic import *
 from classes import trainer
 from sqlite3 import connect
+import argparse
 
 if __name__ == '__main__':
     poss = [1,4,7,25,143,132,129,123,95,92,77,13,17,21,35]
@@ -30,11 +31,20 @@ if __name__ == '__main__':
     #        count += 1
     #    current = scrolling(current, possible)
     #    sleep(5)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("moveset1")
+    parser.add_argument("moveset2")
+    parser.add_argument("moveset3")
+    parser.add_argument("moveset4")
+    parser.add_argument("moveset5")
+    parser.add_argument("moveset6")
+    args = parser.parse_args()
+    moveset = [args.moveset1,args.moveset2,args.moveset3,args.moveset4,args.moveset5,args.moveset6]
     mypkmn = [1,150,149,6,25,100]
     opppkmn = [7,150,149,6,25,100]
-    myname = 'ASD'
-    oppname = 'TEst2'
-    mypkmn = build_team(mypkmn, me = True)
+    myname = 'Player1'
+    oppname = 'Player2'
+    mypkmn = build_team(mypkmn, me = True, moveset = moveset)
     opppkmn = build_team(opppkmn)
     me = trainer(myname, mypkmn)
     opp = trainer(oppname, opppkmn)

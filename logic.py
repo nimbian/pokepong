@@ -270,14 +270,17 @@ def scrolling(current,possible):
         display.update([x+1,520,width + 1, height])
     return current
 
-def build_team(pkmn, me = False):
+def build_team(testpkmn, me = False, moveset = None):
     team = []
-    for i in pkmn:
-        team.append(pokemon(i))
-        if me:
-            pkmn = loadimg('backs/{0}.PNG'.format(i)).convert()
+    for i in range(0, len(testpkmn)):
+        if moveset:
+            team.append(pokemon(testpkmn[i], moveset = moveset[i]))
         else:
-            pkmn = loadimg('fronts/{0}.PNG'.format(i)).convert()
+            team.append(pokemon(testpkmn[i]))
+        if me:
+            pkmn = loadimg('backs/{0}.PNG'.format(testpkmn[i])).convert()
+        else:
+            pkmn = loadimg('fronts/{0}.PNG'.format(testpkmn[i])).convert()
         pkmn.set_colorkey((255,255,255))
         team[-1].setimg(pkmn)
     return team
@@ -847,7 +850,7 @@ def run_game(me, opp, mode):
                         draw_all_me(me.current)
                         if opp_move.__class__.__name__ == 'move':
                             if opp_move.name == 'Quick Attack' or opp.current.calc_speed() > me.current.calc_speed():
-                                run_opp_move(me,opp,opp_move)
+                                run_opp_move(me,opp,opp_move, True)
                                 sleep(2)
                                 if not me.current.alive:
                                     return 1
@@ -860,7 +863,7 @@ def run_game(me, opp, mode):
                                 me.set_current(select)
                                 pop_ball(me.current.name)
                                 draw_all_me(me.current)
-                                run_opp_move(me,opp,opp_move)
+                                run_opp_move(me,opp,opp_move, True)
                                 if not me.current.alive:
                                     return 1
                     draw_all_me(me.current)

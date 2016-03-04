@@ -4,6 +4,7 @@ from logic import write_btm, draw_opp_hp, draw_my_hp, wait_for_button, clean_me_
 from time import sleep
 from classes import move as oneoff
 from copy import deepcopy
+from math import floor
 DISABLE = ['Counter', 'Bide', 'Dig', 'Fly']
 FLAT = ['Sonicboom', 'Dragon Rage']
 MULTI = ['Spike Cannon', 'Comet Punch', 'Barrage', 'Doubleslap', 'Fury Attack', 'Pin Missile', 'Fury Swipes']
@@ -61,7 +62,7 @@ def usable_move(move, mode):
 
 def dmg_pkmn(pkmn, dmg, me):
     if pkmn.substitute == 0:
-        if 'BIDE' in pkmn.buffs:
+        if pkmn.bide:
             pkmn.bidedmg += dmg * 2
         if dmg > 0:
             for d in range(dmg):
@@ -83,7 +84,6 @@ def dmg_pkmn(pkmn, dmg, me):
                 else:
                     display.update(draw_opp_hp(pkmn))
                 sleep(.02)
-        print pkmn.hp
 
         return 0
     else:
@@ -262,6 +262,10 @@ def do_move(attack, defend, move, mode, me, first):
             attack.controllable = True
             return 0
         elif attack.lastmove.name in PREP:
+            if me:
+                display.update(write_btm(attack.name, 'used {0}'.format(move.name.upper())))
+            else:
+                display.update(write_btm('Enemy ' + attack.name, 'used {0}'.format(move.name.upper())))
             if attack.lastmove.name == 'Fly':
                 attack.buffs.pop(attack.buffs.index('FLY'))
             if attack.lastmove.name == 'Dig':
@@ -280,19 +284,22 @@ def do_move(attack, defend, move, mode, me, first):
             if attack.bidecnt == 0:
                 attack.controllable = True
                 if defend.type1 != 'Ghost':
-                    attack.bidedmg = 0
-                    attack.bidecnt = -1
-                    return dmg_pkmn(defend, attack.bidedmg, me)
+                    retval = dmg_pkmn(defend, attack.bidedmg, me)
                 else:
                     display.update(write_btm(defend.name, 'was unaffected'))
-                    return 0
+                    retval = 0
+                attack.bidedmg = 0
+                attack.bidecnt = -1
+                attack.bide = False
+                return retval
             else:
                 display.update(write_btm(attack.name, 'is biding time'))
+                sleep(1)
                 attack.bidecnt -= 1
         elif attack.lastmove.name in WRAP:
             display.update(write_btm(attack.name+ "'s", 'attack continues'))
-            defend.wrap -= 1
-            if defend.wrap == 0:
+            defend.wrapped -= 1
+            if defend.wrapped == 0:
                 attack.controllable = True
             return do_attacks(attack,defend,move,me)
         elif attack.lastmove.name in THRASH:
@@ -315,6 +322,7 @@ def do_attacks(attack, defend, move, me, times = 1):
         retval = dmg_pkmn(defend, dmg, me)
         if crit:
             display.update(write_btm('Critical Hit!'))
+        sleep(1)
     if crit:
         sleep(1)
     if type_ > 1:
@@ -333,7 +341,7 @@ def multi(attack, defend, move, me):
     multi = [2,2,2,3,3,3,4,5]
     times = choice(multi)
     retval = do_attacks(attack, defend, move, me, times = times)
-    write_btm('hit {0} times!'.format(times))
+    display.update(write_btm('hit {0} times!'.format(times)))
     sleep(1)
     return retval
 
@@ -382,6 +390,8 @@ def absorb(attack, defend, move, me):
 
 def double(attack, defend, move, me):
     retval = do_attacks(attack, defend, move, me, times = 2)
+    display.update(write_btm('hit {0} times!'.format(times)))
+    sleep(1)
     if move.name == 'Twineedle' and random() < .2:
         poisoned(defend)
     return retval
@@ -600,19 +610,19 @@ def leech(pokemon):
 def preping(attack, move):
     attack.controllable = False
     if move.name == 'Skull Bash':
-        display.update(write_btm(pokemon.name,  "lowered it's head"))
+        display.update(write_btm(attack.name,  "lowered it's head"))
     elif move.name == 'Solar Beam':
-        display.update(write_btm(pokemon.name, "is charging up"))
+        display.update(write_btm(attack.name, "is charging up"))
     elif move.name == 'Razor Wind':
-        display.update(write_btm(pokemon.name, "is charging up"))
+        display.update(write_btm(attack.name, "is charging up"))
     elif move.name == 'Sky Attack':
-        display.update(write_btm(pokemon.name, "started to glow"))
+        display.update(write_btm(attack.name, "started to glow"))
     elif move.name == 'Fly':
         attack.buffs.append('Fly')
-        display.update(write_btm(pokemon.name, "flew up high"))
+        display.update(write_btm(attack.name, "flew up high"))
     elif move.name == 'Dig':
         attack.buffs.append('DIG')
-        display.update(write_btm(pokemon.name, "dug underground"))
+        display.update(write_btm(attack.name, "dug underground"))
     sleep(1)
 
 def disable(defend):
@@ -637,3 +647,6 @@ def convert(defend):
     else:
         display.update(write_btm('but if failed!'))
         sleep(1)
+
+def bide(attack):
+    attack.bide = True
