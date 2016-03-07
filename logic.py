@@ -1,11 +1,13 @@
 from pygame import image, draw, display, event
 import pygame
 from util import loadimg, loadalphaimg, alphabet
-from random import choice, randint
+from util import choice, randint
 from time import sleep
 from math import ceil,floor
 from sqlite3 import connect
+import json
 
+#TODO if speeds are equal me will go first.  me is different on client vs server
 
 SIZE = (1280,1024)
 WHITE = (253, 236, 254)
@@ -34,13 +36,14 @@ TRAINER = loadalphaimg('trainer.png')
 TRAINERBACK = loadalphaimg('trainerback.png')
 POKE1 = loadalphaimg('poke1.png')
 POKE2 = loadalphaimg('poke2.png')
+ITEMS = loadalphaimg('items.png')
 
 SSIZE = [392,392]
 BTM_TUPLE = (10, SIZE[1]-340)
 
 MYHPBAR_RECT = [SIZE[0] - 700, SIZE[1]-505, MYHP.get_width(), MYHP.get_height()]
 MYHP_RECT = [SIZE[0]-532, SIZE[1]-486, 399, 14]
-MYPKMN = [59,SIZE[1]-740]
+MYPKMN = [59,SIZE[1]-736]
 
 OPPHPBAR_RECT = [80, 120, 602, 91]
 OPPHP_RECT = [227,141,399,15]
@@ -270,17 +273,14 @@ def scrolling(current,possible):
         display.update([x+1,520,width + 1, height])
     return current
 
-def build_team(testpkmn, me = False, moveset = None):
+def build_team(testpkmn, me = False):
     team = []
     for i in range(0, len(testpkmn)):
-        if moveset:
-            team.append(pokemon(testpkmn[i], moveset = moveset[i]))
-        else:
-            team.append(pokemon(testpkmn[i]))
+        team.append(pokemon(*testpkmn[i]))
         if me:
-            pkmn = loadimg('backs/{0}.PNG'.format(testpkmn[i])).convert()
+            pkmn = loadimg('backs/{0}.PNG'.format(team[-1].id)).convert()
         else:
-            pkmn = loadimg('fronts/{0}.PNG'.format(testpkmn[i])).convert()
+            pkmn = loadimg('fronts/{0}.PNG'.format(team[-1].id)).convert()
         pkmn.set_colorkey((255,255,255))
         team[-1].setimg(pkmn)
     return team
@@ -333,19 +333,22 @@ def update_choice(select):
     display.update(dirty)
 
 
-def me_next_mon(me, opp, mode):
+
+def me_next_mon(me, opp, mode, socket):
+    send_val = draw_choose_pkmn(me, opp, mydeath = True)
     if mode == 'battle':
-        pkmn = opp_change_pkmn()
-        if opp.current != pkmn:
+        socket.send(str(send_val))
+        tmp = int(socket.recv())
+        if opp.current != opp.pkmn[tmp]:
+            opp.set_current(tmp)
+            #TODO animate swap
             pass
-            #TODO swap opp pkmn
-    draw_choose_pkmn(me, opp, mydeath = True)
     draw_all_opp(opp.current)
 
 
 
 
-def opp_next_mon(me, opp, mode):
+def opp_next_mon(me, opp, mode, socket):
     display.update(draw.rect(SCREEN, WHITE, [230,60,180,60]))
     display.update(draw.rect(SCREEN, WHITE, [60,1,600,60]))
     display.update(draw_opp_poke_balls(opp.pkmn))
@@ -354,7 +357,7 @@ def opp_next_mon(me, opp, mode):
     elif mode == 'pong':
         opp.get_next_pkmn()
     elif mode == 'battle':
-        opp.set_current(wait_for_opp_next_mon())
+        opp.set_current(wait_for_opp_next_mon(socket))
     display.update(write_btm(opp.name +' is', 'about to use'))
     if mode != 'pong':
         wait_for_button()
@@ -367,6 +370,7 @@ def opp_next_mon(me, opp, mode):
         sleep(1)
     if mode != 'pong':
         change_pokemon(me, opp)
+        socket.send(str(me.get_current_index()))
     else:
         no_change()
     dirty = []
@@ -443,6 +447,52 @@ def update_attacking(me, selector):
     dirty.extend(draw_move(me.current.moves[selector]))
     display.update(dirty)
 
+
+def draw_items(me, select):
+    clearbtm()
+    dirty = []
+    dirty.append(draw.rect(SCREEN, WHITE, [308, SIZE[1]-891, ITEMS.get_width(), ITEMS.get_height()]))
+    dirty.append(SCREEN.blit(ITEMS, (10, SIZE[1]-880)))
+    c = 0
+    for i in me.shownitems:
+        if c == select:
+            word_builder('>', 360, 200 + c * 120)
+        else:
+            word_builder(' ', 360, 200 + c * 120)
+        word_builder(i[0], 420,200 + c * 120)
+        if i[1] < 10:
+            num = '  ' + str(i[1])
+        elif i[1] < 100:
+            num = ' ' + str(i[1])
+        else:
+            num = str(i[1])
+        word_builder('*' + num, 820, 260 + c * 120)
+        c += 1
+    display.update(dirty)
+
+def update_items(me, select):
+    dirty = []
+    c = 0
+    dirty.append(draw.rect(SCREEN, WHITE, [360, SIZE[1]-830, 700, 490]))
+    for i in me.shownitems:
+        if c == select:
+            dirty.append(word_builder('>', 360, 200 + c * 120))
+        else:
+            dirty.append(word_builder(' ', 360, 200 + c * 120))
+        dirty.append(word_builder(i[0], 420, 200 + c * 120))
+        if i[0] != 'CANCEL':
+            if i[1] < 10:
+                num = '  ' + str(i[1])
+            elif i[1] < 100:
+                num = ' ' + str(i[1])
+            else:
+                num = str(i[1])
+            dirty.append(word_builder('*' + num, 820, 260 + c * 120))
+            c += 1
+    display.update(dirty)   
+
+
+
 def clean_me_up(me):
     dirty = []
     dirty.append(clearbtm())
@@ -482,29 +532,10 @@ def run_move(me, opp, move, first):
     retval = do_move(me.current, opp.current, move, 'tmp', True, first)
     me.current.do_status(opp.current, True)
     return retval
-    #if move.pp > 0:
-    #    move.usepp()
-    #    if me.current.hit_or_miss(opp.current, move):
-    #        crit, type_, dmg = me.current.calc_dmg(opp.current, move)
-    #        display.update(write_btm(me.current.name, 'used {0}'.format(move.name.upper())))
-    #        sleep(1)
-    #        if crit:
-    #            display.update(write_btm('Critical Hit!'))
-    #            sleep(1)
-    #        if type_ > 1:
-    #            display.update(write_btm("It's Super Effective!"))
-    #        elif 0 < type_ < 1:
-    #            display.update(write_btm("It wasn't", "very effective!"))
-    #        elif type_ == 0:
-    #            display.update(write_btm("It had no effect"))
-    #        sleep(1)
-    #        return dmg_pkmn(opp.current, dmg)
-    #    else:
-    #        display.update(write_btm(me.current.name, 'used {0}'.format(move.name.upper())))
-    #        sleep(1)
-    #        display.update(write_btm(me.current.name + "'s", 'attack missed!'))
-    #        sleep(1)
 
+def run_opp_swap(opp, val):
+    opp.set_current(val)
+    draw_all_opp(opp.current)
 
 
 def wait_for_button():
@@ -560,6 +591,27 @@ def update_choose(old, new, me):
     display.update(dirty)
 
 
+
+def draw_choose_items(me):
+    selector = 0
+    draw_items(me, selector)
+    pygame.event.clear()
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
+                if selector > 0:
+                    selector -= 1
+                    update_items(me, selector)
+                elif me.shownitems[0] != me.items[0]:
+                    me.shift_items_left()
+                    update_items(me, selector)
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
+                if selector < 2:
+                    selector += 1
+                    update_items(me, selector)
+                elif me.shownitems[-1] != me.items[-1]:
+                    me.shift_items_right()
+                    update_items(me, selector)
 
 
 
@@ -637,50 +689,27 @@ def draw_choose_pkmn(me, opp, oppdeath = False, mydeath = False):
 
 
 
-def wait_for_opp_move(opp,mode):
+def wait_for_opp_move(opp,mymove, mode,socket):
     if mode == 'random' or mode == 'wild':
         #TODO PP check
         return opp.current.moves[randint(0,len(opp.current.moves)-1)]
     else:
+        socket.send(json.dumps(mymove))
+        display.update(write_btm('Waiting for opponenet'))
+        x = json.loads(socket.recv())
+        return x
         #TODO OPP wait
         pass
 
-def wait_for_opp_next_mon():
-    #TODO waiting for opp
-    pass
+def wait_for_opp_next_mon(socket):
+    display.update(write_btm('Waiting for opponenet'))
+    return int(socket.recv())
 
 def run_opp_move(me, opp, move, first):
     opp.current.attempt_move(False)
     retval = do_move(opp.current, me.current, move, 'tmp', False, first)
     opp.current.do_status(me.current, False)
     return retval
-    #move.usepp()
-    #if opp.current.hit_or_miss(me.current, move):
-    #    crit, type_, dmg = opp.current.calc_dmg(opp.current, move)
-    #    display.update(write_btm('Enemy ' + opp.current.name, 'used {0}'.format(move.name.upper())))
-    #    sleep(1)
-    #    if crit:
-    #        display.update(write_btm('Critical Hit!'))
-    #        sleep(1)
-    #    if type_ > 1:
-    #        display.update(write_btm("It's Super Effective!"))
-    #    elif 0 < type_ < 1:
-    #        display.update(write_btm("It wasn't", "very effective!"))
-    #    elif type_ == 0:
-    #        display.update(write_btm("It had no effect"))
-    #    sleep(1)
-    #    return dmg_pkmn(me.current, dmg, me = True)
-    #else:
-    #    display.update(write_btm('Enemy ' + opp.current.name, 'used {0}'.format(move.name.upper())))
-    #    sleep(1)
-    #    display.update(write_btm('Enemy ' + opp.current.name + "'s", 'attack missed'))
-    #    sleep(1)
-
-
-
-
-
-
 
 
 def change_pokemon(me, opp):
@@ -780,7 +809,7 @@ def win(me, opp, mode):
 
 
 
-def run_game(me, opp, mode):
+def run_game(me, opp, mode, socket):
     selector = 0
     pygame.event.clear()
     while True:
@@ -804,54 +833,87 @@ def run_game(me, opp, mode):
                     else:
                         my_move = me.current.lastmove
                     if my_move:
-                        opp_move = wait_for_opp_move(opp, mode)
-                        if my_move.name == 'Quick Attack' != opp_move.name == 'Quick Attack':
+                        tmp, opp_move = wait_for_opp_move(opp, ['move', me.current.moves.index(my_move)], mode, socket)
+                        if tmp == 'move':
+                            opp_move = opp.current.moves[opp_move]
+                            if my_move.name == 'Quick Attack' != opp_move.name == 'Quick Attack':
+                                if my_move.name == 'Quick Attack':
+                                    run_move(me, opp, my_move)
+                                    clean_me_up(me)
+                                    if not opp.current.alive():
+                                        return 0
+                                    run_opp_move(me, opp, opp_move, False)
+                                    if not me.current.alive():
+                                        return 1
+                                else:
+                                    clean_me_up(me)
+                                    run_opp_move(me, opp, opp_move, True)
+                                    if not me.current.alive():
+                                        return 1
+                                    run_move(me, opp, my_move)
+                                    if not opp.current.alive():
+                                        return 0
+                            else:
+                                if me.current.calc_speed() > opp.current.calc_speed():
+                                    
+                                    run_move(me, opp, my_move, True)
+                                    clean_me_up(me)
+                                    if not opp.current.alive():
+                                        return 0
+                                    run_opp_move(me, opp, opp_move, False)
+                                    if not me.current.alive():
+                                        return 1
+                                else:
+
+                                    clean_me_up(me)
+                                    run_opp_move(me, opp, opp_move, True)
+                                    if not me.current.alive():
+                                        return 1
+                                    run_move(me, opp, my_move, False)
+                                    if not opp.current.alive():
+                                        return 0
+                        elif tmp == 'swap':
                             if my_move.name == 'Quick Attack':
-                                run_move(me, opp, my_move)
-                                clean_me_up(me)
-                                if not opp.current.alive():
-                                    return 0
-                                run_opp_move(me, opp, opp_move, False)
-                                if not me.current.alive():
-                                    return 1
+                                    run_move(me, opp, my_move, True)
+                                    clean_me_up(me)
+                                    if not opp.current.alive():
+                                        return 0
+                                    run_opp_swap(opp, opp_move)
                             else:
-                                clean_me_up(me)
-                                run_opp_move(me, opp, opp_move, True)
-                                if not me.current.alive():
-                                    return 1
-                                run_move(me, opp, my_move)
-                                if not opp.current.alive():
-                                    return 0
-                        else:
-                            if me.current.calc_speed() > opp.current.calc_speed():
-                                run_move(me, opp, my_move, True)
-                                clean_me_up(me)
-                                if not opp.current.alive():
-                                    return 0
-                                run_opp_move(me, opp, opp_move, False)
-                                if not me.current.alive():
-                                    return 1
-                            else:
-                                clean_me_up(me)
-                                run_opp_move(me, opp, opp_move, True)
-                                if not me.current.alive():
-                                    return 1
-                                run_move(me, opp, my_move, False)
-                                if not opp.current.alive():
-                                    return 0
+                                if me.current.calc_speed() > opp.current.calc_speed():
+                                    run_move(me, opp, my_move, True)
+                                    clean_me_up(me)
+                                    if not opp.current.alive():
+                                        return 0
+                                    run_opp_swap(opp, opp_move)
+                                else:
+                                    clean_me_up(me)
+                                    run_opp_swap(opp, opp_move)
+                                    run_move(me, opp, my_move, False)
+                                    if not opp.current.alive():
+                                        return 0
+
                         return 4
+                if selector == 1:
+                    select = 0
+                    select == draw_choose_items(me)
+                    sleep(15)
+                    clear()
+                    pygame.display.flip()
+                    draw_all_opp(opp.current)
+                    draw_all_me(me.current)
                 if selector == 2:
                     select = draw_choose_pkmn(me,opp)
                     clear()
                     pygame.display.flip()
                     draw_all_opp(opp.current)
                     if type(select) == int:
-                        opp_move = wait_for_opp_move(opp, mode)
+                        tmp, opp_move = wait_for_opp_move(opp, ['swap', select], mode, socket)
                         draw_all_me(me.current)
-                        if opp_move.__class__.__name__ == 'move':
+                        if tmp == 'move':
+                            opp_move = opp.current.moves[opp_move]
                             if opp_move.name == 'Quick Attack' or opp.current.calc_speed() > me.current.calc_speed():
                                 run_opp_move(me,opp,opp_move, True)
-                                sleep(2)
                                 if not me.current.alive:
                                     return 1
                                 return_my_pokemon(me)
@@ -866,6 +928,19 @@ def run_game(me, opp, mode):
                                 run_opp_move(me,opp,opp_move, True)
                                 if not me.current.alive:
                                     return 1
+                        elif tmp == 'swap':
+                            if opp.current.calc_speed() > me.current.calc_speed():
+                                run_opp_swap(opp, opp_move)
+                                return_my_pokemon(me)
+                                me.set_current(select)
+                                pop_ball(me.current.name)
+                                draw_all_me(me.current)
+                            else:
+                                return_my_pokemon(me)
+                                me.set_current(select)
+                                pop_ball(me.current.name)
+                                draw_all_me(me.current)
+                                run_opp_swap(opp, opp_move)
                     draw_all_me(me.current)
                     clearbtm()
                     selector = 0

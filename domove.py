@@ -1,5 +1,5 @@
 from pygame import display
-from random import choice,randint, random
+from util import choice,randint, get_random
 from logic import write_btm, draw_opp_hp, draw_my_hp, wait_for_button, clean_me_up
 from time import sleep
 from classes import move as oneoff
@@ -392,7 +392,7 @@ def double(attack, defend, move, me):
     retval = do_attacks(attack, defend, move, me, times = 2)
     display.update(write_btm('hit {0} times!'.format(times)))
     sleep(1)
-    if move.name == 'Twineedle' and random() < .2:
+    if move.name == 'Twineedle' and get_random() < .2:
         poisoned(defend)
     return retval
 
@@ -437,35 +437,35 @@ def proc(attack,defend,move,me,first):
     else:
         retval = do_attacks(attack, defend, move, me)
         if not retval:
-            if move.name in ['Flamethrower','Fire Punch','Ember'] and random() < .1:
+            if move.name in ['Flamethrower','Fire Punch','Ember'] and get_random() < .1:
                 burn(defend)
-            elif move.name in ['Psybeam','Confusion'] and random() < .1:
+            elif move.name in ['Psybeam','Confusion'] and get_random() < .1:
                 confuse(defend)
-            elif move.name in ['Blizzard','Ice Beam','Ice Punch'] and random() < .1:
+            elif move.name in ['Blizzard','Ice Beam','Ice Punch'] and get_random() < .1:
                 freeze(defend)
-            elif move.name == 'Aurora Beam' and random() < .1:
+            elif move.name == 'Aurora Beam' and get_random() < .1:
                 stat_change(defend, -1, 'attack')
-            elif move.name == 'Acid' and random() < .1:
+            elif move.name == 'Acid' and get_random() < .1:
                 stat_change(defend, -1, 'defense')
-            elif move.name in ['Bubblebeam','Bubble','Constrict'] and random() < .1:
+            elif move.name in ['Bubblebeam','Bubble','Constrict'] and get_random() < .1:
                 stat_change(defend, -1, 'speed')
-            elif move.name in ['Hyper Fang','Bone Club','Bite'] and random() < .1:
+            elif move.name in ['Hyper Fang','Bone Club','Bite'] and get_random() < .1:
                 if first:
                     flinch(defend)
-            elif move.name in ['Thunder','Thunderbold', 'Thunderpunch','Thundershock'] and random() < .1:
+            elif move.name in ['Thunder','Thunderbold', 'Thunderpunch','Thundershock'] and get_random() < .1:
                 paralyze(defend)
-            elif move.name == 'Poison Sting' and random() < .2:
+            elif move.name == 'Poison Sting' and get_random() < .2:
                 poison(defend)
-            elif move.name == 'Fire Blast' and random() < .3:
+            elif move.name == 'Fire Blast' and get_random() < .3:
                 burn(defend)
-            elif move.name == 'Psychic' and random() < .3:
+            elif move.name == 'Psychic' and get_random() < .3:
                 stat_change(defend, -1, 'special')
-            elif move.name in ['Headbutt','Stomp','Rolling Kick','Low Kick'] and random() < .3:
+            elif move.name in ['Headbutt','Stomp','Rolling Kick','Low Kick'] and get_random() < .3:
                 if first:
                     flinch(defend)
-            elif move.name in ['Lick','Body Slam'] and random() < .3:
+            elif move.name in ['Lick','Body Slam'] and get_random() < .3:
                 paralyze(defend)
-            elif move.name in ['Sludge','Smog'] and random() < .3:
+            elif move.name in ['Sludge','Smog'] and get_random() < .3:
                 poison(defend)
     return 0
 

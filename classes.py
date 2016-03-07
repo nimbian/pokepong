@@ -13,40 +13,33 @@ stat_stages=[1/4., 2/7., 2/6., 2/5., 1/2., 2/3., 1, 3/2., 2, 5/2., 3, 7/2., 4]
 
 from math import floor
 class pokemon:
-    def __init__(self, number, moveset = None):
+    def __init__(self, name, moves, lvl, evs, ivs, exp, pps):
         self.attack_stage = self.defense_stage = self.speed_stage = self.special_stage = 0
         self.accuracy_stage = self.evasion_stage = 0
         self.buffs = []
         self.ttick = 0
         self.sleep = -1
+
         conn = connect('shawn')
         c = conn.cursor()
-    
-        tmp = c.execute("SELECT * from pokemon where id = '{0}'".format(number)).fetchone()
-        self.lvl = 50
-        self.name = tmp[1]
-        self.hp = self.calchp(int(tmp[2]))
+        tmp = c.execute("SELECT hp, attack, defense, speed, special, exp, type1, type2, id from pokemon where pokemon = '{0}'".format(name)).fetchone()
+        self.lvl = lvl
+        self.name = name
+        base = [tmp[0],tmp[1],tmp[2],tmp[3],tmp[4]]
+        hpiv = [0,8][ivs[0] % 2] + [0,8][ivs[1] % 2] + [0,8][ivs[2] % 2] + [0,8][ivs[3] % 2]
+        self.hp = self.calchp(base[0], evs[0], hpiv)
         self.maxhp = self.hp
-        self.attack = int(tmp[3])
-        self.defense = int(tmp[4])
-        self.speed = int(tmp[5])
-        self.special = int(tmp[6])
-        self.exptogain = int(tmp[7])
-        self.type1 = tmp[8]
-        self.type2 = tmp[9]
-        if moveset:
-            tmp = c.execute("SELECT * from tmp where rowid = '{0}'".format(int(ceil(int(moveset)*2))- 1)).fetchone()
-
-            
-        else:
-            
-            cmd = "SELECT move from learnablemoves where id = '{0}' and learnedat < {1} order by rowid".format(number, self.lvl)
-            tmp2 = c.execute(cmd).fetchall()
-            tmp = []
-            for x in tmp2[-4:]:
-                tmp.append(x[0])
+        self.attack = self.calcstat(base[1], evs[1], ivs[0])
+        self.defense = self.calcstat(base[2], evs[2], ivs[1])
+        self.speed = self.calcstat(base[3], evs[3], ivs[2])
+        self.special = self.calcstat(base[4], evs[4], ivs[3])
+        self.exp = tmp[5]
+        self.type1 = tmp[6]
+        self.type2 = tmp[7]
+        self.id = tmp[8]
+        
         self.moves = []
-        for i in tmp[-4:]:
+        for i in moves:
             self.moves.append(move(i))
         self.sprite1 = self.set_sprite1()
         self.sprite2 = self.set_sprite2()
@@ -75,12 +68,12 @@ class pokemon:
     def set_sprite2(self):
         return loadalphaimg('mon2.png')
 
-    def calchp(self, hp, E = 0, I = randint(0,15)):
+    def calchp(self, hp, E, I):
         hp = floor((2 * hp + I + E) * self.lvl / 100. + self.lvl + 10)
         return int(hp)
 
-    def calcstat(self, stat, lvl = 50, E = 0, I = randint(0,15)):
-        stat = floor((2 * stat + I + E) * lvl / 100. + 5)
+    def calcstat(self, stat, E, I):
+        stat = floor((2 * stat + I + E) * self.lvl / 100. + 5)
         return int(stat)
 
     def setimg(self, img):
@@ -433,6 +426,13 @@ class trainer:
         self.name = name
         self.pkmn = pkmn
         self.current = pkmn[0]
+        self.items = []
+        self.items.append(['POKEBALL',1])
+        self.items.append(['ULTRABALL',9])
+        self.items.append(['POTION',888])
+        self.items.append(['ANTIDOTE',10])
+        self.items.append(['CANCEL'])
+        self.shownitems = self.items[:4]
 
     def alive(self):
         for mon in self.pkmn:
@@ -456,3 +456,12 @@ class trainer:
         cash = 0
         for i in pkmn:
             cash += i.payday
+
+    def shift_items_right(self):
+        y = self.items.index(self.shownitems[1])
+        self.shownitems = self.items[y:y+4]
+
+    def shift_items_left(self):
+        y = self.items.index(self.shownitems[0])
+        self.shownitems = self.items[y-1:y+3]
+
