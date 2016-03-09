@@ -7,6 +7,25 @@ import sys
 images = 'images/'
 
 
+def send_move(move, socket):
+    socket.send(json.dumps(move.args))
+    print 'waiting for response'
+    socket.recv()
+
+def recv_move(socket):
+    move = json.loads(socket.recv())
+    socket.send('')
+    return move
+
+
+class MyMoveOccuring(Exception):
+    def __init__(self,*args,**kwargs):
+        Exception.__init__(self,*args,**kwargs)
+
+class OppMoveOccuring(Exception):
+    def __init__(self,*args,**kwargs):
+        Exception.__init__(self,*args,**kwargs)
+
 def loadalphaimg(img):
     return loadimg(img).convert_alpha()
 
@@ -29,13 +48,13 @@ def send_teams(mypkmn, opppkmn, myname, oppname, socket):
     tmp = []
     for i in mypkmn:
         x = c.execute("SELECT * from ownedpkmn where rowid = '{0}'".format(i)).fetchone()
-        tmp.append([x[1], [x[2],x[3],x[4],x[5]], x[6], [x[7],x[8],x[9],x[10],x[11]], 
+        tmp.append([x[1], [x[2],x[3],x[4],x[5]], x[6], [x[7],x[8],x[9],x[10],x[11]],
                 [x[12],x[13],x[14],x[15]], x[16], [x[17],x[18],x[19],x[20]]])
 
     tmp2 = []
     for i in opppkmn:
         x = c.execute("SELECT * from ownedpkmn where rowid = '{0}'".format(i)).fetchone()
-        tmp2 .append([x[1], [x[2],x[3],x[4],x[5]], x[6], [x[7],x[8],x[9],x[10],x[11]], 
+        tmp2 .append([x[1], [x[2],x[3],x[4],x[5]], x[6], [x[7],x[8],x[9],x[10],x[11]],
                  [x[12],x[13],x[14],x[15]], x[16], [x[17],x[18],x[19],x[20]]])
 
     seed = random.randint(0,sys.maxint)

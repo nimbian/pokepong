@@ -1,11 +1,17 @@
+from time import sleep
+sleep(1)
 from logic import *
 from classes import trainer
 from sqlite3 import connect
 from util import send_teams, get_teams, set_seed, get_random
-import argparse
+from util import MyMoveOccuring, OppMoveOccuring, send_move, recv_move
+from redis import StrictRedis
 import zmq
 
+
 if __name__ == '__main__':
+    r = StrictRedis(host = '127.0.0.1')
+    r.delete('lock')
     poss = [1,4,7,25,143,132,129,123,95,92,77,13,17,21,35]
     possible = []
     for p in poss:
@@ -14,6 +20,20 @@ if __name__ == '__main__':
         possible.append(pkmn)
         if p == 4:
             current = pkmn
+    if r.lock('client').acquire(blocking=False):
+        client = False
+    else:
+        client = True
+    r.incr('count')
+    while r.get('count') < 2:
+        sleep(1)
+    context = zmq.Context()
+    socket = context.socket(zmq.PAIR)
+    if client:
+        socket.connect("tcp://127.0.0.1:7777")
+    else:
+        socket.bind("tcp://*:7777")
+
     #intro(current)
     #sleep(5)
     count = 0
@@ -33,18 +53,11 @@ if __name__ == '__main__':
     #        count += 1
     #    current = scrolling(current, possible)
     #    sleep(5)
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--client', action='store_true')
-    args = parser.parse_args()
-    context = zmq.Context()
-    socket = context.socket(zmq.PAIR)
-    client = args.client
-    if not client:
-        socket.connect("tcp://127.0.0.1:7777")
-    else:
-        socket.bind("tcp://*:7777")
+
 
     sleep(2)
+    r.delete('client')
+    r.delete('count')
     if not client:
         mypkmn = [1,150,149,6,25,100]
         opppkmn = [7,150,149,6,25,100]
@@ -53,6 +66,8 @@ if __name__ == '__main__':
         mypkmn, opppkmn, myname, oppname, seed = send_teams(mypkmn, opppkmn, myname, oppname, socket)
     else:
         mypkmn, opppkmn, myname, oppname, seed = get_teams(socket)
+    r.delete(myname)
+    r.delete(oppname)
     mypkmn = build_team(mypkmn, me = True)
     opppkmn = build_team(opppkmn)
     me = trainer(myname, mypkmn)
@@ -74,9 +89,27 @@ if __name__ == '__main__':
     #mode = 'wild'
     new_game_start(me, opp, mode)
     while me.alive() and opp.alive():
-        clearbtm()
-        draw_choice(0)
-        tmp = run_game(me, opp, mode, socket)
+        try:
+            clearbtm()
+            draw_choice(0)
+            tmp = run_game(me, opp, mode, socket)
+        except OppMoveOccuring:
+            clear()
+            display.flip()
+            draw_all_opp(opp.current)
+            draw_all_me(me.current)
+            move = recv_move(socket)
+            tmp = battle_logic(me, opp, move, False)
+            print tmp
+        except MyMoveOccuring as move:
+            clear()
+            display.flip()
+            draw_all_opp(opp.current)
+            draw_all_me(me.current)
+            send_move(move,socket)
+            tmp = battle_logic(me, opp, move, True)
+            r.delete('lock')
+            print tmp
         if tmp == 0:
             run_opp_faint(opp)
             if opp.alive():

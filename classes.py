@@ -37,7 +37,7 @@ class pokemon:
         self.type1 = tmp[6]
         self.type2 = tmp[7]
         self.id = tmp[8]
-        
+
         self.moves = []
         for i in moves:
             self.moves.append(move(i))
@@ -443,6 +443,13 @@ class trainer:
     def set_current(self, pkmn):
         if pkmn < len(self.pkmn):
             self.current = self.pkmn[pkmn]
+
+    def num_fainted(self):
+        count = 0
+        for mon in self.pkmn:
+            if mon.hp == 0:
+                count += 1
+        return count
 
 
     def get_next_pkmn(self):

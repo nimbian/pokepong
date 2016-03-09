@@ -1,11 +1,14 @@
 from pygame import image, draw, display, event
 import pygame
 from util import loadimg, loadalphaimg, alphabet
-from util import choice, randint
+from util import choice, randint, MyMoveOccuring, OppMoveOccuring
 from time import sleep
 from math import ceil,floor
 from sqlite3 import connect
 import json
+from redis import StrictRedis
+
+r = StrictRedis(host = '127.0.0.1')
 
 #TODO if speeds are equal me will go first.  me is different on client vs server
 
@@ -335,7 +338,7 @@ def update_choice(select):
 
 
 def me_next_mon(me, opp, mode, socket):
-    send_val = draw_choose_pkmn(me, opp, mydeath = True)
+    send_val = draw_choose_pkmn(me, opp, mode, mydeath = True)
     if mode == 'battle':
         socket.send(str(send_val))
         tmp = int(socket.recv())
@@ -368,11 +371,9 @@ def opp_next_mon(me, opp, mode, socket):
         wait_for_button()
     else:
         sleep(1)
-    if mode != 'pong':
-        change_pokemon(me, opp)
+    change_pokemon(me, opp, mode)
+    if mode == 'battle':
         socket.send(str(me.get_current_index()))
-    else:
-        no_change()
     dirty = []
     dirty.extend(write_btm(opp.name + ' sent', 'out ' + opp.current.name + '!'))
     dirty.extend(draw_opp_pkmn_sprite(opp.current))
@@ -416,7 +417,7 @@ def attacking(me):
     dirty = []
     selector = 0
     clearbtm()
-    dirty.append(draw.rect(SCREEN, WHITE, [0, 442 ,695,300]))
+    dirty.append(draw.rect(SCREEN, WHITE, [0, 442 ,696,300]))
     dirty.append(SCREEN.blit(ATTACK, (10, SIZE[1]-577)))
     dirty.append(word_builder(['>',' ',' ',' '][selector] + me.current.moves[0].name.upper(),300, SIZE[1]-285))
     if len(me.current.moves) > 1:
@@ -437,7 +438,7 @@ def attacking(me):
 
 def update_attacking(me, selector):
     dirty = []
-    dirty.append(draw.rect(SCREEN, WHITE, [0, 442 ,695,300]))
+    dirty.append(draw.rect(SCREEN, WHITE, [0, 442 ,696,300]))
     dirty.append(SCREEN.blit(ATTACK, (10, SIZE[1]-577)))
     dirty.append(word_builder(['>',' ',' ',' '][selector] + me.current.moves[0].name.upper() ,300, SIZE[1]-285))
     dirty.append(word_builder([' ','>',' ',' '][selector],300, SIZE[1]-225))
@@ -489,7 +490,7 @@ def update_items(me, select):
                 num = str(i[1])
             dirty.append(word_builder('*' + num, 820, 260 + c * 120))
             c += 1
-    display.update(dirty)   
+    display.update(dirty)
 
 
 
@@ -541,6 +542,8 @@ def run_opp_swap(opp, val):
 def wait_for_button():
     pygame.event.clear()
     while True:
+        if r.get('lock'):
+            raise OppMoveOccuring
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 return
@@ -616,7 +619,7 @@ def draw_choose_items(me):
 
 
 
-def draw_choose_pkmn(me, opp, oppdeath = False, mydeath = False):
+def draw_choose_pkmn(me, opp, mode, oppdeath = False, mydeath = False):
     clear()
     offset = 0
     dirty = []
@@ -631,46 +634,70 @@ def draw_choose_pkmn(me, opp, oppdeath = False, mydeath = False):
     count = 0
     tmp = True
     while True:
-        for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
-                if select > 0:
-                    select -= 1
-                    update_choose(select+1, select, me)
-                    count = 1
-                    tmp = True
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
-                if select < len(me.pkmn) - 1:
-                    select += 1
-                    update_choose(select-1, select, me)
-                    count = 1
-                    tmp = True
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_z:
-                if select == me.get_current_index():
-                    display.update(write_btm(me.current.name, 'is already out!'))
-                    wait_for_button()
-                    display.update(write_btm('Bring out which', 'POK~MON?'))
-                elif me.pkmn[select].hp == 0:
-                    #TODO can't bring out fainted
-                    pass
-                else:
-                    clear()
-                    pygame.display.flip()
-                    if not oppdeath:
-                        draw_all_opp(opp.current)
+        if r.get('lock'):
+            raise OppMoveOccuring
+        if mode == 'pong':
+            if count == 10:
+                select += 1
+                update_choose(select-1, select, me)
+                tmp = True
+            if count == 20:
+                clear()
+                pygame.display.flip()
+                draw_all_opp(opp.current)
+                me.set_current(select)
+                sleep(2)
+                pop_ball(me.current.name)
+                draw_all_me(me.current)
+                return select
+
+
+        else:
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
+                    if select > 0:
+                        select -= 1
+                        update_choose(select+1, select, me)
+                        count = 1
+                        tmp = True
+                elif event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
+                    if select < len(me.pkmn) - 1:
+                        select += 1
+                        update_choose(select-1, select, me)
+                        count = 1
+                        tmp = True
+                elif event.type == pygame.KEYDOWN and event.key == pygame.K_z:
+                    if select == me.get_current_index():
+                        display.update(write_btm(me.current.name, 'is already out!'))
+                        wait_for_button()
+                        display.update(write_btm('Bring out which', 'POK~MON?'))
+                    elif me.pkmn[select].hp == 0:
+                        #TODO can't bring out fainted
+                        pass
                     else:
-                        draw_all_me(me.current)
-                        return_my_pokemon(me)
-                    if mydeath or oppdeath:
-                        me.set_current(select)
-                        pop_ball(me.current.name)
-                        draw_all_me(me.current)
-                        sleep(.5)
-                    return select
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_x:
-                if not mydeath:
-                    clear()
-                    draw_all_opp(opp.current)
-                    return False
+                        if mode == 'battle':
+                            if r.lock('lock').acquire():
+                                raise MyMoveOccuring('swap', str(select))
+                            else:
+                                raise OppMoveOccuring
+                        clear()
+                        pygame.display.flip()
+                        if not oppdeath:
+                            draw_all_opp(opp.current)
+                        else:
+                            draw_all_me(me.current)
+                            return_my_pokemon(me)
+                        if mydeath or oppdeath:
+                            me.set_current(select)
+                            pop_ball(me.current.name)
+                            draw_all_me(me.current)
+                            sleep(.5)
+                        return select
+                elif event.type == pygame.KEYDOWN and event.key == pygame.K_x:
+                    if not mydeath:
+                        clear()
+                        draw_all_opp(opp.current)
+                        return False
 
         sleep(.1)
         con1 = count % 2 == 0 and me.pkmn[select].hp > me.pkmn[select].maxhp / 2
@@ -712,7 +739,7 @@ def run_opp_move(me, opp, move, first):
     return retval
 
 
-def change_pokemon(me, opp):
+def change_pokemon(me, opp, mode):
     dirty = []
     dirty.append(draw.rect(SCREEN, WHITE, [0, 403, 375, 280]))
     dirty.extend(write_btm('Will ' + me.name, 'change POK~MON?'))
@@ -721,26 +748,37 @@ def change_pokemon(me, opp):
     select = 0
     pygame.event.clear()
     while True:
+        #TODO wait for chaning pkmn in battle.  Check for token?
+        sleep(.1)
         selecting(select)
-        for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
-                if select == 0:
-                    select = 1
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
-                if select == 1:
-                    select = 0
-            if event.type == pygame.KEYDOWN and ((event.key == pygame.K_z and select == 1) or event.key == pygame.K_x):
-                dirty = []
-                dirty.append(draw.rect(SCREEN, WHITE, [0, 403, 375, 280]))
-                dirty.extend(draw_my_pkmn_sprite(me.current))
-                display.update(dirty)
-                return False
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_z:
-                draw_choose_pkmn(me, opp, oppdeath = True)
-                clear()
-                display.flip()
-                draw_all_me(me.current)
-                return True
+        if mode == 'pong':
+            sleep(1)
+            selecting(1)
+            sleep(1)
+            dirty.append(draw.rect(SCREEN, WHITE, [0, 403, 375, 280]))
+            dirty.extend(draw_my_pkmn_sprite(me.current))
+            display.update(dirty)
+            return False
+        else:
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
+                    if select == 0:
+                        select = 1
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
+                    if select == 1:
+                        select = 0
+                if event.type == pygame.KEYDOWN and ((event.key == pygame.K_z and select == 1) or event.key == pygame.K_x):
+                    dirty = []
+                    dirty.append(draw.rect(SCREEN, WHITE, [0, 403, 375, 280]))
+                    dirty.extend(draw_my_pkmn_sprite(me.current))
+                    display.update(dirty)
+                    return False
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_z:
+                    draw_choose_pkmn(me, opp, mode, oppdeath = True)
+                    clear()
+                    display.flip()
+                    draw_all_me(me.current)
+                    return True
 
 
 def run_attack(me, opp, mode):
@@ -748,6 +786,8 @@ def run_attack(me, opp, mode):
     select = 0
     pygame.event.clear()
     while True:
+        if r.get('lock'):
+            raise OppMoveOccuring
         if me.current.pp_left():
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
@@ -764,6 +804,11 @@ def run_attack(me, opp, mode):
                     if mode != 'pong':
                         clean_me_up(me)
                         if usable_move(me.current.moves[select], mode):
+                            if mode == 'battle':
+                                if r.lock('lock').acquire():
+                                    raise MyMoveOccuring('move', str(select))
+                                else:
+                                    raise OppMoveOccuring
                             return me.current.moves[select]
                         else:
                             attacking(me)
@@ -808,11 +853,54 @@ def win(me, opp, mode):
         sleep(2)
 
 
+def run_pong(me, opp):
+    #TODO switch client order. or use a redis queue
+    draw_choice(0)
+    while True:
+        if opp.num_fainted() < int(r.get(opp.name) or 0):
+            attacking(me)
+            sleep(2)
+            clean_me_up(me)
+            do_move(me.current, opp.current, me.current.moves[0], 'pong', True, True)
+            return 0
+        elif me.num_fainted() < int(r.get(me.name) or 0):
+            sleep(2)
+            do_move(opp.current, me.current, opp.current.moves[0], 'pong', False, True)
+            return 1
+        sleep(.1)
+
+
+def battle_logic(me, opp, move, my):
+    if move[0] == 'move':
+        if my:
+            run_move(me, opp, me.current.moves[int(move[1])], my)
+            if not opp.current.alive():
+                return 0
+        else:
+            run_opp_move(me, opp, opp.current.moves[int(move[1])], my)
+            if not me.current.alive():
+                return 1
+    if move[0] == 'swap':
+        if my:
+            return_my_pokemon(me)
+            me.set_current(int(move[1]))
+            pop_ball(me.current.name)
+            draw_all_me(me.current)
+        else:
+            run_opp_swap(opp, opp_move)
+    return 4
+
+
+
 
 def run_game(me, opp, mode, socket):
     selector = 0
     pygame.event.clear()
+    if mode == 'pong':
+        return run_pong(me, opp)
     while True:
+        if r.get('lock'):
+            raise OppMoveOccuring
         for ev in event.get():
             if ev.type == pygame.KEYDOWN and ev.key == pygame.K_RIGHT:
                 if selector == 0 or selector == 1:
@@ -855,7 +943,7 @@ def run_game(me, opp, mode, socket):
                                         return 0
                             else:
                                 if me.current.calc_speed() > opp.current.calc_speed():
-                                    
+
                                     run_move(me, opp, my_move, True)
                                     clean_me_up(me)
                                     if not opp.current.alive():
@@ -903,7 +991,7 @@ def run_game(me, opp, mode, socket):
                     draw_all_opp(opp.current)
                     draw_all_me(me.current)
                 if selector == 2:
-                    select = draw_choose_pkmn(me,opp)
+                    select = draw_choose_pkmn(me,opp, mode)
                     clear()
                     pygame.display.flip()
                     draw_all_opp(opp.current)

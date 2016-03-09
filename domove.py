@@ -97,6 +97,13 @@ def dmg_pkmn(pkmn, dmg, me):
 
 
 def do_move(attack, defend, move, mode, me, first):
+    if mode == 'pong' and move.name != 'Transform':
+        if me:
+            display.update(write_btm(attack.name, 'used {0}'.format(move.name.upper())))
+        else:
+            display.update(write_btm('Enemy ' + attack.name, 'used {0}'.format(move.name.upper())))
+        return dmg_pkmn(defend, defend.hp, me)
+
     if attack.wrapped > 0:
         display.update(write_btm(attack.name, "can't move"))
         attack.wrapped -= 1
