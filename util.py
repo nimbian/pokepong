@@ -48,13 +48,13 @@ def send_teams(mypkmn, opppkmn, myname, oppname, socket):
     tmp = []
     for i in mypkmn:
         x = c.execute("SELECT * from ownedpkmn where rowid = '{0}'".format(i)).fetchone()
-        tmp.append([x[1], [x[2],x[3],x[4],x[5]], x[6], [x[7],x[8],x[9],x[10],x[11]],
+        tmp.append([x[0], x[1], [x[2],x[3],x[4],x[5]], x[6], [x[7],x[8],x[9],x[10],x[11]],
                 [x[12],x[13],x[14],x[15]], x[16], [x[17],x[18],x[19],x[20]]])
 
     tmp2 = []
     for i in opppkmn:
         x = c.execute("SELECT * from ownedpkmn where rowid = '{0}'".format(i)).fetchone()
-        tmp2 .append([x[1], [x[2],x[3],x[4],x[5]], x[6], [x[7],x[8],x[9],x[10],x[11]],
+        tmp2 .append([x[0], x[1], [x[2],x[3],x[4],x[5]], x[6], [x[7],x[8],x[9],x[10],x[11]],
                  [x[12],x[13],x[14],x[15]], x[16], [x[17],x[18],x[19],x[20]]])
 
     seed = random.randint(0,sys.maxint)

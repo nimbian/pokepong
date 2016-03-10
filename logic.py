@@ -281,9 +281,9 @@ def build_team(testpkmn, me = False):
     for i in range(0, len(testpkmn)):
         team.append(pokemon(*testpkmn[i]))
         if me:
-            pkmn = loadimg('backs/{0}.PNG'.format(team[-1].id)).convert()
+            pkmn = loadimg('backs/{0}.PNG'.format(team[-1].picid)).convert()
         else:
-            pkmn = loadimg('fronts/{0}.PNG'.format(team[-1].id)).convert()
+            pkmn = loadimg('fronts/{0}.PNG'.format(team[-1].picid)).convert()
         pkmn.set_colorkey((255,255,255))
         team[-1].setimg(pkmn)
     return team
@@ -493,6 +493,11 @@ def update_items(me, select):
     display.update(dirty)
 
 
+def gain_exp(me,opp):
+    for mon in me.used:
+        lvlup = mon.gain_exp(me, opp)
+        #TODO lvlup
+
 
 def clean_me_up(me):
     dirty = []
@@ -676,6 +681,8 @@ def draw_choose_pkmn(me, opp, mode, oppdeath = False, mydeath = False):
                         pass
                     else:
                         if mode == 'battle':
+                            if mydeath:
+                                return select
                             if r.lock('lock').acquire():
                                 raise MyMoveOccuring('swap', str(select))
                             else:

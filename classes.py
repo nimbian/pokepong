@@ -13,12 +13,15 @@ stat_stages=[1/4., 2/7., 2/6., 2/5., 1/2., 2/3., 1, 3/2., 2, 5/2., 3, 7/2., 4]
 
 from math import floor
 class pokemon:
-    def __init__(self, name, moves, lvl, evs, ivs, exp, pps):
+    #TODO badge bonus?
+    def __init__(self, id_,name, moves, lvl, evs, ivs, exp, pps):
+        self.id_ = id_
         self.attack_stage = self.defense_stage = self.speed_stage = self.special_stage = 0
         self.accuracy_stage = self.evasion_stage = 0
         self.buffs = []
         self.ttick = 0
         self.sleep = -1
+        self.exp = exp
 
         conn = connect('shawn')
         c = conn.cursor()
@@ -33,14 +36,14 @@ class pokemon:
         self.defense = self.calcstat(base[2], evs[2], ivs[1])
         self.speed = self.calcstat(base[3], evs[3], ivs[2])
         self.special = self.calcstat(base[4], evs[4], ivs[3])
-        self.exp = tmp[5]
+        self.baseexp = tmp[5]
         self.type1 = tmp[6]
         self.type2 = tmp[7]
-        self.id = tmp[8]
-
+        self.picid = tmp[8]
         self.moves = []
-        for i in moves:
-            self.moves.append(move(i))
+        for i in range(len(moves)):
+            if moves[i] != '':
+                self.moves.append(move(moves[i],pps[i]))
         self.sprite1 = self.set_sprite1()
         self.sprite2 = self.set_sprite2()
         self.fleecount = 0
@@ -49,7 +52,7 @@ class pokemon:
         self.controllable = True
         self.disabled = 0
         self.substitute = 0
-        self.struggle = move('Struggle')
+        self.struggle = move('Struggle',0)
         self.bidecnt = -1
         self.bidedmg = 0
         self.wrapped = 0
@@ -59,6 +62,9 @@ class pokemon:
         self.payday = 0
         self.confused = 0
         self.bide = False
+        tmp = c.execute("SELECT speed from lvlspeed where pkmn = '{0}'".format(name)).fetchone()
+        self.lvlspeed = tmp[0]
+
 
 
 
@@ -388,18 +394,37 @@ class pokemon:
             self.pp = 5
             self.maxpp = 5
 
+    def gain_exp(self,me, opp):
+        #TODO test exp
+        #TODO evs for all or just last?
+        if self.id_ > 150:
+            self.exp += (opp.baseexp * opp.lvl)/ me.used
+            for i in range(5):
+                self.evs[i] += opp.base[i]
+            conn = connect('shawn')
+            c = conn.cursor()
+            lvl = c.execute("SELECT lvl from {0} where exp < '{1}' order by exp asc limit 1").fetchone()[0]
+            return lvl > self.lvl
+        return False
+
+
+
+
+
+
+
 
 
 
 class move:
-    def __init__(self,name):
+    def __init__(self,name,pp):
         conn = connect('shawn')
         c = conn.cursor()
         tmp = c.execute("SELECT * from moves where move = '{0}'".format(name)).fetchone()
         self.name = str(name)
         self.type_ = str(tmp[1])
-        self.pp = int(tmp[2])
-        self.maxpp = int(tmp[2])
+        self.pp = int(tmp[2]) + pp
+        self.maxpp = int(tmp[2]) + pp
         try:
             self.power = int(tmp[3])
         except ValueError:
@@ -433,6 +458,7 @@ class trainer:
         self.items.append(['ANTIDOTE',10])
         self.items.append(['CANCEL'])
         self.shownitems = self.items[:4]
+        self.used = [self.current]
 
     def alive(self):
         for mon in self.pkmn:
