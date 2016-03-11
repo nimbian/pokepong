@@ -11,6 +11,32 @@ from util import loadalphaimg
 
 
 
+def body_slam():
+    pixels = pygame.surfarray.pixels3d(SCREEN)
+    pixels ^= 2 ** 32 -1
+    pygame.display.flip()
+    sleep(5)
+    pixels ^= 2 ** 32 -1
+    pygame.display.flip()
+    sleep(.1)
+    pixels ^= 2 ** 32 -1
+    pygame.display.flip()
+    sleep(.1)
+    pixels ^= 2 ** 32 -1
+    pygame.display.flip()
+    sleep(.1)
+
+def barrier(me):
+    barrier = loadalphaimg('moves/barrier.png')
+    for i in range(6):
+        x = SCREEN.blit(barrier, (525,292))
+        display.update(x)
+        sleep(.2)
+        display.update(pygame.draw.rect(SCREEN, WHITE, x))
+        draw_all_me(me.current)
+        sleep(.2)
+
+
 def beam(me,opp):
     beams = []
     for i in range(1,7):
@@ -70,6 +96,14 @@ def invertcolor():
     pixels = (pixels ^ 2 ** 32 -1) & 5111629
 
 
+def pics():
+    for i in range(1,255):
+        pixels = pygame.surfarray.array3d(SCREEN)
+        pixels ^= i
+        pygame.display.flip()
+        sleep(.1)
+        pixels ^= i
+        pygame.display.flip()
 
 if __name__ == '__main__':
     clear()
@@ -96,5 +130,5 @@ if __name__ == '__main__':
     draw_all_me(me.current)
     draw_all_opp(opp.current)
     sleep(2)
-    beam(me,opp)
+    pics()
 
