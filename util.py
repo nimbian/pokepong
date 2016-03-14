@@ -4,6 +4,7 @@ import json
 from sqlite3 import connect
 import random
 import sys
+import zmq
 images = 'images/'
 
 
@@ -42,7 +43,7 @@ def alphabet():
             c+=1
     return alpha_dict
 
-def send_teams(mypkmn, opppkmn, myname, oppname, socket):
+def send_teams(mypkmn, myname, opppkmn = None, oppname = None, socket = None):
     conn = connect('shawn')
     c = conn.cursor()
     tmp = []
@@ -52,17 +53,19 @@ def send_teams(mypkmn, opppkmn, myname, oppname, socket):
                 [x[12],x[13],x[14],x[15]], x[16], [x[17],x[18],x[19],x[20]]])
 
     tmp2 = []
-    for i in opppkmn:
-        x = c.execute("SELECT * from ownedpkmn where rowid = '{0}'".format(i)).fetchone()
-        tmp2 .append([x[0], x[1], [x[2],x[3],x[4],x[5]], x[6], [x[7],x[8],x[9],x[10],x[11]],
-                 [x[12],x[13],x[14],x[15]], x[16], [x[17],x[18],x[19],x[20]]])
+    if opppkmn:
+        for i in opppkmn:
+            x = c.execute("SELECT * from ownedpkmn where rowid = '{0}'".format(i)).fetchone()
+            tmp2 .append([x[0], x[1], [x[2],x[3],x[4],x[5]], x[6], [x[7],x[8],x[9],x[10],x[11]],
+                     [x[12],x[13],x[14],x[15]], x[16], [x[17],x[18],x[19],x[20]]])
 
     seed = random.randint(0,sys.maxint)
-    socket.send(json.dumps([tmp2, tmp, oppname, myname, seed]))
+    if socket:
+        socket.send(json.dumps([tmp2, tmp, oppname, myname, seed]))
     return [tmp, tmp2, myname, oppname, seed]
 
 def get_teams(socket):
-    return json.loads(socket.recv())
+    return json.loads(socket.recv(zmq.NOBLOCK))
 
 def set_seed(seed):
     random.seed(seed)

@@ -126,9 +126,9 @@ if __name__ == '__main__':
     opppkmn = build_team(tmp2)
     me = trainer(myname, mypkmn)
     opp = trainer(oppname, opppkmn)
+    choose_loc()
     draw_choice(0)
     draw_all_me(me.current)
     draw_all_opp(opp.current)
     sleep(2)
-    pics()
 

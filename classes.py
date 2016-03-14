@@ -14,8 +14,23 @@ stat_stages=[1/4., 2/7., 2/6., 2/5., 1/2., 2/3., 1, 3/2., 2, 5/2., 3, 7/2., 4]
 from math import floor
 class pokemon:
     #TODO badge bonus?
-    def __init__(self, id_,name, moves, lvl, evs, ivs, exp, pps):
-        self.id_ = id_
+    def __init__(self, id_,name, moves, lvl, evs, ivs, exp, pps, wild = False):
+        self.name = name
+        if name == "Farfetch'd":
+            name = "Farfetch''d"
+        conn = connect('shawn')
+        c = conn.cursor()
+        tmp = c.execute("SELECT hp, attack, defense, speed, special, exp, type1, type2, id from pokemon where pokemon = '{0}'".format(name)).fetchone()
+        if wild:
+            id_ = tmp[8]
+            query = "SELECT move from learnablemoves where learnedat < '{0}' and pokemon = '{1}' order by learnedat desc limit 4"
+            tmp2 = c.execute(query.format(lvl, name))
+            for i in tmp2:
+                moves.append(i[0])
+                pps.append(0)
+            self
+
+
         self.attack_stage = self.defense_stage = self.speed_stage = self.special_stage = 0
         self.accuracy_stage = self.evasion_stage = 0
         self.buffs = []
@@ -23,11 +38,7 @@ class pokemon:
         self.sleep = -1
         self.exp = exp
 
-        conn = connect('shawn')
-        c = conn.cursor()
-        tmp = c.execute("SELECT hp, attack, defense, speed, special, exp, type1, type2, id from pokemon where pokemon = '{0}'".format(name)).fetchone()
         self.lvl = lvl
-        self.name = name
         base = [tmp[0],tmp[1],tmp[2],tmp[3],tmp[4]]
         hpiv = [0,8][ivs[0] % 2] + [0,8][ivs[1] % 2] + [0,8][ivs[2] % 2] + [0,8][ivs[3] % 2]
         self.hp = self.calchp(base[0], evs[0], hpiv)

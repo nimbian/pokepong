@@ -7,6 +7,8 @@ from math import ceil,floor
 from sqlite3 import connect
 import json
 from redis import StrictRedis
+from routes import ROUTES, MAPLIST, MAPROUTE
+import random
 
 r = StrictRedis(host = '127.0.0.1')
 
@@ -40,6 +42,8 @@ TRAINERBACK = loadalphaimg('trainerback.png')
 POKE1 = loadalphaimg('poke1.png')
 POKE2 = loadalphaimg('poke2.png')
 ITEMS = loadalphaimg('items.png')
+MAP = loadimg('map.png').convert()
+MAPSELECTOR = loadalphaimg('mapselector.png')
 
 SSIZE = [392,392]
 BTM_TUPLE = (10, SIZE[1]-340)
@@ -64,6 +68,29 @@ def word_builder(word,start_x, start_y):
         SCREEN.blit(ALPHA,(start_x, start_y),ALPHA_DICT[l])
         start_x+=56
     return [x, start_y, len(word)*56,60]
+
+def draw_map():
+    SCREEN.blit(MAP,(0,0))
+
+def get_wild_mon(route):
+    tmp = ROUTES[route]
+    poss = []
+    for i in tmp:
+        poss.extend([i] * int((tmp[i][1] * 100)))
+    name = random.choice(poss)
+    lvl = random.randint(tmp[name][0][0],tmp[name][0][1])
+    evs = [0] * 5
+    ivs = []
+    for i in range(4):
+        ivs.append(random.randint(0,15))
+    pkmn = pokemon(0,name, [],lvl,evs,ivs,0,[], wild = True)
+    pkmnimg = loadimg('fronts/{0}.PNG'.format(pkmn.picid)).convert()
+    pkmnimg.set_colorkey((255,255,255))
+    pkmn.setimg(pkmnimg)
+    return pkmn
+
+
+
 
 
 def write_btm(*args):
@@ -139,7 +166,7 @@ def draw_my_poke_balls(team):
             SCREEN.blit(ALIVE, (SIZE[0]-575 + offset * 65, SIZE[1]-430))
         offset += 1
     for i in range(offset, 6):
-        SCREEN.blit(FAINTED, (SIZE[0]-500 + i * 65, SIZE[1]-430))
+        SCREEN.blit(FAINTED, (SIZE[0]-500 + (i-1) * 65, SIZE[1]-430))
     return [MYHPBAR_RECT]
 
 def draw_opp_hp_bar():
@@ -188,7 +215,7 @@ def draw_opp_poke_balls(team):
             SCREEN.blit(ALIVE, (180 + offset * 65, 132))
         offset += 1
     for i in range(offset, 6):
-        SCREEN.blit(FAINTED, (180 + i * 65, 132))
+        SCREEN.blit(FAINTED, (180 + (i-1) * 65, 132))
     return [OPPHPBAR_RECT]
 
 def return_my_pokemon(me):
@@ -336,6 +363,22 @@ def update_choice(select):
     display.update(dirty)
 
 
+def draw_location(select):
+    draw_map()
+    display.flip()
+    display.update(SCREEN.blit(MAPSELECTOR, MAPLIST[select]))
+    display.update(word_builder(MAPROUTE[select], 50, 10))
+
+
+def draw_loc_update(old, new):
+    draw_map()
+    display.update(MAPLIST[old] + [MAPSELECTOR.get_width(), MAPSELECTOR.get_height()])
+    display.update(SCREEN.blit(MAPSELECTOR, MAPLIST[new]))
+    word_builder(MAPROUTE[new], 50, 10)
+    display.update(50,10,1280,64)
+
+
+
 
 def me_next_mon(me, opp, mode, socket):
     send_val = draw_choose_pkmn(me, opp, mode, mydeath = True)
@@ -404,7 +447,6 @@ def new_game_start(me, opp, mode):
         dirty.extend(write_btm(opp.name + ' sent', 'out ' + opp.current.name + '!'))
     else:
         draw_all_opp(opp.current)
-        move_opp_trainer_out()
         dirty.extend(write_btm('A wild ' + opp.current.name, 'has appeard!'))
     display.update(dirty)
 
@@ -622,6 +664,32 @@ def draw_choose_items(me):
                     update_items(me, selector)
 
 
+def choose_loc():
+    selector = 0
+    draw_location(0)
+    pygame.event.clear()
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
+                if selector < len(MAPROUTE) - 1:
+                    selector += 1
+                    draw_loc_update(selector - 1, selector)
+                else:
+                    selector = 0
+                    draw_loc_update(len(MAPROUTE) - 1, selector)
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
+                if selector > 0:
+                    selector -= 1
+                    draw_loc_update(selector + 1, selector)
+                else:
+                    selector = len(MAPROUTE) - 1
+                    draw_loc_update(0, selector)
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_z:
+                return MAPROUTE[selector]
+
+
+
+
 
 
 def draw_choose_pkmn(me, opp, mode, oppdeath = False, mydeath = False):
@@ -726,7 +794,7 @@ def draw_choose_pkmn(me, opp, mode, oppdeath = False, mydeath = False):
 def wait_for_opp_move(opp,mymove, mode,socket):
     if mode == 'random' or mode == 'wild':
         #TODO PP check
-        return opp.current.moves[randint(0,len(opp.current.moves)-1)]
+        return ['move', randint(0,len(opp.current.moves)-1)]
     else:
         socket.send(json.dumps(mymove))
         display.update(write_btm('Waiting for opponenet'))
@@ -853,7 +921,10 @@ def lost(me, mode):
     sleep(1)
 
 def win(me, opp, mode):
-    display.update(write_btm(me.name + ' defeated', opp.name + '!'))
+    if mode != 'wild':
+        display.update(write_btm(me.name + ' defeated', opp.name + '!'))
+    else:
+        display.update(write_btm(me.name + ' defeated', opp.current.name + '!'))
     if mode != 'pong':
         wait_for_button()
     else:
@@ -929,19 +1000,18 @@ def run_game(me, opp, mode, socket):
                         my_move = me.current.lastmove
                     if my_move:
                         tmp, opp_move = wait_for_opp_move(opp, ['move', me.current.moves.index(my_move)], mode, socket)
+                        clean_me_up(me)
                         if tmp == 'move':
                             opp_move = opp.current.moves[opp_move]
                             if my_move.name == 'Quick Attack' != opp_move.name == 'Quick Attack':
                                 if my_move.name == 'Quick Attack':
                                     run_move(me, opp, my_move)
-                                    clean_me_up(me)
                                     if not opp.current.alive():
                                         return 0
                                     run_opp_move(me, opp, opp_move, False)
                                     if not me.current.alive():
                                         return 1
                                 else:
-                                    clean_me_up(me)
                                     run_opp_move(me, opp, opp_move, True)
                                     if not me.current.alive():
                                         return 1
@@ -952,15 +1022,12 @@ def run_game(me, opp, mode, socket):
                                 if me.current.calc_speed() > opp.current.calc_speed():
 
                                     run_move(me, opp, my_move, True)
-                                    clean_me_up(me)
                                     if not opp.current.alive():
                                         return 0
                                     run_opp_move(me, opp, opp_move, False)
                                     if not me.current.alive():
                                         return 1
                                 else:
-
-                                    clean_me_up(me)
                                     run_opp_move(me, opp, opp_move, True)
                                     if not me.current.alive():
                                         return 1
@@ -970,19 +1037,16 @@ def run_game(me, opp, mode, socket):
                         elif tmp == 'swap':
                             if my_move.name == 'Quick Attack':
                                     run_move(me, opp, my_move, True)
-                                    clean_me_up(me)
                                     if not opp.current.alive():
                                         return 0
                                     run_opp_swap(opp, opp_move)
                             else:
                                 if me.current.calc_speed() > opp.current.calc_speed():
                                     run_move(me, opp, my_move, True)
-                                    clean_me_up(me)
                                     if not opp.current.alive():
                                         return 0
                                     run_opp_swap(opp, opp_move)
                                 else:
-                                    clean_me_up(me)
                                     run_opp_swap(opp, opp_move)
                                     run_move(me, opp, my_move, False)
                                     if not opp.current.alive():

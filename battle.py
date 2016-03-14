@@ -72,12 +72,12 @@ if __name__ == '__main__':
     opppkmn = build_team(opppkmn)
     me = trainer(myname, mypkmn)
     opp = trainer(oppname, opppkmn)
-    if client:
-        socket.send('')
-    else:
-        socket.recv()
+    #if client:
+    #    socket.send('')
+    #else:
+    #    socket.recv()
     set_seed(seed)
-    mode = 'battle'
+    mode = 'wild'
     #opppkmn = [1]
     #mypkmn = [9,150,149,6,25,100]
     #myname = 'ASD'
@@ -87,7 +87,13 @@ if __name__ == '__main__':
     #me = trainer(myname, mypkmn)
     #opp = trainer(oppname, opppkmn)
     #mode = 'wild'
-    new_game_start(me, opp, mode)
+    if mode != 'wild':
+        new_game_start(me, opp, mode)
+    else:
+        loc = choose_loc()
+        opp = trainer('', [get_wild_mon(loc)])
+
+
     while me.alive() and opp.alive():
         try:
             clearbtm()
