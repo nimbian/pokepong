@@ -393,6 +393,10 @@ def me_next_mon(me, opp, mode, socket):
 
 
 
+def catchem(item, pkmn):
+    val = pkmn.catch_me(item[0])
+    print val
+
 
 def opp_next_mon(me, opp, mode, socket):
     display.update(draw.rect(SCREEN, WHITE, [230,60,180,60]))
@@ -502,14 +506,15 @@ def draw_items(me, select):
             word_builder('>', 360, 200 + c * 120)
         else:
             word_builder(' ', 360, 200 + c * 120)
-        word_builder(i[0], 420,200 + c * 120)
-        if i[1] < 10:
-            num = '  ' + str(i[1])
-        elif i[1] < 100:
-            num = ' ' + str(i[1])
-        else:
-            num = str(i[1])
-        word_builder('*' + num, 820, 260 + c * 120)
+        word_builder(i.item, 420,200 + c * 120)
+        if i.item != 'CANCEL':
+            if i.count < 10:
+                num = '  ' + str(i.count)
+            elif i.count < 100:
+                num = ' ' + str(i.count)
+            else:
+                num = str(i.count)
+            word_builder('*' + num, 820, 260 + c * 120)
         c += 1
     display.update(dirty)
 
@@ -522,23 +527,31 @@ def update_items(me, select):
             dirty.append(word_builder('>', 360, 200 + c * 120))
         else:
             dirty.append(word_builder(' ', 360, 200 + c * 120))
-        dirty.append(word_builder(i[0], 420, 200 + c * 120))
-        if i[0] != 'CANCEL':
-            if i[1] < 10:
-                num = '  ' + str(i[1])
-            elif i[1] < 100:
-                num = ' ' + str(i[1])
+        dirty.append(word_builder(i.item, 420, 200 + c * 120))
+        if i.item != 'CANCEL':
+            if i.count < 10:
+                num = '  ' + str(i.count)
+            elif i.count < 100:
+                num = ' ' + str(i.count)
             else:
-                num = str(i[1])
+                num = str(i.count)
             dirty.append(word_builder('*' + num, 820, 260 + c * 120))
             c += 1
     display.update(dirty)
 
 
-def gain_exp(me,opp):
+def gain_exp(me,opp, multi):
     for mon in me.used:
-        lvlup = mon.gain_exp(me, opp)
-        #TODO lvlup
+        if mon.id_ > 151:
+            lvlup, exp = mon.gain_exp(me, opp, multi)
+            display.update(write_btm(mon.name, 'gained ' + str(exp) + ' exp.'))
+            wait_for_button()
+            if mon.lvl != lvlup:
+                gain_lvl(lvlup)
+                display.update(write_btm(mon.name + ' grew', 'to level ' + str(lvlup) + '!'))
+                wait_for_button()
+
+
 
 
 def clean_me_up(me):
@@ -656,12 +669,16 @@ def draw_choose_items(me):
                     me.shift_items_left()
                     update_items(me, selector)
             if event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
-                if selector < 2:
+                if selector < 2 and selector < len(me.shownitems) - 1:
                     selector += 1
                     update_items(me, selector)
-                elif me.shownitems[-1] != me.items[-1]:
+                elif len(me.shownitems) > 3:
                     me.shift_items_right()
                     update_items(me, selector)
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_x:
+                return False
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_z:
+                return selector
 
 
 def choose_loc():
@@ -1054,13 +1071,17 @@ def run_game(me, opp, mode, socket):
 
                         return 4
                 if selector == 1:
-                    select = 0
-                    select == draw_choose_items(me)
-                    sleep(15)
+                    select = draw_choose_items(me)
                     clear()
                     pygame.display.flip()
                     draw_all_opp(opp.current)
                     draw_all_me(me.current)
+                    item = me.shownitems[select]
+                    if item.item != 'CANCEL':
+                        item.use(me)
+                        if item.item[-4:] == 'BALL':
+                            catchem(item.item, opp.current)
+
                 if selector == 2:
                     select = draw_choose_pkmn(me,opp, mode)
                     clear()

@@ -127,6 +127,8 @@ if __name__ == '__main__':
                 r.delete('lock')
             if tmp == 0:
                 run_opp_faint(opp)
+                if mode == 'random' or mode == 'wild':
+                    gain_exp(me,opp,[1.5,1][mode == 'wild'])
                 if opp.alive():
                     opp_next_mon(me, opp, mode, socket)
                 else:

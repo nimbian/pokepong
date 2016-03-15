@@ -5,6 +5,8 @@ from logic import write_btm
 from pygame import display
 from time import sleep
 from math import ceil
+from redis import StrictRedis
+import json
 
 normal=['Normal','Fighting','Poison','Ground','Flying','Bug','Rock','Ghost']
 special=['Fire','Water','Electric','Grass','Ice','Psychic','Dragon']
@@ -12,7 +14,7 @@ special=['Fire','Water','Electric','Grass','Ice','Psychic','Dragon']
 stat_stages=[1/4., 2/7., 2/6., 2/5., 1/2., 2/3., 1, 3/2., 2, 5/2., 3, 7/2., 4]
 
 from math import floor
-class pokemon:
+class pokemon(object):
     #TODO badge bonus?
     def __init__(self, id_,name, moves, lvl, evs, ivs, exp, pps, wild = False):
         self.name = name
@@ -29,24 +31,25 @@ class pokemon:
                 moves.append(i[0])
                 pps.append(0)
             self
-
-
+        self.basecatch = c.execute("SELECT rate from catchrate where id = '{0}'".format(tmp[8])).fetchone()[0]
+        self.id_ = id_
         self.attack_stage = self.defense_stage = self.speed_stage = self.special_stage = 0
         self.accuracy_stage = self.evasion_stage = 0
         self.buffs = []
         self.ttick = 0
         self.sleep = -1
         self.exp = exp
-
         self.lvl = lvl
-        base = [tmp[0],tmp[1],tmp[2],tmp[3],tmp[4]]
-        hpiv = [0,8][ivs[0] % 2] + [0,8][ivs[1] % 2] + [0,8][ivs[2] % 2] + [0,8][ivs[3] % 2]
-        self.hp = self.calchp(base[0], evs[0], hpiv)
+        self.evs = evs
+        self.ivs = ivs
+        self.base = [tmp[0],tmp[1],tmp[2],tmp[3],tmp[4]]
+        self.hpiv = [0,8][ivs[0] % 2] + [0,8][ivs[1] % 2] + [0,8][ivs[2] % 2] + [0,8][ivs[3] % 2]
+        self.hp = self.calchp(self.base[0], self.evs[0], self.hpiv)
         self.maxhp = self.hp
-        self.attack = self.calcstat(base[1], evs[1], ivs[0])
-        self.defense = self.calcstat(base[2], evs[2], ivs[1])
-        self.speed = self.calcstat(base[3], evs[3], ivs[2])
-        self.special = self.calcstat(base[4], evs[4], ivs[3])
+        self.attack = self.calcstat(self.base[1], self.evs[1], self.ivs[0])
+        self.defense = self.calcstat(self.base[2], self.evs[2], self.ivs[1])
+        self.speed = self.calcstat(self.base[3], self.evs[3], self.ivs[2])
+        self.special = self.calcstat(self.base[4], self.evs[4], self.ivs[3])
         self.baseexp = tmp[5]
         self.type1 = tmp[6]
         self.type2 = tmp[7]
@@ -75,6 +78,11 @@ class pokemon:
         self.bide = False
         tmp = c.execute("SELECT speed from lvlspeed where pkmn = '{0}'".format(name)).fetchone()
         self.lvlspeed = tmp[0]
+        if wild:
+            self.exp = {'f': int(4 * self.lvl ** 3 / 5.),
+                        'mf': self.lvl ** 3,
+                        'ms': int(6/5. * self.lvl ** 3 - 15 * self.lvl ** 2 + 100 * self.lvl - 140),
+                        's': int(5 * self.lvl ** 3 / 4.)}[self.lvlspeed]
 
 
 
@@ -238,7 +246,7 @@ class pokemon:
                 return 'PAR'
         if 'SLP' in self.buffs:
             if self.sleep == 0:
-                self.buffs.pop(self.buffs.index('SLP'))
+                self.buffs.remove('SLP')
                 self.sleep -= 1
                 return 'WOKE'
             else:
@@ -278,7 +286,7 @@ class pokemon:
 
     def catch_me(self, ball):
         if ball == 'M':
-            return -1
+            return True
         elif ball == 'U':
             x = randint(0,150)
         elif ball == 'G':
@@ -290,7 +298,7 @@ class pokemon:
         elif 'PAR' in self.buffs or 'BRN' in self.buffs or 'PSN' in self.buffs:
             x -= 12
         if x < 0:
-            return -1
+            return True
         f = self.maxhp * 255
         if ball == 'G':
             f /= 8
@@ -405,18 +413,36 @@ class pokemon:
             self.pp = 5
             self.maxpp = 5
 
-    def gain_exp(self,me, opp):
+    def gain_exp(self,me, opp, multi):
         #TODO test exp
-        #TODO evs for all or just last?
-        if self.id_ > 150:
-            self.exp += (opp.baseexp * opp.lvl)/ me.used
+        print self.id_
+        if self.id_ > 151:
+            self.exp += (multi * opp.current.baseexp * opp.current.lvl)/ (7 * len(me.used))
             for i in range(5):
-                self.evs[i] += opp.base[i]
-            conn = connect('shawn')
-            c = conn.cursor()
-            lvl = c.execute("SELECT lvl from {0} where exp < '{1}' order by exp asc limit 1").fetchone()[0]
-            return lvl > self.lvl
-        return False
+                self.evs[i] += opp.current.base[i]
+            c = 0
+            while True:
+                lvl = self.lvl + c
+                exp = {'f': int(4 * lvl ** 3 / 5.),
+                       'mf': lvl ** 3,
+                       'ms': int(6/5. * lvl ** 3 - 15 * lvl ** 2 + 100 * lvl - 140),
+                       's': int(5 * lvl ** 3 / 4.)}[self.lvlspeed]
+                if self.exp < exp:
+                    break
+                c += 1
+            #TODO set to actual host
+            r = StrictRedis(host='127.0.0.1')
+            d = {'id': self.id_, 'exp': self.exp, 'lvl': self.lvl+c, 'evs': self.evs}
+            r.rpush('gain', json.dumps(d))
+            return [self.lvl + c, (opp.current.baseexp * opp.current.lvl)/ (7 * len(me.used))]
+
+    def gain_lvl(self, lvl):
+        self.lvl = lvl
+        self.maxhp = self.calchp(self.base[0], self.evs[0], self.hpiv)
+        self.attack = self.calcstat(self.base[1], self.evs[1], self.ivs[0])
+        self.defense = self.calcstat(self.base[2], self.evs[2], self.ivs[1])
+        self.speed = self.calcstat(self.base[3], self.evs[3], self.ivs[2])
+        self.special = self.calcstat(self.base[4], self.evs[4], self.ivs[3])
 
 
 
@@ -427,7 +453,11 @@ class pokemon:
 
 
 
-class move:
+
+
+
+
+class move(object):
     def __init__(self,name,pp):
         conn = connect('shawn')
         c = conn.cursor()
@@ -457,17 +487,17 @@ class move:
         return self.pp > 0
 
 
-class trainer:
+class trainer(object):
     def __init__(self, name, pkmn):
         self.name = name
         self.pkmn = pkmn
         self.current = pkmn[0]
         self.items = []
-        self.items.append(['POKEBALL',1])
-        self.items.append(['ULTRABALL',9])
-        self.items.append(['POTION',888])
-        self.items.append(['ANTIDOTE',10])
-        self.items.append(['CANCEL'])
+        self.items.append(item('POKEBALL',count = 1))
+        self.items.append(item('ULTRABALL',count = 9))
+        self.items.append(item('GREATBALL',count = 888))
+        self.items.append(item('MASTERBALL',count = 1))
+        self.items.append(item('CANCEL'))
         self.shownitems = self.items[:4]
         self.used = [self.current]
 
@@ -509,3 +539,19 @@ class trainer:
         y = self.items.index(self.shownitems[0])
         self.shownitems = self.items[y-1:y+3]
 
+class item(object):
+    def __init__(self, item, count = None):
+        self.item = item
+        self.count = count
+
+    def use(self, me):
+        #TODO write to DB
+        self.count -= 1
+        if self.count == 0:
+            me.items.remove(self)
+            try:
+                me.shownitems.remove(self)
+                me.shift_items_right()
+                me.shift_items_left()
+            except:
+                pass
