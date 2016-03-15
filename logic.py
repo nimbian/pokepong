@@ -547,7 +547,7 @@ def gain_exp(me,opp, multi):
             display.update(write_btm(mon.name, 'gained ' + str(exp) + ' exp.'))
             wait_for_button()
             if mon.lvl != lvlup:
-                gain_lvl(lvlup)
+                mon.gain_lvl(lvlup)
                 display.update(write_btm(mon.name + ' grew', 'to level ' + str(lvlup) + '!'))
                 wait_for_button()
 

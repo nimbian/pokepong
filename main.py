@@ -27,6 +27,7 @@ if __name__ == '__main__':
     count = 0
     king = None
     new_game = True
+    me = None
     while True:
         oldmode = mode
         mode = r.get('mode')
@@ -34,6 +35,8 @@ if __name__ == '__main__':
             mode = 'pong'
             r.set('mode','pong')
         elif mode != oldmode:
+            me = None
+            opp = None
             count = 0
         if mode != 'wild' and new_game:
             r.incr('count')
@@ -71,9 +74,6 @@ if __name__ == '__main__':
                         else:
                             oppname = tmp['name']
                             opppkmnlist = tmp['pokemon']
-                    #TODO uncomment when Production
-                    #c.execute("DELETE from teams where name = '{0}'".format(tmp[0]))
-                    #conn.commit()
                     count += 1
                     if count == needed:
                         break
@@ -86,18 +86,21 @@ if __name__ == '__main__':
                 except:
                     current = scrolling(current, possible)
                     sleep(5)
-
-        if mode == 'wild':
-            mypkmn, opppkmn, myname, oppname, seed = send_teams(mypkmnlist, myname)
+        if mode == 'wild' and not me:
+            if mode == 'wild':
+                mypkmn, opppkmn, myname, oppname, seed = send_teams(mypkmnlist, myname)
+            else:
+                if client:
+                    mypkmn, opppkmn, myname, oppname, seed = send_teams(mypkmnlist, myname,
+                                                                        opppkmn = opppkmnlist,
+                                                                        oppname = oppname,
+                                                                        socket = socket)
+            set_seed(seed)
+            mypkmn = build_team(mypkmn, me = True)
+            me = trainer(myname, mypkmn)
         else:
-            if client:
-                mypkmn, opppkmn, myname, oppname, seed = send_teams(mypkmnlist, myname,
-                                                                    opppkmn = opppkmnlist,
-                                                                    oppname = oppname,
-                                                                    socket = socket)
-        set_seed(seed)
-        mypkmn = build_team(mypkmn, me = True)
-        me = trainer(myname, mypkmn)
+            for mon in me.pkmn:
+                mon.clear()
         if mode == 'wild':
             loc = choose_loc()
             opp = trainer('', [get_wild_mon(loc)])
@@ -152,5 +155,3 @@ if __name__ == '__main__':
             else:
                 king = None
         new_game = False
-
-

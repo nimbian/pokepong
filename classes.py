@@ -94,10 +94,12 @@ class pokemon(object):
         return loadalphaimg('mon2.png')
 
     def calchp(self, hp, E, I):
+        E = min(63,int(floor(floor((max(0, E-1)**.5)+1)/4.)))
         hp = floor((2 * hp + I + E) * self.lvl / 100. + self.lvl + 10)
         return int(hp)
 
     def calcstat(self, stat, E, I):
+        E = min(63,int(floor(floor((max(0, E-1)**.5)+1)/4.)))
         stat = floor((2 * stat + I + E) * self.lvl / 100. + 5)
         return int(stat)
 
@@ -415,7 +417,6 @@ class pokemon(object):
 
     def gain_exp(self,me, opp, multi):
         #TODO test exp
-        print self.id_
         if self.id_ > 151:
             self.exp += (multi * opp.current.baseexp * opp.current.lvl)/ (7 * len(me.used))
             for i in range(5):
@@ -444,6 +445,28 @@ class pokemon(object):
         self.speed = self.calcstat(self.base[3], self.evs[3], self.ivs[2])
         self.special = self.calcstat(self.base[4], self.evs[4], self.ivs[3])
 
+
+    def clean(self):
+        self.hp = self.maxhp
+        for i in moves:
+            i.pp = i.maxpp
+        self.haze()
+        self.fleecount = 0
+        self.lastmove = ''
+        self.lastcount = 0
+        self.controllable = True
+        self.disabled = 0
+        self.substitute = 0
+        self.struggle = move('Struggle',0)
+        self.bidecnt = -1
+        self.bidedmg = 0
+        self.wrapped = 0
+        self.thrashing = -1
+        self.rage = False
+        #TODO what to do with payday
+        self.payday = 0
+        self.confused = 0
+        self.bide = False
 
 
 

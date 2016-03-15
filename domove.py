@@ -462,7 +462,7 @@ def proc(attack,defend,move,me,first):
             elif move.name in ['Thunder','Thunderbold', 'Thunderpunch','Thundershock'] and get_random() < .1:
                 paralyze(defend)
             elif move.name == 'Poison Sting' and get_random() < .2:
-                poison(defend)
+                poisoned(defend)
             elif move.name == 'Fire Blast' and get_random() < .3:
                 burn(defend)
             elif move.name == 'Psychic' and get_random() < .3:
@@ -473,7 +473,7 @@ def proc(attack,defend,move,me,first):
             elif move.name in ['Lick','Body Slam'] and get_random() < .3:
                 paralyze(defend)
             elif move.name in ['Sludge','Smog'] and get_random() < .3:
-                poison(defend)
+                poisoned(defend)
     return 0
 
 def lowerability(defend, move):
@@ -594,7 +594,7 @@ def sleeper(pokemon):
         sleep(1)
 
 
-def poisoned(pokemon):
+def toxic(pokemon):
     if 'TOXIC' in pokemon.buffs:
         display.update(write_btm('but it failed'))
         sleep(1)
