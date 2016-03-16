@@ -433,7 +433,7 @@ class pokemon(object):
                 c += 1
             #TODO set to actual host
             r = StrictRedis(host='127.0.0.1')
-            d = [self.exp, self.lvl+c] + self.evs + [self.id_]
+            d = [self.lvl+c] + self.evs + [self.exp, self.id_]
             r.rpush('queue', json.dumps(['gain',d]))
             return [self.lvl + c, (opp.current.baseexp * opp.current.lvl)/ (7 * len(me.used))]
 
