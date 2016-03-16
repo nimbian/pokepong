@@ -288,7 +288,7 @@ class pokemon(object):
 
     def catch_me(self, ball):
         if ball == 'M':
-            return True
+            return 4
         elif ball == 'U':
             x = randint(0,150)
         elif ball == 'G':
@@ -300,7 +300,7 @@ class pokemon(object):
         elif 'PAR' in self.buffs or 'BRN' in self.buffs or 'PSN' in self.buffs:
             x -= 12
         if x < 0:
-            return True
+            return 4
         f = self.maxhp * 255
         if ball == 'G':
             f /= 8
@@ -312,7 +312,7 @@ class pokemon(object):
         if self.basecatch < x:
             pass
         elif randint(0,255) < f:
-            return True
+            return 4
         w = self.basecatch * 100
 
         if ball == 'U':

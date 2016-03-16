@@ -44,6 +44,18 @@ POKE2 = loadalphaimg('poke2.png')
 ITEMS = loadalphaimg('items.png')
 MAP = loadimg('map.png').convert()
 MAPSELECTOR = loadalphaimg('mapselector.png')
+BALL = {'POKEBALL': [loadalphaimg('PLball.png'),
+                     loadalphaimg('PCball.png'),
+                     loadalphaimg('PRball.png')],
+        'GREATBALL': [loadalphaimg('GLball.png'),
+                     loadalphaimg('GCball.png'),
+                     loadalphaimg('GRball.png')],
+        'ULTRABALL': [loadalphaimg('ULball.png'),
+                     loadalphaimg('UCball.png'),
+                     loadalphaimg('URball.png')],
+        'MASTERBALL': [loadalphaimg('MLball.png'),
+                     loadalphaimg('MCball.png'),
+                     loadalphaimg('MRball.png')]}
 
 SSIZE = [392,392]
 BTM_TUPLE = (10, SIZE[1]-340)
@@ -392,10 +404,57 @@ def me_next_mon(me, opp, mode, socket):
     draw_all_opp(opp.current)
 
 
+def toss_ball(item, pkmn):
+    #TODO animate toss
+    pass
+
+
+def wobble(val, item):
+    ballloc = [800,270]
+    display.update(draw.rect(SCREEN, WHITE, OPPPKMN + SSIZE))
+    for i in range(min(3,val)):
+        display.update(draw.rect(SCREEN, WHITE,  ballloc + [BALL[item][1].get_width(), BALL[item][1].get_height()]))
+        display.update(SCREEN.blit(BALL[item][1], ballloc))
+        sleep(.5)
+        display.update(draw.rect(SCREEN, WHITE,  ballloc + [BALL[item][1].get_width(), BALL[item][1].get_height()]))
+        display.update(SCREEN.blit(BALL[item][0], ballloc))
+        sleep(.1)
+        display.update(draw.rect(SCREEN, WHITE,  ballloc + [BALL[item][1].get_width(), BALL[item][1].get_height()]))
+        display.update(SCREEN.blit(BALL[item][1], ballloc))
+        sleep(.1)
+        display.update(draw.rect(SCREEN, WHITE,  ballloc + [BALL[item][1].get_width(), BALL[item][1].get_height()]))
+        display.update(SCREEN.blit(BALL[item][2], ballloc))
+        sleep(.1)
+    if val == 1:
+        display.update(write_btm('Darn! The POK~MON broke', 'free!'))
+    elif val == 2:
+        display.update(write_btm('Aww! It appeared to be', 'caught!'))
+    elif val == 3:
+        display.update(write_btm('Shoot! It was so close too!'))
+        #TODO write to db
+
+
+
+
+
+
+
 
 def catchem(item, pkmn):
     val = pkmn.catch_me(item[0])
-    print val
+    toss_ball(item, pkmn)
+    if val > 0:
+        wobble(val,item)
+        if val < 4:
+            display.update(draw_all_opp(pkmn))
+        else:
+            display.update(write_btm(pkmn.name + ' was', 'caugt!'))
+    else:
+        display.update(draw_all_opp(pkmn))
+        display.update(write_btm('You missed the', 'POK~MON'))
+    wait_for_button()
+    return val == 4
+
 
 
 def opp_next_mon(me, opp, mode, socket):
@@ -1080,7 +1139,22 @@ def run_game(me, opp, mode, socket):
                     if item.item != 'CANCEL':
                         item.use(me)
                         if item.item[-4:] == 'BALL':
-                            catchem(item.item, opp.current)
+                            display.update(write_btm(me.name + ' used', item.item))
+                            ret = catchem(item.item, opp.current)
+                            if ret:
+                                return 5
+                            else:
+                                tmp, opp_move = wait_for_opp_move(opp, ['swap', select], mode, socket)
+                                draw_all_me(me.current)
+                                if tmp == 'move':
+                                    opp_move = opp.current.moves[opp_move]
+                                    run_opp_move(me,opp,opp_move, True)
+                                    if not me.current.alive:
+                                        return 1
+                                draw_all_me(me.current)
+                                clearbtm()
+                                selector = 0
+                                draw_choice(0)
 
                 if selector == 2:
                     select = draw_choose_pkmn(me,opp, mode)
