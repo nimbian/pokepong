@@ -431,16 +431,9 @@ def wobble(val, item):
         display.update(write_btm('Aww! It appeared to be', 'caught!'))
     elif val == 3:
         display.update(write_btm('Shoot! It was so close too!'))
-        #TODO write to db
 
 
-
-
-
-
-
-
-def catchem(item, pkmn):
+def catchem(item, pkmn, me):
     val = pkmn.catch_me(item[0])
     toss_ball(item, pkmn)
     if val > 0:
@@ -448,14 +441,14 @@ def catchem(item, pkmn):
         if val < 4:
             display.update(draw_all_opp(pkmn))
         else:
+            d = [me.name, pkmn.name] + (pkmn.list_moves() + ['null'] * 4)[:4] + [pkmn.lvl] + pkmn.ivs + [pkmn.exp]
+            r.rpush('queue', json.dumps(['new', d]))
             display.update(write_btm(pkmn.name + ' was', 'caugt!'))
     else:
         display.update(draw_all_opp(pkmn))
         display.update(write_btm('You missed the', 'POK~MON'))
     wait_for_button()
     return val == 4
-
-
 
 def opp_next_mon(me, opp, mode, socket):
     display.update(draw.rect(SCREEN, WHITE, [230,60,180,60]))
@@ -1140,7 +1133,7 @@ def run_game(me, opp, mode, socket):
                         item.use(me)
                         if item.item[-4:] == 'BALL':
                             display.update(write_btm(me.name + ' used', item.item))
-                            ret = catchem(item.item, opp.current)
+                            ret = catchem(item.item, opp.current, me)
                             if ret:
                                 return 5
                             else:

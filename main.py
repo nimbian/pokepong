@@ -100,7 +100,7 @@ if __name__ == '__main__':
             me = trainer(myname, mypkmn)
         else:
             for mon in me.pkmn:
-                mon.clear()
+                mon.clean()
         if mode == 'wild':
             loc = choose_loc()
             opp = trainer('', [get_wild_mon(loc)])
@@ -145,6 +145,8 @@ if __name__ == '__main__':
             elif tmp == 3:
                 pass
                 #TODO escape
+            elif tmp == 5:
+                break
         if mode == 'pong':
             if play_again(me.alive()):
                 if me.alive():

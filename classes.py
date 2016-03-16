@@ -394,7 +394,7 @@ class pokemon(object):
     def list_moves(self):
         moves = []
         for i in self.moves:
-            moves += i.name
+            moves.append(i.name)
         return moves
 
     def transform(self, defend):
@@ -433,8 +433,8 @@ class pokemon(object):
                 c += 1
             #TODO set to actual host
             r = StrictRedis(host='127.0.0.1')
-            d = {'id': self.id_, 'exp': self.exp, 'lvl': self.lvl+c, 'evs': self.evs}
-            r.rpush('gain', json.dumps(d))
+            d = [self.exp, self.lvl+c] + self.evs + [self.id_]
+            r.rpush('queue', json.dumps(['gain',d]))
             return [self.lvl + c, (opp.current.baseexp * opp.current.lvl)/ (7 * len(me.used))]
 
     def gain_lvl(self, lvl):
@@ -448,7 +448,7 @@ class pokemon(object):
 
     def clean(self):
         self.hp = self.maxhp
-        for i in moves:
+        for i in self.moves:
             i.pp = i.maxpp
         self.haze()
         self.fleecount = 0
