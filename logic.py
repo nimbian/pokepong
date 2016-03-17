@@ -126,7 +126,7 @@ def draw_my_hp_bar():
     return [MYHPBAR_RECT]
 
 def draw_my_lvl(pkmn):
-    return [word_builder('%' + str(pkmn.lvl), SIZE[0] - 405, SIZE[1]-565)]
+    return [word_builder('%' + str(pkmn.lvl) + ' ', SIZE[0] - 405, SIZE[1]-565)]
 
 def draw_my_hp(pkmn):
     maxhp = pkmn.maxhp
@@ -187,7 +187,7 @@ def draw_opp_hp_bar():
     return [OPPHPBAR_RECT]
 
 def draw_opp_lvl(pkmn):
-    return [word_builder('%' + str(pkmn.lvl), 230,60)]
+    return [word_builder('%' + str(pkmn.lvl) + ' ', 230,60)]
 
 def draw_opp_hp(pkmn):
     maxhp = pkmn.maxhp
@@ -602,6 +602,7 @@ def gain_exp(me,opp, multi):
                 mon.gain_lvl(lvlup)
                 display.update(write_btm(mon.name + ' grew', 'to level ' + str(lvlup) + '!'))
                 wait_for_button()
+    me.used.clear()
 
 
 
@@ -619,6 +620,7 @@ def run_me_faint(me):
         SCREEN.blit(me.current.img, (59, SIZE[1]-740 + i), (0,0,392,392-i))
         display.update(59, SIZE[1]-738 + i, 392,394-i)
     display.update(write_btm(me.current.name, 'fainted!'))
+    self.used.remove(me.current)
 
 def run_opp_faint(opp):
     for i in range(0,393,2):
@@ -833,6 +835,7 @@ def draw_choose_pkmn(me, opp, mode, oppdeath = False, mydeath = False):
                             return_my_pokemon(me)
                         if mydeath or oppdeath:
                             me.set_current(select)
+                            me.used.add(me.current)
                             pop_ball(me.current.name)
                             draw_all_me(me.current)
                             sleep(.5)
@@ -1188,6 +1191,7 @@ def run_game(me, opp, mode, socket):
                                 pop_ball(me.current.name)
                                 draw_all_me(me.current)
                                 run_opp_swap(opp, opp_move)
+                        me.used.add(me.current)
                     draw_all_me(me.current)
                     clearbtm()
                     selector = 0

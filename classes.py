@@ -56,7 +56,7 @@ class pokemon(object):
         self.picid = tmp[8]
         self.moves = []
         for i in range(len(moves)):
-            if moves[i] != '':
+            if moves[i] and moves[i] != '':
                 self.moves.append(move(moves[i],pps[i]))
         self.sprite1 = self.set_sprite1()
         self.sprite2 = self.set_sprite2()
@@ -394,7 +394,7 @@ class pokemon(object):
     def list_moves(self):
         moves = []
         for i in self.moves:
-            moves.append(i.name)
+            moves.append("'" + i.name + "'")
         return moves
 
     def transform(self, defend):
@@ -522,7 +522,8 @@ class trainer(object):
         self.items.append(item('MASTERBALL',count = 1))
         self.items.append(item('CANCEL'))
         self.shownitems = self.items[:4]
-        self.used = [self.current]
+        self.used = set()
+        self.used.add(self.current)
 
     def alive(self):
         for mon in self.pkmn:
