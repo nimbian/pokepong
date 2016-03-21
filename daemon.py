@@ -4,11 +4,12 @@ import json
 
 if __name__ == '__main__':
     r = StrictRedis(host = '127.0.0.1')
-    insert = ("INSERT INTO ownedpkmn VALUES ('{0}','{1}',{2},{3},{4},"
+    new = ("INSERT INTO ownedpkmn VALUES ('{0}','{1}',{2},{3},{4},"
               "{5},{6},0,0,0,0,0,'{7}','{8}','{9}','{10}','{11}',0,0,0,0)")
-    update = ("UPDATE ownedpkmn set lvl = {0}, hpev = {1}, attackev = {2},"
+    gain = ("UPDATE ownedpkmn set lvl = {0}, hpev = {1}, attackev = {2},"
               "defenseev = {3}, speedev = {4}, specialev = {5}, exp = {6} "
               "WHERE rowid = '{7}'")
+    money = "UPDATE money set money = {0} where name = {1}"
     while True:
         tmp, msg = r.blpop('queue')
         msg = json.loads(msg)
@@ -17,10 +18,11 @@ if __name__ == '__main__':
         conn = connect('shawn')
         c = conn.cursor()
         if type_ == 'gain':
-            c.execute(update.format(*msg))
+            c.execute(gain.format(*msg))
         elif type_ == 'new':
-            print insert.format(*msg)
-            c.execute(insert.format(*msg))
+            c.execute(new.format(*msg))
+        elif type_ == 'money':
+            c.execute(money.format(*msg))
         else:
             print 'unk: ' + msg
         conn.commit()

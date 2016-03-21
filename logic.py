@@ -859,6 +859,21 @@ def shop(me):
                     retval = conf()
                     if retval:
                         if me.money < item[1] * retval:
+                            display.update(write_btm("You don't have", 'enough money'))
+                            wait_for_button()
+                            display.update(draw.rect(SCREEN, WHITE, [360, SIZE[1]-830, 700, 490]))
+                            update_shop(shopp, selector)
+                        else:
+                            me.money -= item[1] * retval
+                            d = [me.money, me.name]
+                            r.rpush('queue', json.dumps(['money', d]))
+                            display.update(write_btm('Here you are!', 'Thank you!'))
+                            #TODO write to db
+                            display.update(draw.rect(SCREEN, WHITE, [360, SIZE[1]-830, 700, 490]))
+                            update_shop(shopp, selector)
+                    else:
+                        display.update(draw.rect(SCREEN, WHITE, [360, SIZE[1]-830, 700, 490]))
+                        update_shop(shopp, selector)
 
 
                 else:
