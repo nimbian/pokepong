@@ -1,7 +1,8 @@
 from pygame import image, draw, display, event
 import pygame
-from util import loadimg, loadalphaimg, alphabet
-from util import choice, randint, MyMoveOccuring, OppMoveOccuring
+#from util import loadimg, loadalphaimg, alphabet
+#from util import choice, randint, MyMoveOccuring, OppMoveOccuring
+from util import *
 from time import sleep
 from math import ceil,floor
 from sqlite3 import connect
@@ -42,6 +43,7 @@ TRAINERBACK = loadalphaimg('trainerback.png')
 POKE1 = loadalphaimg('poke1.png')
 POKE2 = loadalphaimg('poke2.png')
 ITEMS = loadalphaimg('items.png')
+AMOUNT = loadalphaimg('amount.png')
 MAP = loadimg('map.png').convert()
 MAPSELECTOR = loadalphaimg('mapselector.png')
 BALL = {'POKEBALL': [loadalphaimg('PLball.png'),
@@ -558,7 +560,7 @@ def draw_items(me, select):
             word_builder('>', 360, 200 + c * 120)
         else:
             word_builder(' ', 360, 200 + c * 120)
-        word_builder(i.item, 420,200 + c * 120)
+        word_builder(i.item.upper().ljust(12), 420,200 + c * 120)
         if i.item != 'CANCEL':
             if i.count < 10:
                 num = '  ' + str(i.count)
@@ -579,7 +581,7 @@ def update_items(me, select):
             dirty.append(word_builder('>', 360, 200 + c * 120))
         else:
             dirty.append(word_builder(' ', 360, 200 + c * 120))
-        dirty.append(word_builder(i.item, 420, 200 + c * 120))
+        dirty.append(word_builder(i.item.upper().ljust(12), 420, 200 + c * 120))
         if i.item != 'CANCEL':
             if i.count < 10:
                 num = '  ' + str(i.count)
@@ -758,9 +760,110 @@ def choose_loc():
             if event.type == pygame.KEYDOWN and event.key == pygame.K_z:
                 return MAPROUTE[selector]
 
+def update_shop(shopp, select):
+    dirty = []
+    c = 0
+    dirty.append(draw.rect(SCREEN, WHITE, [360, SIZE[1]-830, 700, 490]))
+    for i in shopp.shownitems:
+        if c == select:
+            dirty.append(word_builder('>', 360, 200 + c * 120))
+        else:
+            dirty.append(word_builder(' ', 360, 200 + c * 120))
+        dirty.append(word_builder(i[0].upper().ljust(12), 420, 200 + c * 120))
+        if i[0] != 'CANCEL':
+            dirty.append(word_builder('<' + str(i[1]).rjust(4), 820, 260 + c * 120))
+        c += 1
+    display.update(dirty)
+
+
+def update_amount(item, select):
+    dirty = []
+    dirty.append(draw.rect(SCREEN, WHITE, [473, 495, AMOUNT.get_width() + 14, AMOUNT.get_height() + 14]))
+    dirty.append(SCREEN.blit(AMOUNT, (480, 502)))
+    dirty.append(word_builder('*'+ str(select).zfill(2) + ('<' + str(item[1] * select)).rjust(8),534, 555))
+    display.update(dirty)
+
+def amount(item):
+    selector = 1
+    dirty = []
+    dirty.append(draw.rect(SCREEN, WHITE, [473, 495, AMOUNT.get_width() + 14, AMOUNT.get_height() + 14]))
+    dirty.append(SCREEN.blit(AMOUNT, (480, 502)))
+    dirty.append(word_builder('*'+ str(selector).zfill(2) + ('<' + str(item[1])).rjust(8),534, 555))
+    display.update(dirty)
+    pygame.event.clear()
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
+                if selector < 99:
+                    selector += 1
+                else:
+                    selector = 1
+                update_amount(item, selector)
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
+                if selector > 1:
+                    selector -= 1
+                else:
+                    selector = 99
+                update_amount(item, selector)
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_RIGHT:
+                selector = (selector + 10) % 100
+                update_amount(item, selector)
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT:
+                selector = (100 + (selector - 10)) % 100
+                update_amount(item, selector)
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_x:
+                return False
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_z:
+                return selector
 
 
 
+def shop(me):
+    shopp = shoppe()
+    clear()
+    display.flip()
+    dirty = []
+    dirty.append(word_builder('Take your time.', 50, SIZE[1]-250))
+    dirty.append(SCREEN.blit(ITEMS, (10, SIZE[1]-880)))
+    display.update(dirty)
+    selector = 0
+    update_shop(shopp, selector)
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
+                if selector > 0:
+                    selector -= 1
+                    update_shop(shopp, selector)
+                elif shopp.items[0] != shopp.shownitems[0]:
+                    shopp.shift_items_left()
+                    update_shop(shopp, selector)
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
+                if selector < 2 and selector < len(shopp.shownitems) - 1:
+                    selector += 1
+                    update_shop(shopp, selector)
+                elif len(shopp.shownitems) > 3:
+                    shopp.shift_items_right()
+                    update_shop(shopp,selector)
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_x:
+                return False
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_z:
+                item = shopp.shownitems[selector]
+                retval = amount(item)
+                if retval:
+                    #TODO confirm/check cash/send to DB/items
+                    pass
+                    display.update(write_btm(item[0] + '?',
+                                             'That will be'))
+                    wait_for_button()
+                    display.update(write_btm('That will be', item[1] * retval + '. OK?'))
+                    retval = conf()
+                    if retval:
+                        if me.money < item[1] * retval:
+
+
+                else:
+                    display.update(draw.rect(SCREEN, WHITE, [360, SIZE[1]-830, 700, 490]))
+                    update_shop(shopp, selector)
 
 
 def draw_choose_pkmn(me, opp, mode, oppdeath = False, mydeath = False):
@@ -1222,4 +1325,4 @@ def run_game(me, opp, mode, socket):
 
 
 from domove import do_move, usable_move
-from classes import pokemon
+from classes import pokemon, shoppe

@@ -579,3 +579,29 @@ class item(object):
                 me.shift_items_left()
             except:
                 pass
+
+
+
+class shoppe(object):
+    def __init__(self):
+        self.items = [['Pok~ ball',200],['Great Ball',600],['Ultra Ball',1200],
+                      ['Potion',300],['Super Potion',700],['Hyper Potion',1200],
+                      ['Max Potion',2500],['Antidote',100],['Paralyz Heal',200],
+                      ['Burn Heal',250],['Ice Heal',250],['Awakening',250],
+                      ['Full Heal',600],['Revive',1500],['Full Restore',3000],
+                      ['X Attack',500],['X Defend',550],['X Special',350],
+                      ['X Speed',350],['X Accuracy',950],['Dire Hit',650],
+                      ['Guard Spec',700],['Thunderstone',2100],
+                      ['Fire Stone',2100],['Water Stone',2100],
+                      ['Moon Stone',2100],['Leaf Stone',2100],['Protein',9800],
+                      ['Iron',9800],['HP Up',9800],['Calcium',9800],
+                      ['Carbos',9800],['CANCEL']]
+        self.shownitems = self.items[:4]
+
+    def shift_items_right(self):
+        y = self.items.index(self.shownitems[1])
+        self.shownitems = self.items[y:y+4]
+
+    def shift_items_left(self):
+        y = self.items.index(self.shownitems[0])
+        self.shownitems = self.items[y-1:y+3]

@@ -91,7 +91,10 @@ if __name__ == '__main__':
         new_game_start(me, opp, mode)
     else:
         loc = choose_loc()
-        opp = trainer('', [get_wild_mon(loc)])
+        if loc == 'PALLET TOWN':
+            shop(me)
+        else:
+            opp = trainer('', [get_wild_mon(loc)])
 
 
     while me.alive() and opp.alive():

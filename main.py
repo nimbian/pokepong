@@ -103,7 +103,11 @@ if __name__ == '__main__':
                 mon.clean()
         if mode == 'wild':
             loc = choose_loc()
-            opp = trainer('', [get_wild_mon(loc)])
+            if loc == 'PALLET TOWN':
+                shop(me)
+                continue
+            else:
+                opp = trainer('', [get_wild_mon(loc)])
         else:
             opppkmn = build_team(opppkmn)
             opp = trainer(oppname, opppkmn)
