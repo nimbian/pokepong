@@ -42,6 +42,7 @@ class pokemon(object):
         self.lvl = lvl
         self.evs = evs
         self.ivs = ivs
+        self.tmppps = pps
         self.base = [tmp[0],tmp[1],tmp[2],tmp[3],tmp[4]]
         self.hpiv = [0,8][ivs[0] % 2] + [0,8][ivs[1] % 2] + [0,8][ivs[2] % 2] + [0,8][ivs[3] % 2]
         self.hp = self.calchp(self.base[0], self.evs[0], self.hpiv)
@@ -53,7 +54,8 @@ class pokemon(object):
         self.baseexp = tmp[5]
         self.type1 = tmp[6]
         self.type2 = tmp[7]
-        self.picid = tmp[8]
+        self.baseid = tmp[8]
+        self.tmpmoves = moves
         self.moves = []
         for i in range(len(moves)):
             if moves[i] and moves[i] != '':
@@ -83,6 +85,18 @@ class pokemon(object):
                         'mf': self.lvl ** 3,
                         'ms': int(6/5. * self.lvl ** 3 - 15 * self.lvl ** 2 + 100 * self.lvl - 140),
                         's': int(5 * self.lvl ** 3 / 4.)}[self.lvlspeed]
+
+
+    def check_evolve(self):
+        conn = connect('shawn')
+        c = conn.cursor()
+        query = 'select evolveto from evolve where lvl < {0} and id = {1}'.format(self.lvl,self.baseid)
+        tmp = c.execute(query).fetchone()
+        if tmp:
+            x = c.execute("select pokemon from pokemon where id = {0}".format(tmp[0])).fetchone()
+            return [tmp[0], x[0]]
+        else:
+            return False
 
 
 
@@ -522,6 +536,15 @@ class trainer(object):
         self.items.append(item('MASTERBALL',count = 1))
         self.items.append(item('CANCEL'))
         self.shownitems = self.items[:4]
+        self.usable = []
+        self.usable.append(item('Fire Stone', count = 1))
+        self.usable.append(item('Thunderstone', count = 1))
+        self.usable.append(item('Water Stone', count = 1))
+        self.usable.append(item('Leaf Stone', count = 1))
+        self.usable.append(item('Moon Stone', count = 1))
+        self.usable.append(item('Link Stone', count = 1))
+        self.usable.append(item('CANCEL'))
+        self.usable_items = self.usable[:4]
         self.used = set()
         self.used.add(self.current)
 
@@ -563,6 +586,14 @@ class trainer(object):
         y = self.items.index(self.shownitems[0])
         self.shownitems = self.items[y-1:y+3]
 
+    def shift_usable_right(self):
+        y = self.usable.index(self.shown_usable[1])
+        self.shown_usable = self.usable[y:y+4]
+
+    def shift_usable_left(self):
+        y = self.usable.index(self.shown_usable[0])
+        self.shown_usable = self.usable[y-1:y+3]
+
 class item(object):
     def __init__(self, item, count = None):
         self.item = item
@@ -593,9 +624,9 @@ class shoppe(object):
                       ['X Speed',350],['X Accuracy',950],['Dire Hit',650],
                       ['Guard Spec',700],['Thunderstone',2100],
                       ['Fire Stone',2100],['Water Stone',2100],
-                      ['Moon Stone',2100],['Leaf Stone',2100],['Protein',9800],
-                      ['Iron',9800],['HP Up',9800],['Calcium',9800],
-                      ['Carbos',9800],['CANCEL']]
+                      ['Moon Stone',2100],['Leaf Stone',2100],
+                      ['Link Stone', 2100],['Protein',9800],['Iron',9800],
+                      ['HP Up',9800],['Calcium',9800],['Carbos',9800],['CANCEL']]
         self.shownitems = self.items[:4]
 
     def shift_items_right(self):

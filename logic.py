@@ -59,6 +59,13 @@ BALL = {'POKEBALL': [loadalphaimg('PLball.png'),
                      loadalphaimg('MCball.png'),
                      loadalphaimg('MRball.png')]}
 
+ABLE = {'Thunderstone':{133:135,25:26},
+        'Fire Stone':{133:136,37:38,58:59},
+        'Water Stone':{133:134,90:91,120:121,61:62},
+        'Leaf Stone':{70:71,102:13,44:45},
+        'Moon Stone':{30:31,33:34,35:36,39:40},
+        'Link Stone':{64:65,67:68,93:94,75:76}}
+
 SSIZE = [392,392]
 BTM_TUPLE = (10, SIZE[1]-340)
 
@@ -98,7 +105,7 @@ def get_wild_mon(route):
     for i in range(4):
         ivs.append(random.randint(0,15))
     pkmn = pokemon(0,name, [],lvl,evs,ivs,0,[], wild = True)
-    pkmnimg = loadimg('fronts/{0}.PNG'.format(pkmn.picid)).convert()
+    pkmnimg = loadimg('fronts/{0}.PNG'.format(pkmn.baseid)).convert()
     pkmnimg.set_colorkey((255,255,255))
     pkmn.setimg(pkmnimg)
     return pkmn
@@ -322,9 +329,9 @@ def build_team(testpkmn, me = False):
     for i in range(0, len(testpkmn)):
         team.append(pokemon(*testpkmn[i]))
         if me:
-            pkmn = loadimg('backs/{0}.PNG'.format(team[-1].picid)).convert()
+            pkmn = loadimg('backs/{0}.PNG'.format(team[-1].baseid)).convert()
         else:
-            pkmn = loadimg('fronts/{0}.PNG'.format(team[-1].picid)).convert()
+            pkmn = loadimg('fronts/{0}.PNG'.format(team[-1].baseid)).convert()
         pkmn.set_colorkey((255,255,255))
         team[-1].setimg(pkmn)
     return team
@@ -606,6 +613,63 @@ def gain_exp(me,opp, multi):
                 wait_for_button()
     me.used.clear()
 
+def do_evolve(oldpic, newpic):
+    sleep(2)
+    for i in range(100):
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_x:
+                return False
+        if (i + 2) % 12 == 0:
+            draw.rect(SCREEN,WHITE, [444,120]+SSIZE)
+            display.update(SCREEN.blit(newpic,[444,120]))
+        elif i % 12 == 0:
+            draw.rect(SCREEN,WHITE, [444,120]+SSIZE)
+            display.update(SCREEN.blit(oldpic,[444,120]))
+        sleep(.01)
+    for i in range(100):
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_x:
+                return False
+        if (i + 2) % 8 == 0:
+            draw.rect(SCREEN,WHITE, [444,120]+SSIZE)
+            display.update(SCREEN.blit(newpic,[444,120]))
+        elif i % 8 == 0:
+            draw.rect(SCREEN,WHITE, [444,120]+SSIZE)
+            display.update(SCREEN.blit(oldpic,[444,120]))
+        sleep(.01)
+    for i in range(100):
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_x:
+                return False
+        if (i + 2) % 4 == 0:
+            draw.rect(SCREEN,WHITE, [444,120]+SSIZE)
+            display.update(SCREEN.blit(newpic,[444,120]))
+        elif i % 4 == 0:
+            draw.rect(SCREEN,WHITE, [444,120]+SSIZE)
+            display.update(SCREEN.blit(oldpic,[444,120]))
+        sleep(.01)
+    return True
+
+
+def evolve(me, mon, new):
+    oldpic = loadimg('fronts/{0}.PNG'.format(mon.baseid)).convert()
+    oldpic.set_colorkey((255,255,255))
+    oldpic = pygame.transform.flip(oldpic,True,False)
+    newpic = loadimg('fronts/{0}.PNG'.format(new[0])).convert()
+    newpic.set_colorkey((255,255,255))
+    newpic = pygame.transform.flip(newpic,True,False)
+    clear()
+    write_btm('What? {0}'.format(mon.name), 'is evolving!')
+    SCREEN.blit(oldpic,[444,120])
+    display.flip()
+    if do_evolve(oldpic, newpic):
+        #TODO write to DB
+        display.update(write_btm('{0} evolved'.format(mon.name),"into " + new[1]))
+        wait_for_button()
+    else:
+        display.update(write_btm('Huh? {0}'.format(mon.name),"stopped evolving!"))
+        wait_for_button()
+    sleep(15)
 
 
 
@@ -817,15 +881,142 @@ def amount(item):
                 return selector
 
 
+def update_using(me, select):
+    dirty = []
+    c = 0
+    dirty.append(draw.rect(SCREEN, WHITE, [360, SIZE[1]-830, 700, 490]))
+    for i in me.shown_usable:
+        if c == select:
+            dirty.append(word_builder('>', 360, 200 + c * 120))
+        else:
+            dirty.append(word_builder(' ', 360, 200 + c * 120))
+        dirty.append(word_builder(i.item.upper().ljust(12), 420, 200 + c * 120))
+        if i[0] != 'CANCEL':
+            dirty.append(word_builder('*' + str(me.count).rjust(3), 820, 260 + c * 120))
+        c += 1
+    display.update(dirty)
+
+
+def draw_use_on(mon,offset,item):
+    word_builder(mon.name, 160, offset* 110 + 10)
+    word_builder('%' + str(mon.lvl), 800, offset * 110)
+    SCREEN.blit(mon.sprite1, (60, offset * 110+ 15))
+    try:
+        able = mon.baseid in ABLE[item]
+        word_builder( ['NOT ABLE','    ABLE'][able], 520, offset * 110 + 60)
+    except:
+        #TODO TM/HMS
+        pass
+    return able
+
+def update_usable(old,new,me):
+    dirty = []
+    dirty.append(word_builder(' ', 0, 110 * old + 60))
+    dirty.append(draw.rect(SCREEN, WHITE, [10, 110 * old + 15, 105, 105]))
+    dirty.append(draw.rect(SCREEN, WHITE, [60, 110 * old + 15, 101, 101]))
+    dirty.append(SCREEN.blit(me.pkmn[old].sprite1, (60, 110 * old + 15)))
+    dirty.append(word_builder('>', 0, 110 * new + 60))
+    display.update(dirty)
+
+
+def usable_on(me, item):
+    clear()
+    write_btm('Use {0} on', 'which POK~MON')
+    offset = 0
+    able_list = []
+    for mon in me.pkmn:
+        able.append(draw_use_on(mon,offset,item))
+        offset += 1
+    word_builder('>', 0, 60)
+    display.flip()
+    count = 0
+    while True
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
+                if select > 0:
+                    select -= 1
+                    update_usable(select+1, select, me)
+                    count = 1
+                    tmp = True
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
+                if select < len(me.pkmn) - 1:
+                    select += 1
+                    update_usable(select-1, select, me)
+                    count = 1
+                    tmp = True
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_z:
+                #TODO add conf
+                #conf()
+                return select
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_x:
+                return False
+
+        sleep(.1)
+        con1 = count % 2 == 0 and me.pkmn[select].hp > me.pkmn[select].maxhp / 2
+        con2 = count % 5 == 0 and me.pkmn[select].hp <= me.pkmn[select].maxhp / 2
+        if con1 or con2:
+            dirty = draw.rect(SCREEN, WHITE, [60, select * 110+ 15, 101, 101])
+            if tmp:
+                SCREEN.blit(me.pkmn[select].sprite2, (60, select * 110+ 15))
+            else:
+                SCREEN.blit(me.pkmn[select].sprite1, (60, select * 110+ 15))
+            display.update(dirty)
+            tmp = not tmp
+
+
+def use(me, item, mon):
+    #TODO replace tmp with new name
+    if item in ABLE:
+        evolve(me, mon, [ABLE[item][mon.baseid], 'tmp']
+
+
+
+def using(me):
+    while True:
+        clear()
+        SCREEN.blit(ITEMS, (10, SIZE[1]-880))
+        write_btm('Which item would', 'you like to use?')
+        display.flip()
+        selector = 0
+        update_using(me, select)
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
+                    if selector > 0:
+                        selector -= 1
+                        update_using(me, selector)
+                    elif shopp.items[0] != shopp.shownitems[0]:
+                        shopp.shift_usable_left()
+                        update_using(me, selector)
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
+                    if selector < 2 and selector < len(me.shown_usable) - 1:
+                        selector += 1
+                        update_using(me, selector)
+                    elif len(me.shown_usable) > 3:
+                        shopp.shift_usable_right()
+                        update_using(me,selector)
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_x:
+                    return False
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_z:
+                    if me.shown_usable[selector].item == 'CANCEL':
+                        return False
+                    else:
+                        retval = usable_on(me, me.shown_usable[selector])
+                        if retval:
+                            use(me, me.shown_usable[selector], me.pkmn[retval])
+                        break
+
+
+
+
+
 
 def shop(me):
     shopp = shoppe()
     clear()
+    word_builder('Take your time.', 50, SIZE[1]-250)
+    SCREEN.blit(ITEMS, (10, SIZE[1]-880))
     display.flip()
-    dirty = []
-    dirty.append(word_builder('Take your time.', 50, SIZE[1]-250))
-    dirty.append(SCREEN.blit(ITEMS, (10, SIZE[1]-880)))
-    display.update(dirty)
     selector = 0
     update_shop(shopp, selector)
     while True:
@@ -1324,10 +1515,12 @@ def run_game(me, opp, mode, socket):
                     else:
                         F = (me.calc_speed() * 32)/(opp.calc_speed()/4) + 30 * me.fleecount
                         if random.randint(0,255) < F:
+                            display.update(write_btm("Got away safely!"))
+                            wait_for_button()
                             return 3
                         else:
-                            display.update(write_btm("Failed to escape~"))
-                            sleep(2)
+                            display.update(write_btm("Failed to escape!"))
+                            return 3
                             run_opp_move(me, opp, opp_move)
                             if not me.current.alive():
                                 return 1

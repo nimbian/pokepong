@@ -3,7 +3,6 @@ from time import sleep
 sleep(1)
 from logic import *
 from classes import trainer
-from sqlite3 import connect
 from util import *
 from redis import StrictRedis
 import zmq
@@ -78,7 +77,8 @@ if __name__ == '__main__':
                     if count == needed:
                         break
                 current = scrolling(current, possible)
-                sleep(5)
+                #TODO uncomment for PROD
+                #sleep(5)
             else:
                 try:
                     mypkmn, opppkmn, myname, oppname, seed = get_teams(socket)
@@ -102,6 +102,10 @@ if __name__ == '__main__':
             for mon in me.pkmn:
                 mon.clean()
         if mode == 'wild':
+            for mon in me.pkmn:
+                tmp = mon.check_evolve()
+            if tmp:
+                evolve(me, mon, tmp)
             loc = choose_loc()
             if loc == 'PALLET TOWN':
                 shop(me)
@@ -148,7 +152,7 @@ if __name__ == '__main__':
                     lost(me,mode)
             elif tmp == 3:
                 pass
-                #TODO escape
+                break
             elif tmp == 5:
                 break
         if mode == 'pong':
@@ -161,3 +165,9 @@ if __name__ == '__main__':
             else:
                 king = None
         new_game = False
+        #TODO should only evolve when leveled
+        for mon in me.pkmn:
+            tmp = mon.check_evolve()
+            if tmp:
+                evolve(me, mon, tmp)
+
