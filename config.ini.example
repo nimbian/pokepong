@@ -1,0 +1,8 @@
+[dev]
+# SQL connection string
+connection-string=postgresql://postgres:password@localhost/pong
+
+
+# Redis connection string
+# http://docs.celeryproject.org/en/3.0/getting-started/brokers/redis.html
+redis-connection=redis://localhost:6379/0
