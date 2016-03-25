@@ -100,6 +100,16 @@ class Move(Base):
         self.power = move.power
         self.acc = move.acc
         self.pp = self.maxpp
+        self.high_crit = False
+        if self.name in ['Crabhammer','Slash','Karate Chop','Razor lear']:
+            self.high_crit = True
+        self.disabled = False
+
+    def usepp(self):
+        self.pp -= 1
+
+    def has_pp(self):
+        return self.pp > 0
 
 
 class Trainer(Base):
@@ -263,21 +273,13 @@ class Owned(Base):
         self.frontimg = frontimg
         self.backimg = backimg
         self.hp = self.maxhp
-        self.moves = [self.move1]
-        self.move1.maxpp += self.pp1
-        self.move1.pp = self.move1.maxpp
+        self.moves = [Move(self.move1)]
         if self.move2:
-            self.move2.maxpp += self.pp2
-            self.move2.pp = self.move2.maxpp
-            self.moves.append(self.move2)
+            self.moves.append(Move(self.move2))
         if self.move3:
-            self.move3.maxpp += self.pp3
-            self.move3.pp = self.move3.maxpp
-            self.moves.append(self.move3)
+            self.moves.append(Move(self.move3))
         if self.move4:
-            self.move4.maxpp += self.pp4
-            self.move4.pp = self.move4.maxpp
-            self.moves.append(self.move4)
+            self.moves.append(Move(self.move4))
         self.attack_stage = self.defense_stage = self.speed_stage = self.special_stage = 0
         self.accuracy_stage = self.evasion_stage = 0
         self.buffs = []
