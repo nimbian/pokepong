@@ -2,12 +2,13 @@
 from time import sleep
 sleep(1)
 from logic import *
-from classes import trainer
+from models import Trainer
 from util import *
 from redis import StrictRedis
+from models import *
 import zmq
 
-if __name__ == '__main__':
+def main():
     #TODO set to True on opposite table
     client = False
     #TODO set to actual IP
@@ -48,73 +49,67 @@ if __name__ == '__main__':
             else:
                 socket.bind("tcp://*:7777")
             r.delete('count')
-            needed = 2
-        else:
-            needed = 1
         if new_game or (not king and mode != 'wild'):
             intro(current)
             #TODO uncomment for PROD
             #sleep(5)
         while new_game or mode != 'wild':
-            if not client or mode == 'wild':
-                tmp = None
-                try:
-                    tmp = json.loads(r.lpop('lineup'))
-                except:
-                    pass
-                if tmp:
-                    if count == 0:
-                        myname = tmp['name']
-                        mypkmnlist = tmp['pokemon']
-                    if count == 1:
-                        if king == 'opp':
-                            myname = tmp['name']
-                            mypkmnlist = tmp['pokemon']
-                        else:
-                            oppname = tmp['name']
-                            opppkmnlist = tmp['pokemon']
-                    count += 1
-                    if count == needed:
-                        break
+            tmp = None
+            try:
+                tmp = json.loads(r.lpop('lineup'))
+            except:
+                pass
+            if tmp:
+                myname = tmp['name']
+                mypkmnlist = tmp['pokemon']
+                if mode != 'wild':
+                        send_team(myname, mypkmnlist, socket, client)
+                break
+            current = scrolling(current, possible)
+            #TODO uncomment for PROD
+            #sleep(5)
+        if mode != 'pong':
+            me = Trainer.query.filter(Trainer.name == myname).one()
+            me.pkmn = []
+            for mon in mypkmnlist:
+                me.pkmn.append(Owned.query.get(mon))
+            me.current = me.pkmn[0]
+            me.used = set()
+            me.used.add(me.current)
+        else:
+            me = Trainer(myname)
+            me.initialize()
+            me.pkmn = []
+            for mon in mypkmnlist:
+                me.pkmn.append(Owned.query.get(mon))
+                me.current = me.pkmn[0]
+                me.used = set()
+                me.used.add(me.current)
+
+        while mode != 'wild':
+            try:
+                oppname, opppkmnlist = get_teams(socket, client)
+                opp = Trainer.query.filter(Trainer.name == oppname).one()
+                opp.pkmn = []
+                for mon in opppkmnlist:
+                    opp.pkmn.append(Owned.get(mon))
+                opp.current = opp.pkmn[0]
+                break
+            except:
                 current = scrolling(current, possible)
                 #TODO uncomment for PROD
                 #sleep(5)
-            else:
-                try:
-                    mypkmn, opppkmn, myname, oppname, seed = get_teams(socket)
-                    break
-                except:
-                    current = scrolling(current, possible)
-                    sleep(5)
-        if mode == 'wild' and not me:
-            if mode == 'wild':
-                mypkmn, opppkmn, myname, oppname, seed = send_teams(mypkmnlist, myname)
-            else:
-                if client:
-                    mypkmn, opppkmn, myname, oppname, seed = send_teams(mypkmnlist, myname,
-                                                                        opppkmn = opppkmnlist,
-                                                                        oppname = oppname,
-                                                                        socket = socket)
-            set_seed(seed)
-            mypkmn = build_team(mypkmn, me = True)
-            me = trainer(myname, mypkmn)
-        else:
-            for mon in me.pkmn:
-                mon.clean()
         if mode == 'wild':
-            for mon in me.pkmn:
-                tmp = mon.check_evolve()
-            if tmp:
-                evolve(me, mon, tmp)
             loc = choose_loc()
             if loc == 'PALLET TOWN':
                 shop(me)
+                new_game = False
                 continue
             else:
-                opp = trainer('', [get_wild_mon(loc)])
-        else:
-            opppkmn = build_team(opppkmn)
-            opp = trainer(oppname, opppkmn)
+                opp = Trainer('')
+                opp.pkmn = [get_wild_mon(loc)]
+                opp.current = opp.pkmn[0]
+        opp.initialize()
         new_game_start(me, opp, mode)
         while me.alive() and opp.alive():
             try:
@@ -167,7 +162,9 @@ if __name__ == '__main__':
         new_game = False
         #TODO should only evolve when leveled
         for mon in me.pkmn:
+            mon.clean()
             tmp = mon.check_evolve()
             if tmp:
                 evolve(me, mon, tmp)
+
 

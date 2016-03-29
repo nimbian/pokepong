@@ -2,7 +2,6 @@ from pygame import display
 from util import choice,randint, get_random
 from logic import write_btm, draw_opp_hp, draw_my_hp, wait_for_button, clean_me_up
 from time import sleep
-from classes import move as oneoff
 from copy import deepcopy
 from math import floor
 DISABLE = ['Counter', 'Bide', 'Dig', 'Fly']
@@ -233,6 +232,7 @@ def do_move(attack, defend, move, mode, me, first):
                     attack.substitute = hp
                 return 0
             elif move.name == 'Metronome':
+                #TODO FIX WITH NEW MODELS
                 name = move.name
                 conn = connect('shawn')
                 c = conn.cursor()
@@ -618,7 +618,7 @@ def preping(attack, move):
     attack.controllable = False
     if move.name == 'Skull Bash':
         display.update(write_btm(attack.name,  "lowered it's head"))
-    elif move.name == 'Solar Beam':
+    elif move.name == 'Solarbeam':
         display.update(write_btm(attack.name, "is charging up"))
     elif move.name == 'Razor Wind':
         display.update(write_btm(attack.name, "is charging up"))

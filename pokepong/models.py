@@ -10,7 +10,7 @@ from sqlalchemy import (Column,
                         Float)
 from sqlalchemy.orm import relationship, backref, reconstructor
 import random
-from pokepong.database import Base
+from pokepong.database import Base, db
 from datetime import datetime
 import bcrypt
 from pokepong.util import *
@@ -116,6 +116,7 @@ class Trainer(Base):
     __tablename__ = 'trainer'
     id = Column(Integer, primary_key=True)
     name = Column(String, unique=True, nullable=False)
+    money = Column(Integer, default=1500)
 
     def __init__(self, name):
         self.name = name
@@ -125,11 +126,13 @@ class Trainer(Base):
         self.battle = []
         self.usable = []
         for i in self.items:
-            if i.battle:
+            if i.item.battle:
                 self.battle.append(i)
             else:
                 self.usable.append(i)
-        self.shownitems = self.items[:4]
+        self.battle.append(OwnedItem(Items('CANCEL'), self, 0))
+        self.usable.append(OwnedItem(Items('CANCEL'), self, 0))
+        self.shownitems = self.battle[:4]
         self.usable_items = self.usable[:4]
 
     def alive(self):
@@ -183,7 +186,7 @@ class Pokemon(Base):
     name = Column(String)
     hp = Column(Integer)
     attack = Column(Integer)
-    defence = Column(Integer)
+    defense = Column(Integer)
     speed = Column(Integer)
     special = Column(Integer)
     exp = Column(Integer)
@@ -195,6 +198,8 @@ class Pokemon(Base):
     evolves_to = relationship('Pokemon',
                               lazy='joined',
                               join_depth=1)
+    basecatch = Column(Integer)
+
     @reconstructor
     def initialize(self):
         self.struggle = Move.query.filter(Move.name == 'Struggle').one()
@@ -241,18 +246,19 @@ class Owned(Base):
 
     def __init__(self, base_id, lvl=5):
         self.base = Pokemon.query.get(base_id)
+        self.base_id = base_id
         self.lvl = lvl
         self.name = self.base.name
         x = LearnableMove.query.filter(LearnableMove.learnedat < self.lvl) \
                                .filter(LearnableMove.pokemon_id == self.base_id).all()
         move1,move2,move3,move4 = (x[-4:]+([None] * 4))[:4]
-        frontimg = loadimg('fronts/{0}.PNG'.format(base_id)).convert()
-        backimg = loadimg('backs/{0}.PNG'.format(base_id)).convert()
-        frontimg.set_colorkey((255,255,255))
-        backimg.set_colorkey((255,255,255))
-        self.frontimg = frontimg
-        self.backimg = backimg
-        self.moves = [move1,move2,move3,move4]
+        self.move1 = move1.move
+        if move2:
+            self.move2 = move2.move
+        if move3:
+            self.move3 = move3.move
+        if move4:
+            self.move4 = move4.move
         self.hpev = 0
         self.attackev = 0
         self.defenseev = 0
@@ -263,23 +269,17 @@ class Owned(Base):
         self.speediv =   random.randint(0,15)
         self.specialiv = random.randint(0,15)
         self.hp = self.maxhp
+        self.pp1 = 0
+        self.pp2 = 0
+        self.pp3 = 0
+        self.pp4 = 0
+        self.initialize()
 
     @reconstructor
     def initialize(self):
-        frontimg = loadimg('fronts/{0}.PNG'.format(self.base_id)).convert()
-        backimg = loadimg('backs/{0}.PNG'.format(self.base_id)).convert()
-        frontimg.set_colorkey((255,255,255))
-        backimg.set_colorkey((255,255,255))
-        self.frontimg = frontimg
-        self.backimg = backimg
-        self.hp = self.maxhp
-        self.moves = [Move(self.move1)]
-        if self.move2:
-            self.moves.append(Move(self.move2))
-        if self.move3:
-            self.moves.append(Move(self.move3))
-        if self.move4:
-            self.moves.append(Move(self.move4))
+        self.load_images()
+        self.load_stats()
+        self.load_moves()
         self.attack_stage = self.defense_stage = self.speed_stage = self.special_stage = 0
         self.accuracy_stage = self.evasion_stage = 0
         self.buffs = []
@@ -297,23 +297,40 @@ class Owned(Base):
         self.rage = False
         #TODO what to do with payday
         self.payday = 0
-        self.confused = 0
+        self.confused = -1
         self.bide = False
         self.bidecnt = -1
 
+    def load_images(self):
+        frontimg = loadimg('fronts/{0}.PNG'.format(self.base_id)).convert()
+        backimg = loadimg('backs/{0}.PNG'.format(self.base_id)).convert()
+        frontimg.set_colorkey((255,255,255))
+        backimg.set_colorkey((255,255,255))
+        self.frontimg = frontimg
+        self.backimg = backimg
+
+    def load_stats(self):
+        self.hp = self.maxhp
+        self.attack = self.calcstat(self.base.attack, self.attackev, self.attackiv)
+        self.defense = self.calcstat(self.base.defense, self.defenseev, self.defenseiv)
+        self.special = self.calcstat(self.base.special, self.specialev, self.specialiv)
+        self.speed = self.calcstat(self.base.speed, self.speedev, self.speediv)
+
+    def load_moves(self):
+        self.moves = [Move(self.move1,self.pp1)]
+        if self.move2:
+            self.moves.append(Move(self.move2,self.pp2))
+        if self.move3:
+            self.moves.append(Move(self.move3,self.pp3))
+        if self.move4:
+            self.moves.append(Move(self.move4,self.pp4))
+
+
     def check_evolve(self):
-        conn = connect('shawn')
-        c = conn.cursor()
-        query = 'select evolveto from evolve where lvl < {0} and id = {1}'.format(self.lvl,self.baseid)
-        tmp = c.execute(query).fetchone()
-        if tmp:
-            x = c.execute("select pokemon from pokemon where id = {0}".format(tmp[0])).fetchone()
-            return [tmp[0], x[0]]
+        if self.base.evolves_at and self.lvl >= self.base.evolves_at:
+            return self.base.evolves_to_id
         else:
             return False
-
-
-
 
     def set_sprite1(self):
         return loadalphaimg('mon1.png')
@@ -421,7 +438,8 @@ class Owned(Base):
         self.hp += amount
 
     def do_status(self, opppkmn, me):
-        from domove import dmg_pkmn
+        from pokepong.domove import dmg_pkmn
+        from pokepong.logic import write_btm
         if 'BRN' in self.buffs:
             retval = dmg_pkmn(self, int(self.maxhp*(1/8.)), not me)
             if me:
@@ -463,14 +481,15 @@ class Owned(Base):
             self.disabled -= 1
 
     def attempt_move(self, me):
-        from domove import dmg_pkmn
+        from pokepong.domove import dmg_pkmn
+        from pokepong.logic import write_btm
         #TODO keep sleep a bit OP?
         #TODO handle words here
         #TODO finish confusion
         if 'FRZ' in self.buffs:
             return 'FRZ'
         if 'PAR' in self.buffs:
-            if random() < .5:
+            if get_random() < .5:
                 return True
             else:
                 return 'PAR'
@@ -482,6 +501,7 @@ class Owned(Base):
             else:
                 self.sleep -= 1
                 return 'SLP'
+        print(self.confused)
         if self.confused > 0:
             display.update(write_btm(self.name, 'is confused'))
             self.confused -= 1
@@ -511,7 +531,7 @@ class Owned(Base):
         if chance > 255/256.:
             chance = 255/256.
 
-        return random() < chance
+        return get_random() < chance
 
 
     def catch_me(self, ball):
@@ -537,11 +557,11 @@ class Owned(Base):
         r = self.hp / 4
         if r > 0:
             f /= r
-        if self.basecatch < x:
+        if self.base.basecatch < x:
             pass
         elif randint(0,255) < f:
             return 4
-        w = self.basecatch * 100
+        w = self.base.basecatch * 100
 
         if ball == 'U':
             w /= 150
@@ -566,21 +586,13 @@ class Owned(Base):
 
 
     def calc_dmg(self, opppkmn, move):
-        stab = [1,1.5][self.type1 == move.type_ or self.type2 == move.type_]
+        stab = [1,1.5][self.base.type1 == move.type_ or self.base.type2 == move.type_]
         crit = self.crit_hit(move.high_crit)
-        conn = connect('shawn')
-        c = conn.cursor()
         type_ = 1
-        if opppkmn.type2:
-            build = "SELECT {0},{1} from types where type = '{2}'".format(opppkmn.type1, opppkmn.type2, move.type_)
-            tmp = c.execute(build).fetchone()
-            type_ *= tmp[0]
-            type_ *= tmp[1]
-        else:
-            build = "SELECT {0} from types where type = '{1}'".format(opppkmn.type1, move.type_)
-            tmp = c.execute(build).fetchone()
-            type_ *= tmp[0]
-        if move.type_ in normal:
+        type_ *= getattr(move.type_, opppkmn.base.type1.lower())
+        if opppkmn.base.type2:
+            type_ *= getattr(move.type_, opppkmn.base.type2.lower())
+        if move.type_.type_ in normal:
             attack = self.calc_attack() * [1,.5]['burn' in self.buffs]
             defense = opppkmn.calc_defense()
         else:
@@ -599,14 +611,14 @@ class Owned(Base):
     def hit_or_miss(self, opppkmn, move):
         if move.acc:
             if move.name == 'Swift':
-                return random() < move.acc/256.
+                return get_random() < move.acc/256.
             if 'FLY' in opppkmn.buffs or 'DIG' in opppkmn.buffs:
                 return False
             acc = move.acc * self.calc_accuracy() * opppkmn.calc_evasion()
             chance = acc/256.
             if chance > 255/256.:
                 chance = 255/256.
-            return random() < (chance / [1,2][self.confused >= 0])
+            return get_random() < (chance / [1,2][self.confused >= 0])
         else:
             return True
 
@@ -625,22 +637,24 @@ class Owned(Base):
         return moves
 
     def transform(self, defend):
-        self.attack = defend.attack
-        self.defense = defend.defense
-        self.speed = defend.speed
-        self.special = defend.special
-        self.type1 = defend.type1
-        self.type2 = defend.type2
-        self.moves = defend.moves
+        self.attack = defend.base.attack
+        self.defense = defend.base.defense
+        self.speed = defend.base.speed
+        self.special = defend.base.special
+        self.type1 = defend.base.type1
+        self.type2 = defend.base.type2
+        moves = defend.moves
+        self.moves = []
+        for i in moves:
+            self.moves.append(Move(i,0))
+        for i in self.moves:
+            i.pp = i.maxpp = 5
         self.attack_stage = defend.attack_stage
         self.defense_stage = defend.defense_stage
         self.speed_stage = defend.speed_stage
         self.special_stage = defend.special_stage
         self.accuracy_stage = defend.accuracy_stage
         self.evasion_stage = defend.evasion_stage
-        for i in self.move:
-            self.pp = 5
-            self.maxpp = 5
 
     def gain_exp(self,me, opp, multi):
         #TODO test exp
@@ -661,7 +675,8 @@ class Owned(Base):
             #TODO set to actual host
             r = StrictRedis(host='127.0.0.1')
             d = [self.lvl+c] + self.evs + [self.exp, self.id_]
-            r.rpush('queue', json.dumps(['gain',d]))
+            db.add(self)
+            db.commit()
             return [self.lvl + c, (opp.current.baseexp * opp.current.lvl)/ (7 * len(me.used))]
 
     def gain_lvl(self, lvl):
@@ -674,35 +689,36 @@ class Owned(Base):
 
 
     def clean(self):
-        self.hp = self.maxhp
-        for i in self.moves:
-            i.pp = i.maxpp
-        self.haze()
-        self.fleecount = 0
-        self.lastmove = ''
-        self.lastcount = 0
-        self.controllable = True
-        self.disabled = 0
-        self.substitute = 0
-        self.struggle = move('Struggle',0)
-        self.bidecnt = -1
-        self.bidedmg = 0
-        self.wrapped = 0
-        self.thrashing = -1
-        self.rage = False
-        #TODO what to do with payday
-        self.payday = 0
-        self.confused = 0
-        self.bide = False
+        self.initialize()
 
 
 class OwnedItem(Base):
     __tablename__ = 'owneditem'
     id = Column(Integer, primary_key=True)
     item_id = Column(Integer, ForeignKey('items.id'))
+    item = relationship('Items')
     trainer_id = Column(Integer, ForeignKey('trainer.id'))
     owner = relationship('Trainer', backref='items')
     count = Column(Integer)
+
+    def __init__(self, item, owner, count):
+        self.item = item
+        self.owner = owner
+        self.count = count
+
+    def use(self, me):
+        #TODO write to DB
+        self.count -= 1
+        if self.count == 0:
+            me.items.remove(self)
+            try:
+                me.shownitems.remove(self)
+                me.shift_items_right()
+                me.shift_items_left()
+            except:
+                pass
+            db.delete(self)
+            db.commit()
 
 class Items(Base):
     __tablename__ = 'items'
@@ -713,9 +729,14 @@ class Items(Base):
     buyprice = Column(Integer)
     sellprice = Column(Integer)
 
+    def __init__(self,name):
+        self.name = name
+
+
 class shoppe(object):
     def __init__(self):
         self.items = Items.query.filter(Items.buyable == 1).all()
+        self.items.append(Items('CANCEL'))
         self.shownitems = self.items[:4]
 
     def shift_items_right(self):

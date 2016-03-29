@@ -7,6 +7,7 @@ from sqlite3 import connect
 import json
 from redis import StrictRedis
 from routes import ROUTES, MAPLIST, MAPROUTE
+from database import db
 
 r = StrictRedis(host = '127.0.0.1')
 
@@ -43,16 +44,16 @@ ITEMS = loadalphaimg('items.png')
 AMOUNT = loadalphaimg('amount.png')
 MAP = loadimg('map.png').convert()
 MAPSELECTOR = loadalphaimg('mapselector.png')
-BALL = {'POKEBALL': [loadalphaimg('PLball.png'),
+BALL = {'POK~BALL': [loadalphaimg('PLball.png'),
                      loadalphaimg('PCball.png'),
                      loadalphaimg('PRball.png')],
-        'GREATBALL': [loadalphaimg('GLball.png'),
+        'GREAT BALL': [loadalphaimg('GLball.png'),
                      loadalphaimg('GCball.png'),
                      loadalphaimg('GRball.png')],
-        'ULTRABALL': [loadalphaimg('ULball.png'),
+        'ULTRA BALL': [loadalphaimg('ULball.png'),
                      loadalphaimg('UCball.png'),
                      loadalphaimg('URball.png')],
-        'MASTERBALL': [loadalphaimg('MLball.png'),
+        'MASTER BALL': [loadalphaimg('MLball.png'),
                      loadalphaimg('MCball.png'),
                      loadalphaimg('MRball.png')]}
 
@@ -429,11 +430,11 @@ def wobble(val, item):
         display.update(SCREEN.blit(BALL[item][2], ballloc))
         sleep(.1)
     if val == 1:
-        display.update(write_btm('Darn! The POK~MON broke', 'free!'))
+        display.update(write_btm('Darn! The POK~MON', 'broke free!'))
     elif val == 2:
-        display.update(write_btm('Aww! It appeared to be', 'caught!'))
+        display.update(write_btm('Aww! It appeared' ,'to be caught!'))
     elif val == 3:
-        display.update(write_btm('Shoot! It was so close too!'))
+        display.update(write_btm('Shoot! It was so', 'close too!'))
 
 
 def catchem(item, pkmn, me):
@@ -444,8 +445,11 @@ def catchem(item, pkmn, me):
         if val < 4:
             display.update(draw_all_opp(pkmn))
         else:
-            d = [me.name, pkmn.name] + (pkmn.list_moves() + ['null'] * 4)[:4] + [pkmn.lvl] + pkmn.ivs + [pkmn.exp]
-            r.rpush('queue', json.dumps(['new', d]))
+            pkmn.trainer = me
+            db.add(pkmn)
+            db.commit()
+            if len(me.pkmn) < 6:
+                me.pkmn.append(pkmn)
             display.update(write_btm(pkmn.name + ' was', 'caugt!'))
     else:
         display.update(draw_all_opp(pkmn))
@@ -561,8 +565,8 @@ def draw_items(me, select):
             word_builder('>', 360, 200 + c * 120)
         else:
             word_builder(' ', 360, 200 + c * 120)
-        word_builder(i.item.upper().ljust(12), 420,200 + c * 120)
-        if i.item != 'CANCEL':
+        word_builder(i.item.name.upper().ljust(12), 420,200 + c * 120)
+        if i.item.name != 'CANCEL':
             if i.count < 10:
                 num = '  ' + str(i.count)
             elif i.count < 100:
@@ -582,8 +586,8 @@ def update_items(me, select):
             dirty.append(word_builder('>', 360, 200 + c * 120))
         else:
             dirty.append(word_builder(' ', 360, 200 + c * 120))
-        dirty.append(word_builder(i.item.upper().ljust(12), 420, 200 + c * 120))
-        if i.item != 'CANCEL':
+        dirty.append(word_builder(i.item.name.upper().ljust(12), 420, 200 + c * 120))
+        if i.item.name != 'CANCEL':
             if i.count < 10:
                 num = '  ' + str(i.count)
             elif i.count < 100:
@@ -597,14 +601,26 @@ def update_items(me, select):
 
 def gain_exp(me,opp, multi):
     for mon in me.used:
-        if mon.id_ > 151:
+        tmp = None
+        if mon.id > 151:
             lvlup, exp = mon.gain_exp(me, opp, multi)
             display.update(write_btm(mon.name, 'gained ' + str(exp) + ' exp.'))
             wait_for_button()
             if mon.lvl != lvlup:
+                for move in mon.base.learns:
+                    if mon.lvl < move.learnedat <= lvlup:
+                        tmp = move.move
                 mon.gain_lvl(lvlup)
                 display.update(write_btm(mon.name + ' grew', 'to level ' + str(lvlup) + '!'))
                 wait_for_button()
+                if tmp:
+                    if len(mon.moves) < 4:
+                        setattr(mon, 'move' + str(len(mon.moves) + 1), tmp)
+                        display.update(write_btm(mon.name + ' learned', tmp.name))
+                        mon.moves.append(Move(tmp,0))
+                    else:
+                        #TODO Forget old move
+                        pass
     me.used.clear()
 
 def do_evolve(oldpic, newpic):
@@ -646,10 +662,10 @@ def do_evolve(oldpic, newpic):
 
 
 def evolve(me, mon, new):
-    oldpic = loadimg('fronts/{0}.PNG'.format(mon.baseid)).convert()
+    oldpic = loadimg('fronts/{0}.PNG'.format(mon.base_id)).convert()
     oldpic.set_colorkey((255,255,255))
     oldpic = pygame.transform.flip(oldpic,True,False)
-    newpic = loadimg('fronts/{0}.PNG'.format(new[0])).convert()
+    newpic = loadimg('fronts/{0}.PNG'.format(new)).convert()
     newpic.set_colorkey((255,255,255))
     newpic = pygame.transform.flip(newpic,True,False)
     clear()
@@ -657,13 +673,13 @@ def evolve(me, mon, new):
     SCREEN.blit(oldpic,[444,120])
     display.flip()
     if do_evolve(oldpic, newpic):
-        #TODO write to DB
-        display.update(write_btm('{0} evolved'.format(mon.name),"into " + new[1]))
+        mon.base_id = new
+        db.commit()
+        display.update(write_btm('{0} evolved'.format(mon.name),"into " + mon.base.name))
         wait_for_button()
     else:
         display.update(write_btm('Huh? {0}'.format(mon.name),"stopped evolving!"))
         wait_for_button()
-    sleep(15)
 
 
 
@@ -677,7 +693,7 @@ def clean_me_up(me):
 def run_me_faint(me):
     for i in range(0,400,2):
         draw.rect(SCREEN, WHITE, [59, SIZE[1]-740, 392, 392])
-        SCREEN.blit(me.current.img, (59, SIZE[1]-740 + i), (0,0,392,392-i))
+        SCREEN.blit(me.current.backimg, (59, SIZE[1]-740 + i), (0,0,392,392-i))
         display.update(59, SIZE[1]-738 + i, 392,394-i)
     display.update(write_btm(me.current.name, 'fainted!'))
     self.used.remove(me.current)
@@ -685,7 +701,7 @@ def run_me_faint(me):
 def run_opp_faint(opp):
     for i in range(0,393,2):
         draw.rect(SCREEN, WHITE, [SIZE[0]-500, 0, 392, 392])
-        SCREEN.blit(opp.current.img, (SIZE[0]-500, i), (0,0,392,392-i))
+        SCREEN.blit(opp.current.frontimg, (SIZE[0]-500, i), (0,0,392,392-i))
         display.update([SIZE[0]-500, i-2,392,394-i])
     display.update(write_btm('Enemy ' + opp.current.name.upper(),'fainted!'))
     sleep(2)
@@ -790,7 +806,7 @@ def draw_choose_items(me):
                     me.shift_items_right()
                     update_items(me, selector)
             if event.type == pygame.KEYDOWN and event.key == pygame.K_x:
-                return False
+                return -1
             if event.type == pygame.KEYDOWN and event.key == pygame.K_z:
                 return selector
 
@@ -827,9 +843,9 @@ def update_shop(shopp, select):
             dirty.append(word_builder('>', 360, 200 + c * 120))
         else:
             dirty.append(word_builder(' ', 360, 200 + c * 120))
-        dirty.append(word_builder(i[0].upper().ljust(12), 420, 200 + c * 120))
-        if i[0] != 'CANCEL':
-            dirty.append(word_builder('<' + str(i[1]).rjust(4), 820, 260 + c * 120))
+        dirty.append(word_builder(i.name.upper().ljust(12), 420, 200 + c * 120))
+        if i.name != 'CANCEL':
+            dirty.append(word_builder('<' + str(i.buyprice).rjust(4), 820, 260 + c * 120))
         c += 1
     display.update(dirty)
 
@@ -838,7 +854,7 @@ def update_amount(item, select):
     dirty = []
     dirty.append(draw.rect(SCREEN, WHITE, [473, 495, AMOUNT.get_width() + 14, AMOUNT.get_height() + 14]))
     dirty.append(SCREEN.blit(AMOUNT, (480, 502)))
-    dirty.append(word_builder('*'+ str(select).zfill(2) + ('<' + str(item[1] * select)).rjust(8),534, 555))
+    dirty.append(word_builder('*'+ str(select).zfill(2) + ('<' + str(item.buyprice * select)).rjust(8),534, 555))
     display.update(dirty)
 
 def amount(item):
@@ -846,7 +862,7 @@ def amount(item):
     dirty = []
     dirty.append(draw.rect(SCREEN, WHITE, [473, 495, AMOUNT.get_width() + 14, AMOUNT.get_height() + 14]))
     dirty.append(SCREEN.blit(AMOUNT, (480, 502)))
-    dirty.append(word_builder('*'+ str(selector).zfill(2) + ('<' + str(item[1])).rjust(8),534, 555))
+    dirty.append(word_builder('*'+ str(selector).zfill(2) + ('<' + str(item.buyprice)).rjust(8),534, 555))
     display.update(dirty)
     pygame.event.clear()
     while True:
@@ -959,9 +975,8 @@ def usable_on(me, item):
 
 
 def use(me, item, mon):
-    #TODO replace tmp with new name
     if item in ABLE:
-        evolve(me, mon, [ABLE[item][mon.baseid], 'tmp'])
+        evolve(me, mon, ABLE[item][mon.base_id])
 
 
 
@@ -995,15 +1010,63 @@ def using(me):
                     if me.shown_usable[selector].item == 'CANCEL':
                         return False
                     else:
-                        retval = usable_on(me, me.shown_usable[selector])
+                        retval = usable_on(me, me.shown_usable[selector].name)
                         if retval:
-                            use(me, me.shown_usable[selector], me.pkmn[retval])
+                            use(me, me.shown_usable[selector].name, me.pkmn[retval])
                         break
 
 
 
 
+def conf():
+    display.update(draw.rect(SCREEN,WHITE, [3,403,CONF.get_width()+14, CONF.get_height()+14]))
+    display.update(SCREEN.blit(CONF,(10,410)))
+    select = 0
+    pygame.event.clear()
+    while True:
+        sleep(.1)
+        selecting(select)
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
+                if select == 0:
+                    select = 1
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
+                if select == 1:
+                    select = 0
+            if event.type == pygame.KEYDOWN and ((event.key == pygame.K_z and select == 1) or event.key == pygame.K_x):
+                return False
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_z:
+                return True
 
+def do_purchase(me, item, retval):
+    if me.money < item.buyprice * retval:
+        display.update(write_btm("You don't have", 'enough money'))
+        wait_for_button()
+        display.update(draw.rect(SCREEN, WHITE, [360, SIZE[1]-830, 700, 490]))
+    else:
+        me.money -= item.buyprice * retval
+        display.update(write_btm('Here you are!', 'Thank you!'))
+        try:
+            o = OwnedItem.query.filter(OwnedItem.item_id == item.id) \
+                               .filter(OwnedItem.owner == me).one()
+            o.count += retval
+            db.commit()
+        except:
+            tmp = OwnedItem(item, me, retval)
+            db.add(tmp)
+            db.commit()
+            if tmp.item.battle:
+                me.battle.append(tmp)
+                self.shownitems = self.battle[:4]
+            else:
+                me.usable.append(tmp)
+                self.usable_items = self.usable[:4]
+        wait_for_button()
+        clear()
+        word_builder('Take your time.', 50, SIZE[1]-250)
+        SCREEN.blit(ITEMS, (10, SIZE[1]-880))
+        display.flip()
+        selector = 0
 
 def shop(me):
     shopp = shoppe()
@@ -1033,37 +1096,27 @@ def shop(me):
                 return False
             if event.type == pygame.KEYDOWN and event.key == pygame.K_z:
                 item = shopp.shownitems[selector]
-                retval = amount(item)
-                if retval:
-                    #TODO confirm/check cash/send to DB/items
-                    pass
-                    display.update(write_btm(item[0] + '?',
-                                             'That will be'))
-                    wait_for_button()
-                    display.update(write_btm('That will be', item[1] * retval + '. OK?'))
-                    retval = conf()
+                if item.name != 'CANCEL':
+                    retval = amount(item)
                     if retval:
-                        if me.money < item[1] * retval:
-                            display.update(write_btm("You don't have", 'enough money'))
-                            wait_for_button()
-                            display.update(draw.rect(SCREEN, WHITE, [360, SIZE[1]-830, 700, 490]))
+                        display.update(write_btm(item.name + '?', 'That will be'))
+                        wait_for_button()
+                        display.update(write_btm('That will be', '<' + str(item.buyprice * retval) + '. OK?'))
+                        ret = conf()
+                        if ret:
+                            do_purchase(me, item, retval)
                             update_shop(shopp, selector)
                         else:
-                            me.money -= item[1] * retval
-                            d = [me.money, me.name]
-                            r.rpush('queue', json.dumps(['money', d]))
-                            display.update(write_btm('Here you are!', 'Thank you!'))
-                            #TODO write to db
                             display.update(draw.rect(SCREEN, WHITE, [360, SIZE[1]-830, 700, 490]))
                             update_shop(shopp, selector)
+
+
                     else:
                         display.update(draw.rect(SCREEN, WHITE, [360, SIZE[1]-830, 700, 490]))
                         update_shop(shopp, selector)
-
-
                 else:
-                    display.update(draw.rect(SCREEN, WHITE, [360, SIZE[1]-830, 700, 490]))
-                    update_shop(shopp, selector)
+                    return False
+
 
 
 def draw_choose_pkmn(me, opp, mode, oppdeath = False, mydeath = False):
@@ -1308,6 +1361,7 @@ def win(me, opp, mode):
 
 def run_pong(me, opp):
     #TODO switch client order. or use a redis queue
+    #TODO set tablenames with client
     draw_choice(0)
     while True:
         if opp.num_fainted() < int(r.get(opp.name) or 0):
@@ -1434,26 +1488,27 @@ def run_game(me, opp, mode, socket):
                     pygame.display.flip()
                     draw_all_opp(opp.current)
                     draw_all_me(me.current)
-                    item = me.shownitems[select]
-                    if item.item != 'CANCEL':
-                        item.use(me)
-                        if item.item[-4:] == 'BALL':
-                            display.update(write_btm(me.name + ' used', item.item))
-                            ret = catchem(item.item, opp.current, me)
-                            if ret:
-                                return 5
-                            else:
-                                tmp, opp_move = wait_for_opp_move(opp, ['swap', select], mode, socket)
-                                draw_all_me(me.current)
-                                if tmp == 'move':
-                                    opp_move = opp.current.moves[opp_move]
-                                    run_opp_move(me,opp,opp_move, True)
-                                    if not me.current.alive:
-                                        return 1
-                                draw_all_me(me.current)
-                                clearbtm()
-                                selector = 0
-                                draw_choice(0)
+                    if select > -1:
+                        item = me.shownitems[select]
+                        if item.item.name != 'CANCEL':
+                            item.use(me)
+                            if item.item.name[-4:].upper() == 'BALL':
+                                display.update(write_btm(me.name + ' used', item.item.name.upper()))
+                                ret = catchem(item.item.name.upper(), opp.current, me)
+                                if ret:
+                                    return 5
+                                else:
+                                    tmp, opp_move = wait_for_opp_move(opp, ['swap', select], mode, socket)
+                                    draw_all_me(me.current)
+                                    if tmp == 'move':
+                                        opp_move = opp.current.moves[opp_move]
+                                        run_opp_move(me,opp,opp_move, True)
+                                        if not me.current.alive:
+                                            return 1
+                                    draw_all_me(me.current)
+                                    clearbtm()
+                                    selector = 0
+                    draw_choice(0)
 
                 if selector == 2:
                     select = draw_choose_pkmn(me,opp, mode)
@@ -1507,7 +1562,7 @@ def run_game(me, opp, mode, socket):
                         selector = 0
                         draw_choice(0)
                     else:
-                        F = (me.calc_speed() * 32)/(opp.calc_speed()/4) + 30 * me.fleecount
+                        F = (me.current.calc_speed() * 32)/(opp.current.calc_speed()/4) + 30 * me.current.fleecount
                         if randint(0,255) < F:
                             display.update(write_btm("Got away safely!"))
                             wait_for_button()
