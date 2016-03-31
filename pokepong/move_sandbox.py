@@ -180,9 +180,9 @@ class trainer(object):
     def __init__(self,current):
         self.current = current
 
-def invert():
-    pixels = pygame.surfarray.pixels3d(SCREEN)
-    pixels[:,:,:3] = CHANGE[(pixels[:,:,0],pixels[:,:,1],pixels[:,:,2])]
+#def invert():
+#    pixels = pygame.surfarray.pixels3d(SCREEN)
+#    pixels[:,:,:3] = CHANGE[(pixels[:,:,0],pixels[:,:,1],pixels[:,:,2])]
 
 def low_big():
     norm = loadalphaimg('moves/Bignorm.png')
@@ -269,6 +269,8 @@ def sandbox():
     opp = trainer(pokemon())
     draw_all_opp(opp.current)
     draw_all_me(me.current)
+    invert()
+    sleep(15)
 
 def wave(count):
     orig = SCREEN.copy()
@@ -297,7 +299,11 @@ def convert(array):
     return CHANGE[tuple(array)]
 
 def invert():
-    pixels = pygame.surfarray.pixels3d(SCREEN)
+    pixels = pygame.surfarray.pixels2d(SCREEN)
+    pixels ^= 2 ** 32 - 1
+    del pixels
+    pygame.display.flip()
+    SCREEN.unlock()
 
 
 

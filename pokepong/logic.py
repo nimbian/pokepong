@@ -41,6 +41,7 @@ TRAINERBACK = loadalphaimg('trainerback.png')
 POKE1 = loadalphaimg('poke1.png')
 POKE2 = loadalphaimg('poke2.png')
 ITEMS = loadalphaimg('items.png')
+MONEY = loadalphaimg('moneybar.png')
 AMOUNT = loadalphaimg('amount.png')
 MAP = loadimg('map.png').convert()
 MAPSELECTOR = loadalphaimg('mapselector.png')
@@ -1056,15 +1057,17 @@ def do_purchase(me, item, retval):
             db.add(tmp)
             db.commit()
             if tmp.item.battle:
-                me.battle.append(tmp)
-                self.shownitems = self.battle[:4]
+                me.battle.insert(-1,tmp)
+                me.shownitems = me.battle[:4]
             else:
-                me.usable.append(tmp)
-                self.usable_items = self.usable[:4]
+                me.usable.insert(-1,tmp)
+                me.usable_items = me.usable[:4]
         wait_for_button()
         clear()
         word_builder('Take your time.', 50, SIZE[1]-250)
         SCREEN.blit(ITEMS, (10, SIZE[1]-880))
+        SCREEN.blit(MONEY, (724, 0))
+        word_builder('<' + str(me.money).rjust(7),772, 45)
         display.flip()
         selector = 0
 
@@ -1073,6 +1076,8 @@ def shop(me):
     clear()
     word_builder('Take your time.', 50, SIZE[1]-250)
     SCREEN.blit(ITEMS, (10, SIZE[1]-880))
+    SCREEN.blit(MONEY, (724, 0))
+    word_builder('<' + str(me.money).rjust(7),772, 45)
     display.flip()
     selector = 0
     update_shop(shopp, selector)
