@@ -34,6 +34,7 @@ MYBAR = loadalphaimg('mybar.png')
 OPPBAR = loadalphaimg('oppbar.png')
 ALIVE = loadalphaimg('alive.png')
 FAINTED = loadalphaimg('fainted.png')
+NOMON = loadalphaimg('nomon.png')
 CONF = loadalphaimg('conf.png')
 LOGO = loadalphaimg('logo.png')
 TRAINER = loadalphaimg('trainer.png')
@@ -45,18 +46,22 @@ MONEY = loadalphaimg('moneybar.png')
 AMOUNT = loadalphaimg('amount.png')
 MAP = loadimg('map.png').convert()
 MAPSELECTOR = loadalphaimg('mapselector.png')
-BALL = {'POK~BALL': [loadalphaimg('PLball.png'),
-                     loadalphaimg('PCball.png'),
-                     loadalphaimg('PRball.png')],
-        'GREAT BALL': [loadalphaimg('GLball.png'),
-                     loadalphaimg('GCball.png'),
-                     loadalphaimg('GRball.png')],
-        'ULTRA BALL': [loadalphaimg('ULball.png'),
-                     loadalphaimg('UCball.png'),
-                     loadalphaimg('URball.png')],
-        'MASTER BALL': [loadalphaimg('MLball.png'),
-                     loadalphaimg('MCball.png'),
-                     loadalphaimg('MRball.png')]}
+BALL = {'POK~BALL': [loadalphaimg('balls/PLball.png'),
+                     loadalphaimg('balls/PCball.png'),
+                     loadalphaimg('balls/PRball.png')],
+        'GREAT BALL': [loadalphaimg('balls/GLball.png'),
+                     loadalphaimg('balls/GCball.png'),
+                     loadalphaimg('balls/GRball.png')],
+        'ULTRA BALL': [loadalphaimg('balls/ULball.png'),
+                     loadalphaimg('balls/UCball.png'),
+                     loadalphaimg('balls/URball.png')],
+        'MASTER BALL': [loadalphaimg('balls/MLball.png'),
+                     loadalphaimg('balls/MCball.png'),
+                     loadalphaimg('balls/MRball.png')]}
+
+POP = [loadalpahimg('pop1.png'), loadalpahimg('pop2.png'),
+       loadalpahimg('pop3.png'), loadalpahimg('pop4.png'),
+       loadalpahimg('pop5.png')]
 
 ABLE = {'Thunderstone':{133:135,25:26},
         'Fire Stone':{133:136,37:38,58:59},
@@ -183,7 +188,7 @@ def draw_my_poke_balls(team):
             SCREEN.blit(ALIVE, (SIZE[0]-575 + offset * 65, SIZE[1]-430))
         offset += 1
     for i in range(offset, 6):
-        SCREEN.blit(FAINTED, (SIZE[0]-500 + (i-1) * 65, SIZE[1]-430))
+        SCREEN.blit(NOMON, (SIZE[0]-500 + (i-1) * 65, SIZE[1]-430))
     return [MYHPBAR_RECT]
 
 def draw_opp_hp_bar():
@@ -232,7 +237,7 @@ def draw_opp_poke_balls(team):
             SCREEN.blit(ALIVE, (180 + offset * 65, 132))
         offset += 1
     for i in range(offset, 6):
-        SCREEN.blit(FAINTED, (180 + (i-1) * 65, 132))
+        SCREEN.blit(NOMON, (180 + (i-1) * 65, 132))
     return [OPPHPBAR_RECT]
 
 def return_my_pokemon(me):
@@ -247,20 +252,17 @@ def return_my_pokemon(me):
 def pop_ball(name):
     display.update(write_btm('Go! ' + name + '!'))
     sleep(1)
-    SCREEN.blit(POKE1,(115,450))
-    display.update(115,450, POKE1.get_width(), POKE1.get_height())
-    sleep(.2)
-    dirty = []
-    dirty.append(draw.rect(SCREEN, WHITE, [115,450,302,302]))
-    dirty.extend(write_btm('Go! ' + name + '!'))
-    dirty.append(SCREEN.blit(POKE2,(120,450)))
-    display.update(dirty)
-    sleep(.2)
-    draw.rect(SCREEN, WHITE, [115,450,302,302])
-    write_btm('')
-    display.update(115,450,302,302)
-
-
+    old = [0,0,0,0]
+    for i in POP[:-1]:
+        write_btm('Go! ' + name + '!')
+        tmp = SCREEN.blit(i,(115,450))
+        display.update(tmp)
+        sleep(.1)
+        old = tmp
+        draw.rect(SCREEN, WHITE, old)
+    tmp = display.update(SCREEN.blit(POP[-1],(87,422))
+    sleep(.1)
+    display.update(write_btm(''))
 
 def draw_all_me(pkmn):
     x = []
@@ -409,9 +411,38 @@ def me_next_mon(me, opp, mode, socket):
     draw_all_opp(opp.current)
 
 
-def toss_ball(item, pkmn):
-    #TODO animate toss
-    pass
+def toss_ball(item, me, pkmn):
+    for i in HIGH_ARC:
+        draw_all_opp(pkmn)
+        draw_my_pkmn_sprite(me.current)
+        tmp = SCREEN.blit(BALL[item[1]], (i[0], i[1]+200))
+        sleep(.1)
+        old = tmp
+        draw.rect(SCREEN, WHITE, old)
+    draw_all_me(me.current)
+    display.update(old)
+
+
+def open_ball(me,pkmn):
+    x = 800
+    y = 204
+    for i in POP[:-1]:
+        tmp = SCREEN.blit(i,(x,y))
+        display.update(tmp)
+        sleep(.1)
+        old = tmp
+        draw.rect(SCREEN, WHITE, old)
+        draw_opp_pkmn_sprite(opp.current)
+        draw_all_me(me.current)
+    tmp = SCREEN.blit(POP[-1],(x-28,y-28))
+    display.update(tmp)
+    sleep(.1)
+    draw.rect(SCREEN, WHITE, tmp)
+    draw_opp_pkmn_sprite(opp.current)
+    draw_all_me(me.current)
+    display.update(tmp)
+
+
 
 
 def wobble(val, item):
@@ -440,8 +471,9 @@ def wobble(val, item):
 
 def catchem(item, pkmn, me):
     val = pkmn.catch_me(item[0])
-    toss_ball(item, pkmn)
+    toss_ball(item, me, pkmn)
     if val > 0:
+        open_ball(me,pkmn)
         wobble(val,item)
         if val < 4:
             display.update(draw_all_opp(pkmn))

@@ -7,6 +7,10 @@ import sys
 import zmq
 images = 'images/'
 
+HIGH_ARC = [(101,302),(234,120),(402,-26),(420,-54),(460,-100),(490,-110),
+            (520,-100),(580,-80),(640,-60),(700,-5),(760,50)]
+LOW_ARC = []
+
 def send_move(move, socket):
     socket.send(json.dumps(move.args))
     print 'waiting for response'

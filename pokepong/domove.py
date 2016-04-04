@@ -4,6 +4,7 @@ from logic import write_btm, draw_opp_hp, draw_my_hp, wait_for_button, clean_me_
 from time import sleep
 from copy import deepcopy
 from math import floor
+import move_sandbox
 DISABLE = ['Counter', 'Bide', 'Dig', 'Fly']
 FLAT = ['Sonicboom', 'Dragon Rage']
 MULTI = ['Spike Cannon', 'Comet Punch', 'Barrage', 'Doubleslap', 'Fury Attack', 'Pin Missile', 'Fury Swipes']
@@ -325,6 +326,8 @@ def do_move(attack, defend, move, mode, me, first):
 
 def do_attacks(attack, defend, move, me, times = 1):
     crit, type_, dmg = attack.calc_dmg(defend, move)
+    meth = getattr(pokepong.move_sandbox, 'do_'+i.name.lower().replace(' ','_').replace('-','_'))
+    meth(attack, defend, me)
     for i in range(times):
         retval = dmg_pkmn(defend, dmg, me)
         if crit:
