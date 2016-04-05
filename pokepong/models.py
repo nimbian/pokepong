@@ -130,8 +130,8 @@ class Trainer(Base):
                 self.battle.append(i)
             else:
                 self.usable.append(i)
-        self.battle.append(OwnedItem(Items('CANCEL'), self, 0))
-        self.usable.append(OwnedItem(Items('CANCEL'), self, 0))
+        self.battle.append(OwnedItem(Items('CANCEL'), Trainer(''), 0))
+        self.usable.append(OwnedItem(Items('CANCEL'), Trainer(''), 0))
         self.shownitems = self.battle[:4]
         self.usable_items = self.usable[:4]
 
@@ -173,7 +173,7 @@ class Trainer(Base):
         self.shownitems = self.items[y-1:y+3]
 
     def shift_usable_right(self):
-        y = self.usable.index(self.shown_usable[1])
+        y = self.usable.index(self.usable_items[1])
         self.shown_usable = self.usable[y:y+4]
 
     def shift_usable_left(self):
@@ -300,6 +300,8 @@ class Owned(Base):
         self.confused = -1
         self.bide = False
         self.bidecnt = -1
+        self.sprite1 = self.set_sprite1()
+        self.sprite2 = self.set_sprite2()
 
     def load_images(self):
         frontimg = loadimg('fronts/{0}.PNG'.format(self.base_id)).convert()

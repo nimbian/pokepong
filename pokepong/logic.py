@@ -44,6 +44,7 @@ POKE2 = loadalphaimg('poke2.png')
 ITEMS = loadalphaimg('items.png')
 MONEY = loadalphaimg('moneybar.png')
 AMOUNT = loadalphaimg('amount.png')
+SHOP_CHOICE = loadalphaimg('shop_choice.png')
 MAP = loadimg('map.png').convert()
 MAPSELECTOR = loadalphaimg('mapselector.png')
 BALL = {'POK~BALL': [loadalphaimg('balls/PLball.png'),
@@ -59,9 +60,9 @@ BALL = {'POK~BALL': [loadalphaimg('balls/PLball.png'),
                      loadalphaimg('balls/MCball.png'),
                      loadalphaimg('balls/MRball.png')]}
 
-POP = [loadalpahimg('pop1.png'), loadalpahimg('pop2.png'),
-       loadalpahimg('pop3.png'), loadalpahimg('pop4.png'),
-       loadalpahimg('pop5.png')]
+POP = [loadalphaimg('pop1.png'), loadalphaimg('pop2.png'),
+       loadalphaimg('pop3.png'), loadalphaimg('pop4.png'),
+       loadalphaimg('pop5.png')]
 
 ABLE = {'Thunderstone':{133:135,25:26},
         'Fire Stone':{133:136,37:38,58:59},
@@ -260,7 +261,7 @@ def pop_ball(name):
         sleep(.1)
         old = tmp
         draw.rect(SCREEN, WHITE, old)
-    tmp = display.update(SCREEN.blit(POP[-1],(87,422))
+    tmp = display.update(SCREEN.blit(POP[-1],(87,422)))
     sleep(.1)
     display.update(write_btm(''))
 
@@ -590,15 +591,15 @@ def update_attacking(me, selector):
 def draw_items(me, select):
     clearbtm()
     dirty = []
-    dirty.append(draw.rect(SCREEN, WHITE, [308, SIZE[1]-891, ITEMS.get_width(), ITEMS.get_height()]))
+    dirty.append(draw.rect(SCREEN, WHITE, [408, SIZE[1]-891, ITEMS.get_width(), ITEMS.get_height()]))
     dirty.append(SCREEN.blit(ITEMS, (10, SIZE[1]-880)))
     c = 0
     for i in me.shownitems:
         if c == select:
-            word_builder('>', 360, 200 + c * 120)
+            word_builder('>', 460, 200 + c * 120)
         else:
-            word_builder(' ', 360, 200 + c * 120)
-        word_builder(i.item.name.upper().ljust(12), 420,200 + c * 120)
+            word_builder(' ', 460, 200 + c * 120)
+        word_builder(i.item.name.upper().ljust(12), 520,200 + c * 120)
         if i.item.name != 'CANCEL':
             if i.count < 10:
                 num = '  ' + str(i.count)
@@ -606,20 +607,20 @@ def draw_items(me, select):
                 num = ' ' + str(i.count)
             else:
                 num = str(i.count)
-            word_builder('*' + num, 820, 260 + c * 120)
+            word_builder('*' + num, 920, 260 + c * 120)
         c += 1
     display.update(dirty)
 
 def update_items(me, select):
     dirty = []
     c = 0
-    dirty.append(draw.rect(SCREEN, WHITE, [360, SIZE[1]-830, 700, 490]))
+    dirty.append(draw.rect(SCREEN, WHITE, [460, SIZE[1]-830, 700, 490]))
     for i in me.shownitems:
         if c == select:
-            dirty.append(word_builder('>', 360, 200 + c * 120))
+            dirty.append(word_builder('>', 460, 200 + c * 120))
         else:
-            dirty.append(word_builder(' ', 360, 200 + c * 120))
-        dirty.append(word_builder(i.item.name.upper().ljust(12), 420, 200 + c * 120))
+            dirty.append(word_builder(' ', 460, 200 + c * 120))
+        dirty.append(word_builder(i.item.name.upper().ljust(12), 520, 200 + c * 120))
         if i.item.name != 'CANCEL':
             if i.count < 10:
                 num = '  ' + str(i.count)
@@ -627,7 +628,7 @@ def update_items(me, select):
                 num = ' ' + str(i.count)
             else:
                 num = str(i.count)
-            dirty.append(word_builder('*' + num, 820, 260 + c * 120))
+            dirty.append(word_builder('*' + num, 920, 260 + c * 120))
             c += 1
     display.update(dirty)
 
@@ -706,6 +707,8 @@ def evolve(me, mon, new):
     SCREEN.blit(oldpic,[444,120])
     display.flip()
     if do_evolve(oldpic, newpic):
+        if mon.base.name == mon.name:
+            mon.name = Pokemon.query.get(new).name
         mon.base_id = new
         db.commit()
         display.update(write_btm('{0} evolved'.format(mon.name),"into " + mon.base.name))
@@ -771,6 +774,14 @@ def wait_for_button():
             if event.type == pygame.KEYDOWN:
                 return
         sleep(.1)
+
+def shop_selecting(select):
+    dirty = []
+    dirty.append(word_builder(['>',' ',' ',' '][select] + 'BUY', 45, 52))
+    dirty.append(word_builder([' ','>',' ',' '][select] + 'SELL', 45, 162))
+    dirty.append(word_builder([' ',' ','>',' '][select] + 'USE', 45, 272))
+    dirty.append(word_builder([' ',' ',' ','>'][select] + 'QUIT', 45, 382))
+    display.update(dirty)
 
 def selecting(select):
     dirty = []
@@ -870,15 +881,15 @@ def choose_loc():
 def update_shop(shopp, select):
     dirty = []
     c = 0
-    dirty.append(draw.rect(SCREEN, WHITE, [360, SIZE[1]-830, 700, 490]))
+    dirty.append(draw.rect(SCREEN, WHITE, [460, SIZE[1]-830, 700, 490]))
     for i in shopp.shownitems:
         if c == select:
-            dirty.append(word_builder('>', 360, 200 + c * 120))
+            dirty.append(word_builder('>', 460, 200 + c * 120))
         else:
-            dirty.append(word_builder(' ', 360, 200 + c * 120))
-        dirty.append(word_builder(i.name.upper().ljust(12), 420, 200 + c * 120))
+            dirty.append(word_builder(' ', 460, 200 + c * 120))
+        dirty.append(word_builder(i.name.upper().ljust(12), 520, 200 + c * 120))
         if i.name != 'CANCEL':
-            dirty.append(word_builder('<' + str(i.buyprice).rjust(4), 820, 260 + c * 120))
+            dirty.append(word_builder('<' + str(i.buyprice).rjust(4), 920, 260 + c * 120))
         c += 1
     display.update(dirty)
 
@@ -927,15 +938,15 @@ def amount(item):
 def update_using(me, select):
     dirty = []
     c = 0
-    dirty.append(draw.rect(SCREEN, WHITE, [360, SIZE[1]-830, 700, 490]))
-    for i in me.shown_usable:
+    dirty.append(draw.rect(SCREEN, WHITE, [460, SIZE[1]-830, 700, 490]))
+    for i in me.usable_items:
         if c == select:
-            dirty.append(word_builder('>', 360, 200 + c * 120))
+            dirty.append(word_builder('>', 460, 200 + c * 120))
         else:
-            dirty.append(word_builder(' ', 360, 200 + c * 120))
-        dirty.append(word_builder(i.item.upper().ljust(12), 420, 200 + c * 120))
-        if i[0] != 'CANCEL':
-            dirty.append(word_builder('*' + str(me.count).rjust(3), 820, 260 + c * 120))
+            dirty.append(word_builder(' ', 460, 200 + c * 120))
+        dirty.append(word_builder(i.item.name.upper().ljust(12), 520, 200 + c * 120))
+        if i.item.name != 'CANCEL':
+            dirty.append(word_builder('*' + str(i.count).rjust(3), 920, 260 + c * 120))
         c += 1
     display.update(dirty)
 
@@ -945,7 +956,7 @@ def draw_use_on(mon,offset,item):
     word_builder('%' + str(mon.lvl), 800, offset * 110)
     SCREEN.blit(mon.sprite1, (60, offset * 110+ 15))
     try:
-        able = mon.baseid in ABLE[item]
+        able = mon.base_id in ABLE[item.item.name]
         word_builder( ['NOT ABLE','    ABLE'][able], 520, offset * 110 + 60)
     except:
         #TODO TM/HMS
@@ -964,15 +975,17 @@ def update_usable(old,new,me):
 
 def usable_on(me, item):
     clear()
-    write_btm('Use {0} on', 'which POK~MON')
+    write_btm('Use {0} on'.format(item.item.name), 'which POK~MON')
     offset = 0
     able_list = []
     for mon in me.pkmn:
-        able.append(draw_use_on(mon,offset,item))
+        able_list.append(draw_use_on(mon,offset,item))
         offset += 1
     word_builder('>', 0, 60)
     display.flip()
     count = 0
+    select = 0
+    tmp = True
     while True:
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
@@ -988,11 +1001,16 @@ def usable_on(me, item):
                     count = 1
                     tmp = True
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_z:
-                #TODO add conf
-                #conf()
-                return select
+                if able_list[select]:
+                    if conf():
+                        return select
+                    else:
+                        pass
+                else:
+                    #TODO reject
+                    pass
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_x:
-                return False
+                return -1
 
         sleep(.1)
         con1 = count % 2 == 0 and me.pkmn[select].hp > me.pkmn[select].maxhp / 2
@@ -1008,8 +1026,9 @@ def usable_on(me, item):
 
 
 def use(me, item, mon):
-    if item in ABLE:
-        evolve(me, mon, ABLE[item][mon.base_id])
+    item.use(me)
+    if item.item.name in ABLE:
+        evolve(me, mon, ABLE[item.item.name][mon.base_id])
 
 
 
@@ -1020,35 +1039,54 @@ def using(me):
         write_btm('Which item would', 'you like to use?')
         display.flip()
         selector = 0
-        update_using(me, select)
+        update_using(me, selector)
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
                     if selector > 0:
                         selector -= 1
                         update_using(me, selector)
-                    elif shopp.items[0] != shopp.shownitems[0]:
-                        shopp.shift_usable_left()
+                    elif me.usable[0] != me.usable_items[0]:
+                        me.shift_usable_left()
                         update_using(me, selector)
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
-                    if selector < 2 and selector < len(me.shown_usable) - 1:
+                    if selector < 2 and selector < len(me.usable_items) - 1:
                         selector += 1
                         update_using(me, selector)
-                    elif len(me.shown_usable) > 3:
-                        shopp.shift_usable_right()
+                    elif len(me.usable_items) > 3:
+                        me.shift_usable_right()
                         update_using(me,selector)
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_x:
                     return False
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_z:
-                    if me.shown_usable[selector].item == 'CANCEL':
+                    if me.usable_items[selector].item.name == 'CANCEL':
                         return False
                     else:
-                        retval = usable_on(me, me.shown_usable[selector].name)
-                        if retval:
-                            use(me, me.shown_usable[selector].name, me.pkmn[retval])
+                        retval = usable_on(me, me.usable_items[selector])
+                        if retval > -1:
+                            use(me, me.usable_items[selector], me.pkmn[retval])
                         break
+            sleep(.1)
 
 
+
+def shop_choice():
+    display.update(SCREEN.blit(SHOP_CHOICE, (10,10)))
+    select = 0
+    pygame.event.clear()
+    while True:
+        shop_selecting(select)
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
+                if select < 3:
+                    select += 1
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
+                if select > 0:
+                    select -= 1
+            if event.type == pygame.KEYDOWN and ((event.key == pygame.K_z and select == 3) or event.key == pygame.K_x):
+                return False
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_z:
+                return select
 
 
 def conf():
@@ -1057,7 +1095,6 @@ def conf():
     select = 0
     pygame.event.clear()
     while True:
-        sleep(.1)
         selecting(select)
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
@@ -1070,12 +1107,13 @@ def conf():
                 return False
             if event.type == pygame.KEYDOWN and event.key == pygame.K_z:
                 return True
+        sleep(.1)
 
 def do_purchase(me, item, retval):
     if me.money < item.buyprice * retval:
         display.update(write_btm("You don't have", 'enough money'))
         wait_for_button()
-        display.update(draw.rect(SCREEN, WHITE, [360, SIZE[1]-830, 700, 490]))
+        display.update(draw.rect(SCREEN, WHITE, [460, SIZE[1]-830, 700, 490]))
     else:
         me.money -= item.buyprice * retval
         display.update(write_btm('Here you are!', 'Thank you!'))
@@ -1103,9 +1141,7 @@ def do_purchase(me, item, retval):
         display.flip()
         selector = 0
 
-def shop(me):
-    shopp = shoppe()
-    clear()
+def buy(me, shopp):
     word_builder('Take your time.', 50, SIZE[1]-250)
     SCREEN.blit(ITEMS, (10, SIZE[1]-880))
     SCREEN.blit(MONEY, (724, 0))
@@ -1144,15 +1180,33 @@ def shop(me):
                             do_purchase(me, item, retval)
                             update_shop(shopp, selector)
                         else:
-                            display.update(draw.rect(SCREEN, WHITE, [360, SIZE[1]-830, 700, 490]))
+                            display.update(draw.rect(SCREEN, WHITE, [460, SIZE[1]-830, 700, 490]))
                             update_shop(shopp, selector)
 
 
                     else:
-                        display.update(draw.rect(SCREEN, WHITE, [360, SIZE[1]-830, 700, 490]))
+                        display.update(draw.rect(SCREEN, WHITE, [460, SIZE[1]-830, 700, 490]))
                         update_shop(shopp, selector)
                 else:
                     return False
+
+def shop(me):
+    shopp = shoppe()
+    while True:
+        clear()
+        SCREEN.blit(MONEY, (724, 0))
+        word_builder('<' + str(me.money).rjust(7),772, 45)
+        write_btm('Hi there!', 'May I help you?')
+        display.flip()
+        retval = shop_choice()
+
+        if retval == 0:
+            buy(me, shopp)
+        elif retval == 1:
+            sell(me)
+        elif retval == 2:
+            using(me)
+
 
 
 

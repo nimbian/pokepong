@@ -7,6 +7,7 @@ from util import *
 from redis import StrictRedis
 from models import *
 import zmq
+import vlc
 
 def main():
     #TODO set to True on opposite table
@@ -110,6 +111,13 @@ def main():
                 opp.pkmn = [get_wild_mon(loc)]
                 opp.current = opp.pkmn[0]
         opp.initialize()
+        if mode == 'wild':
+            music = vlc.MediaPlayer("sounds/wild_battle.mp3")
+            music_vict = vlc.MediaPlayer("sounds/wild_victory.mp3")
+        else:
+            music = vlc.MediaPlayer("sounds/trainer_battle.mp3")
+            music_vict = vlc.MediaPlayer("sounds/trainer_victory.mp3")
+        music.play()
         new_game_start(me, opp, mode)
         while me.alive() and opp.alive():
             try:
@@ -138,12 +146,16 @@ def main():
                 if opp.alive():
                     opp_next_mon(me, opp, mode, socket)
                 else:
+                    music.stop()
+                    music_vict.play()
                     win(me, opp, mode)
+                    music_vict.stop()
             elif tmp == 1:
                 run_me_faint(me)
                 if me.alive():
                     me_next_mon(me, opp, mode, socket)
                 else:
+                    music.stop()
                     lost(me,mode)
             elif tmp == 3:
                 pass
