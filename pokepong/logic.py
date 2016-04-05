@@ -8,6 +8,10 @@ import json
 from redis import StrictRedis
 from routes import ROUTES, MAPLIST, MAPROUTE
 from database import db
+import vlc
+
+SHOP = vlc.MediaPlayer("sounds/shop.mp3")
+EVOLVE = vlc.MediaPlayer("sounds/evolve.mp3")
 
 r = StrictRedis(host = '127.0.0.1')
 
@@ -706,16 +710,18 @@ def evolve(me, mon, new):
     write_btm('What? {0}'.format(mon.name), 'is evolving!')
     SCREEN.blit(oldpic,[444,120])
     display.flip()
+    SHOP.stop()
+    EVOLVE.play()
     if do_evolve(oldpic, newpic):
         if mon.base.name == mon.name:
             mon.name = Pokemon.query.get(new).name
         mon.base_id = new
         db.commit()
         display.update(write_btm('{0} evolved'.format(mon.name),"into " + mon.base.name))
-        wait_for_button()
     else:
         display.update(write_btm('Huh? {0}'.format(mon.name),"stopped evolving!"))
-        wait_for_button()
+    EVOLVE.stop()
+    wait_for_button()
 
 
 
@@ -1065,7 +1071,7 @@ def using(me):
                         retval = usable_on(me, me.usable_items[selector])
                         if retval > -1:
                             use(me, me.usable_items[selector], me.pkmn[retval])
-                        break
+                        return False
             sleep(.1)
 
 
@@ -1192,6 +1198,7 @@ def buy(me, shopp):
 
 def shop(me):
     shopp = shoppe()
+    SHOP.play()
     while True:
         clear()
         SCREEN.blit(MONEY, (724, 0))
