@@ -125,15 +125,19 @@ class Trainer(Base):
     def initialize(self):
         self.battle = []
         self.usable = []
+        self.all_items = []
         for i in self.items:
             if i.item.battle:
                 self.battle.append(i)
             else:
                 self.usable.append(i)
+            self.all_items.append(i)
         self.battle.append(OwnedItem(Items('CANCEL'), Trainer(''), 0))
         self.usable.append(OwnedItem(Items('CANCEL'), Trainer(''), 0))
+        self.all_items.append(OwnedItem(Items('CANCEL'), Trainer(''), 0))
         self.shownitems = self.battle[:4]
         self.usable_items = self.usable[:4]
+        self.all_shown = self.all_items[:4]
 
     def alive(self):
         for mon in self.pkmn:
@@ -174,11 +178,19 @@ class Trainer(Base):
 
     def shift_usable_right(self):
         y = self.usable.index(self.usable_items[1])
-        self.shown_usable = self.usable[y:y+4]
+        self.usable_items = self.usable[y:y+4]
 
     def shift_usable_left(self):
-        y = self.usable.index(self.shown_usable[0])
-        self.shown_usable = self.usable[y-1:y+3]
+        y = self.usable.index(self.usable_items[0])
+        self.usable_items = self.usable[y-1:y+3]
+
+    def shift_all_right(self):
+        y = self.all_items.index(self.all_shown[1])
+        self.all_shown = self.all_items[y:y+4]
+
+    def shift_all_left(self):
+        y = self.all_items.index(self.all_shown[0])
+        self.all_shown = self.all_items[y-1:y+3]
 
 class Pokemon(Base):
     __tablename__ = 'pokemon'
@@ -503,7 +515,6 @@ class Owned(Base):
             else:
                 self.sleep -= 1
                 return 'SLP'
-        print(self.confused)
         if self.confused > 0:
             display.update(write_btm(self.name, 'is confused'))
             self.confused -= 1
@@ -660,26 +671,26 @@ class Owned(Base):
 
     def gain_exp(self,me, opp, multi):
         #TODO test exp
-        if self.id_ > 151:
-            self.exp += (multi * opp.current.baseexp * opp.current.lvl)/ (7 * len(me.used))
-            for i in range(5):
-                self.evs[i] += opp.current.base[i]
+        if self.id > 151:
+            self.exp += (multi * opp.current.base.exp * opp.current.lvl)/ (7 * len(me.used))
+            self.hpev += opp.current.base.hp
+            self.attackev += opp.current.base.attack
+            self.defenseev += opp.current.base.defense
+            self.speedev += opp.current.base.speed
+            self.specialev += opp.current.base.special
             c = 0
             while True:
                 lvl = self.lvl + c
                 exp = {'f': int(4 * lvl ** 3 / 5.),
                        'mf': lvl ** 3,
                        'ms': int(6/5. * lvl ** 3 - 15 * lvl ** 2 + 100 * lvl - 140),
-                       's': int(5 * lvl ** 3 / 4.)}[self.lvlspeed]
+                       's': int(5 * lvl ** 3 / 4.)}[self.base.lvlspeed]
                 if self.exp < exp:
                     break
                 c += 1
-            #TODO set to actual host
-            r = StrictRedis(host='127.0.0.1')
-            d = [self.lvl+c] + self.evs + [self.exp, self.id_]
             db.add(self)
             db.commit()
-            return [self.lvl + c, (opp.current.baseexp * opp.current.lvl)/ (7 * len(me.used))]
+            return [self.lvl + c, (opp.current.base.exp * opp.current.lvl)/ (7 * len(me.used))]
 
     def gain_lvl(self, lvl):
         self.lvl = lvl
@@ -712,11 +723,27 @@ class OwnedItem(Base):
         #TODO write to DB
         self.count -= 1
         if self.count == 0:
-            me.items.remove(self)
+            if self.item.battle:
+                me.battle.remove(self)
+                try:
+                    me.shownitems.remove(self)
+                    me.shift_items_right()
+                    me.shift_items_left()
+                except:
+                    pass
+            else:
+                me.usable.remove(self)
+                try:
+                    me.usable_items.remove(self)
+                    me.shift_usable_right()
+                    me.shift_usable_left()
+                except:
+                    pass
+            me.all_items.remove(self)
             try:
-                me.shownitems.remove(self)
-                me.shift_items_right()
-                me.shift_items_left()
+                me.all_shown.remove(self)
+                me.shift_all_right()
+                me.shift_all_left()
             except:
                 pass
             db.delete(self)

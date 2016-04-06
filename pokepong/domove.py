@@ -326,7 +326,7 @@ def do_move(attack, defend, move, mode, me, first):
 
 def do_attacks(attack, defend, move, me, times = 1):
     crit, type_, dmg = attack.calc_dmg(defend, move)
-    meth = getattr(pokepong.move_sandbox, 'do_'+i.name.lower().replace(' ','_').replace('-','_'))
+    meth = getattr(move_sandbox, 'do_'+move.name.lower().replace(' ','_').replace('-','_'))
     meth(attack, defend, me)
     for i in range(times):
         retval = dmg_pkmn(defend, dmg, me)

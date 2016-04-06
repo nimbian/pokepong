@@ -1,9 +1,10 @@
 from pygame import image, draw, display
+from pygame.mixer import Sound
 import pygame
 from util import loadalphaimg, loadimg, alphabet, HIGH_ARC, LOW_ARC
 from math import floor
 from time import sleep
-from vlc import MediaPlayer
+pygame.mixer.init()
 sleep(1)
 
 SIZE = (1280,1024)
@@ -421,8 +422,8 @@ def beam(attacker,defender,type_ = None):
 
 
 def do_absorb(attacker,defender,attacking):
-    s = MediaPlayer("Absorb.mp3")
-    s.start()
+    s = Sound("sounds/Absorb.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -430,8 +431,8 @@ def do_absorb(attacker,defender,attacking):
     s.stop()
 
 def do_acid(attacker,defender,attacking):
-    s = MediaPlayer("Acid.mp3")
-    s.start()
+    s = Sound("sounds/Acid.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -439,8 +440,8 @@ def do_acid(attacker,defender,attacking):
     s.stop()
 
 def do_acid_armor(attacker,defender,attacking):
-    s = MediaPlayer("Acid Armor.mp3")
-    s.start()
+    s = Sound("sounds/Acid Armor.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -448,8 +449,8 @@ def do_acid_armor(attacker,defender,attacking):
     s.stop()
 
 def do_agility(attacker,defender,attacking):
-    s = MediaPlayer("Agility.mp3")
-    s.start()
+    s = Sound("sounds/Agility.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -457,8 +458,8 @@ def do_agility(attacker,defender,attacking):
     s.stop()
 
 def do_amnesia(attacker,defender,attacking):
-    s = MediaPlayer("Amnesia.mp3")
-    s.start()
+    s = Sound("sounds/Amnesia.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -466,8 +467,8 @@ def do_amnesia(attacker,defender,attacking):
     s.stop()
 
 def do_aurora_beam(attacker,defender,attacking):
-    s = MediaPlayer("Aurora Beam.mp3")
-    s.start()
+    s = Sound("sounds/Aurora Beam.ogg")
+    s.play()
     if attacking:
         beam(attacker,defender,type_ = 'aurora')
     else:
@@ -475,8 +476,8 @@ def do_aurora_beam(attacker,defender,attacking):
     s.stop()
 
 def do_barrage(attacker,defender,attacking):
-    s = MediaPlayer("Barrage.mp3")
-    s.start()
+    s = Sound("sounds/Barrage.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -484,8 +485,8 @@ def do_barrage(attacker,defender,attacking):
     s.stop()
 
 def do_barrier(attacker,defender,attacking):
-    s = MediaPlayer("Barrier.mp3")
-    s.start()
+    s = Sound("sounds/Barrier.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -493,8 +494,8 @@ def do_barrier(attacker,defender,attacking):
     s.stop()
 
 def do_bide(attacker,defender,attacking):
-    s = MediaPlayer("Bide.mp3")
-    s.start()
+    s = Sound("sounds/Bide.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -502,8 +503,8 @@ def do_bide(attacker,defender,attacking):
     s.stop()
 
 def do_bind(attacker,defender,attacking):
-    s = MediaPlayer("Bind.mp3")
-    s.start()
+    s = Sound("sounds/Bind.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -511,8 +512,8 @@ def do_bind(attacker,defender,attacking):
     s.stop()
 
 def do_bite(attacker,defender,attacking):
-    s = MediaPlayer("Bite.mp3")
-    s.start()
+    s = Sound("sounds/Bite.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -520,8 +521,8 @@ def do_bite(attacker,defender,attacking):
     s.stop()
 
 def do_blizzard(attacker,defender,attacking):
-    s = MediaPlayer("Blizzard.mp3")
-    s.start()
+    s = Sound("sounds/Blizzard.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -529,8 +530,8 @@ def do_blizzard(attacker,defender,attacking):
     s.stop()
 
 def do_body_slam(attacker,defender,attacking):
-    s = MediaPlayer("Body Slam.mp3")
-    s.start()
+    s = Sound("sounds/Body Slam.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -538,8 +539,8 @@ def do_body_slam(attacker,defender,attacking):
     s.stop()
 
 def do_bone_club(attacker,defender,attacking):
-    s = MediaPlayer("Bone Club.mp3")
-    s.start()
+    s = Sound("sounds/Bone Club.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -547,8 +548,8 @@ def do_bone_club(attacker,defender,attacking):
     s.stop()
 
 def do_bonemerang(attacker,defender,attacking):
-    s = MediaPlayer("Bonmerang.mp3")
-    s.start()
+    s = Sound("sounds/Bonmerang.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -556,8 +557,8 @@ def do_bonemerang(attacker,defender,attacking):
     s.stop()
 
 def do_bubble(attacker,defender,attacking):
-    s = MediaPlayer("Bubble Beam.mp3")
-    s.start()
+    s = Sound("sounds/Bubble Beam.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -565,8 +566,8 @@ def do_bubble(attacker,defender,attacking):
     s.stop()
 
 def do_bubblebeam(attacker,defender,attacking):
-    s = MediaPlayer("Bubble.mp3")
-    s.start()
+    s = Sound("sounds/Bubble.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -574,8 +575,8 @@ def do_bubblebeam(attacker,defender,attacking):
     s.stop()
 
 def do_clamp(attacker,defender,attacking):
-    s = MediaPlayer("Clamp.mp3")
-    s.start()
+    s = Sound("sounds/Clamp.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -583,8 +584,8 @@ def do_clamp(attacker,defender,attacking):
     s.stop()
 
 def do_comet_punch(attacker,defender,attacking):
-    s = MediaPlayer("Comet Punch.mp3")
-    s.start()
+    s = Sound("sounds/Comet Punch.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -592,8 +593,8 @@ def do_comet_punch(attacker,defender,attacking):
     s.stop()
 
 def do_confuse_ray(attacker,defender,attacking):
-    s = MediaPlayer("Confuse Ray.mp3")
-    s.start()
+    s = Sound("sounds/Confuse Ray.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -601,8 +602,8 @@ def do_confuse_ray(attacker,defender,attacking):
     s.stop()
 
 def do_confusion(attacker,defender,attacking):
-    s = MediaPlayer("Confusion.mp3")
-    s.start()
+    s = Sound("sounds/Confusion.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -610,8 +611,8 @@ def do_confusion(attacker,defender,attacking):
     s.stop()
 
 def do_constrict(attacker,defender,attacking):
-    s = MediaPlayer("Constrict.mp3")
-    s.start()
+    s = Sound("sounds/Constrict.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -619,8 +620,8 @@ def do_constrict(attacker,defender,attacking):
     s.stop()
 
 def do_conversion(attacker,defender,attacking):
-    s = MediaPlayer("Conversion.mp3")
-    s.start()
+    s = Sound("sounds/Conversion.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -628,8 +629,8 @@ def do_conversion(attacker,defender,attacking):
     s.stop()
 
 def do_counter(attacker,defender,attacking):
-    s = MediaPlayer("Counter.mp3")
-    s.start()
+    s = Sound("sounds/Counter.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -637,8 +638,8 @@ def do_counter(attacker,defender,attacking):
     s.stop()
 
 def do_crabhammer(attacker,defender,attacking):
-    s = MediaPlayer("Crabhammer.mp3")
-    s.start()
+    s = Sound("sounds/Crabhammer.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -646,8 +647,8 @@ def do_crabhammer(attacker,defender,attacking):
     s.stop()
 
 def do_cut(attacker,defender,attacking):
-    s = MediaPlayer("Cut.mp3")
-    s.start()
+    s = Sound("sounds/Cut.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -655,8 +656,8 @@ def do_cut(attacker,defender,attacking):
     s.stop()
 
 def do_defense_curl(attacker,defender,attacking):
-    s = MediaPlayer("Defence Curl.mp3")
-    s.start()
+    s = Sound("sounds/Defence Curl.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -664,8 +665,8 @@ def do_defense_curl(attacker,defender,attacking):
     s.stop()
 
 def do_dig(attacker,defender,attacking):
-    s = MediaPlayer("Dig1.mp3")
-    s.start()
+    s = Sound("sounds/Dig1.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -673,8 +674,8 @@ def do_dig(attacker,defender,attacking):
     s.stop()
 
 def do_dig_prep(attacker,defender,attacking):
-    s = MediaPlayer("Dig2.mp3")
-    s.start()
+    s = Sound("sounds/Dig2.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -682,8 +683,8 @@ def do_dig_prep(attacker,defender,attacking):
     s.stop()
 
 def do_disable(attacker,defender,attacking):
-    s = MediaPlayer("Disable.mp3")
-    s.start()
+    s = Sound("sounds/Disable.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -691,8 +692,8 @@ def do_disable(attacker,defender,attacking):
     s.stop()
 
 def do_dizzy_punch(attacker,defender,attacking):
-    s = MediaPlayer("Dizzy Punch.mp3")
-    s.start()
+    s = Sound("sounds/Dizzy Punch.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -700,8 +701,8 @@ def do_dizzy_punch(attacker,defender,attacking):
     s.stop()
 
 def do_double_kick(attacker,defender,attacking):
-    s = MediaPlayer("Double-Egde.mp3")
-    s.start()
+    s = Sound("sounds/Double-Egde.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -709,8 +710,8 @@ def do_double_kick(attacker,defender,attacking):
     s.stop()
 
 def do_double_team(attacker,defender,attacking):
-    s = MediaPlayer("Double Kick.mp3")
-    s.start()
+    s = Sound("sounds/Double Kick.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -718,8 +719,8 @@ def do_double_team(attacker,defender,attacking):
     s.stop()
 
 def do_double_edge(attacker,defender,attacking):
-    s = MediaPlayer("DoubleSlap.mp3")
-    s.start()
+    s = Sound("sounds/DoubleSlap.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -727,8 +728,8 @@ def do_double_edge(attacker,defender,attacking):
     s.stop()
 
 def do_doubleslap(attacker,defender,attacking):
-    s = MediaPlayer("Double Team.mp3")
-    s.start()
+    s = Sound("sounds/Double Team.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -736,8 +737,8 @@ def do_doubleslap(attacker,defender,attacking):
     s.stop()
 
 def do_dragon_rage(attacker,defender,attacking):
-    s = MediaPlayer("Dragon Rage.mp3")
-    s.start()
+    s = Sound("sounds/Dragon Rage.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -745,8 +746,8 @@ def do_dragon_rage(attacker,defender,attacking):
     s.stop()
 
 def do_dream_eater(attacker,defender,attacking):
-    s = MediaPlayer("Dream Eater.mp")
-    s.start()
+    s = Sound("sounds/Dream Eater.mp")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -754,8 +755,8 @@ def do_dream_eater(attacker,defender,attacking):
     s.stop()
 
 def do_drill_peck(attacker,defender,attacking):
-    s = MediaPlayer("Drill Peck.mp")
-    s.start()
+    s = Sound("sounds/Drill Peck.mp")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -763,8 +764,8 @@ def do_drill_peck(attacker,defender,attacking):
     s.stop()
 
 def do_earthquake(attacker,defender,attacking):
-    s = MediaPlayer("Earthquake.mp3")
-    s.start()
+    s = Sound("sounds/Earthquake.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -772,8 +773,8 @@ def do_earthquake(attacker,defender,attacking):
     s.stop()
 
 def do_egg_bomb(attacker,defender,attacking):
-    s = MediaPlayer("Egg Bomb.mp3")
-    s.start()
+    s = Sound("sounds/Egg Bomb.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -781,8 +782,8 @@ def do_egg_bomb(attacker,defender,attacking):
     s.stop()
 
 def do_ember(attacker,defender,attacking):
-    s = MediaPlayer("Ember.mp3")
-    s.start()
+    s = Sound("sounds/Ember.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -790,8 +791,8 @@ def do_ember(attacker,defender,attacking):
     s.stop()
 
 def do_explosion(attacker,defender,attacking):
-    s = MediaPlayer("Explosion.mp3")
-    s.start()
+    s = Sound("sounds/Explosion.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -799,8 +800,8 @@ def do_explosion(attacker,defender,attacking):
     s.stop()
 
 def do_fire_blast(attacker,defender,attacking):
-    s = MediaPlayer("Fire Blast.mp3")
-    s.start()
+    s = Sound("sounds/Fire Blast.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -808,8 +809,8 @@ def do_fire_blast(attacker,defender,attacking):
     s.stop()
 
 def do_fire_punch(attacker,defender,attacking):
-    s = MediaPlayer("Fire Punch.mp3")
-    s.start()
+    s = Sound("sounds/Fire Punch.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -817,8 +818,8 @@ def do_fire_punch(attacker,defender,attacking):
     s.stop()
 
 def do_fire_spin(attacker,defender,attacking):
-    s = MediaPlayer("Fire Spin.mp3")
-    s.start()
+    s = Sound("sounds/Fire Spin.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -826,8 +827,8 @@ def do_fire_spin(attacker,defender,attacking):
     s.stop()
 
 def do_fissure(attacker,defender,attacking):
-    s = MediaPlayer("Fissure.mp3")
-    s.start()
+    s = Sound("sounds/Fissure.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -835,8 +836,8 @@ def do_fissure(attacker,defender,attacking):
     s.stop()
 
 def do_flamethrower(attacker,defender,attacking):
-    s = MediaPlayer("Flamethrower.mp3")
-    s.start()
+    s = Sound("sounds/Flamethrower.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -844,8 +845,8 @@ def do_flamethrower(attacker,defender,attacking):
     s.stop()
 
 def do_flash(attacker,defender,attacking):
-    s = MediaPlayer("Flash.mp3")
-    s.start()
+    s = Sound("sounds/Flash.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -853,8 +854,8 @@ def do_flash(attacker,defender,attacking):
     s.stop()
 
 def do_fly(attacker,defender,attacking):
-    s = MediaPlayer("Fly.mp3")
-    s.start()
+    s = Sound("sounds/Fly.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -862,8 +863,8 @@ def do_fly(attacker,defender,attacking):
     s.stop()
 
 def do_fly_prep(attacker,defender,attacking):
-    s = MediaPlayer("Fly_prep.mp3")
-    s.start()
+    s = Sound("sounds/Fly_prep.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -871,8 +872,8 @@ def do_fly_prep(attacker,defender,attacking):
     s.stop()
 
 def do_focus_energy(attacker,defender,attacking):
-    s = MediaPlayer("Focus Energy.mp3")
-    s.start()
+    s = Sound("sounds/Focus Energy.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -880,8 +881,8 @@ def do_focus_energy(attacker,defender,attacking):
     s.stop()
 
 def do_fury_attack(attacker,defender,attacking):
-    s = MediaPlayer("Fury Attack.mp3")
-    s.start()
+    s = Sound("sounds/Fury Attack.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -889,8 +890,8 @@ def do_fury_attack(attacker,defender,attacking):
     s.stop()
 
 def do_fury_swipes(attacker,defender,attacking):
-    s = MediaPlayer("Fury Swipes.mp3")
-    s.start()
+    s = Sound("sounds/Fury Swipes.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -898,8 +899,8 @@ def do_fury_swipes(attacker,defender,attacking):
     s.stop()
 
 def do_glare(attacker,defender,attacking):
-    s = MediaPlayer("Glare.mp3")
-    s.start()
+    s = Sound("sounds/Glare.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -907,8 +908,8 @@ def do_glare(attacker,defender,attacking):
     s.stop()
 
 def do_growl(attacker,defender,attacking):
-    s = MediaPlayer(attacker.base.name + '.mp3')
-    s.start()
+    s = Sound(attacker.base.name + '.ogg')
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -916,8 +917,8 @@ def do_growl(attacker,defender,attacking):
     s.stop()
 
 def do_growth(attacker,defender,attacking):
-    s = MediaPlayer("Growth.mp3")
-    s.start()
+    s = Sound("sounds/Growth.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -925,8 +926,8 @@ def do_growth(attacker,defender,attacking):
     s.stop()
 
 def do_guillotine(attacker,defender,attacking):
-    s = MediaPlayer("Guillotine.mp3")
-    s.start()
+    s = Sound("sounds/Guillotine.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -934,8 +935,8 @@ def do_guillotine(attacker,defender,attacking):
     s.stop()
 
 def do_gust(attacker,defender,attacking):
-    s = MediaPlayer("Gust.mp3")
-    s.start()
+    s = Sound("sounds/Gust.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -943,8 +944,8 @@ def do_gust(attacker,defender,attacking):
     s.stop()
 
 def do_harden(attacker,defender,attacking):
-    s = MediaPlayer("Harden.mp3")
-    s.start()
+    s = Sound("sounds/Harden.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -952,8 +953,8 @@ def do_harden(attacker,defender,attacking):
     s.stop()
 
 def do_haze(attacker,defender,attacking):
-    s = MediaPlayer("Haze.mp3")
-    s.start()
+    s = Sound("sounds/Haze.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -961,8 +962,8 @@ def do_haze(attacker,defender,attacking):
     s.stop()
 
 def do_headbutt(attacker,defender,attacking):
-    s = MediaPlayer("HeadButt.mp3")
-    s.start()
+    s = Sound("sounds/HeadButt.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -970,8 +971,8 @@ def do_headbutt(attacker,defender,attacking):
     s.stop()
 
 def do_hi_jump_kick(attacker,defender,attacking):
-    s = MediaPlayer("Hi Jump Kick.mp3")
-    s.start()
+    s = Sound("sounds/Hi Jump Kick.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -979,8 +980,8 @@ def do_hi_jump_kick(attacker,defender,attacking):
     s.stop()
 
 def do_horn_attack(attacker,defender,attacking):
-    s = MediaPlayer("Horn Attack.mp3")
-    s.start()
+    s = Sound("sounds/Horn Attack.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -988,8 +989,8 @@ def do_horn_attack(attacker,defender,attacking):
     s.stop()
 
 def do_horn_drill(attacker,defender,attacking):
-    s = MediaPlayer("Horn Drill.mp3")
-    s.start()
+    s = Sound("sounds/Horn Drill.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -997,8 +998,8 @@ def do_horn_drill(attacker,defender,attacking):
     s.stop()
 
 def do_hydro_pump(attacker,defender,attacking):
-    s = MediaPlayer("Hydro Pump.mp3")
-    s.start()
+    s = Sound("sounds/Hydro Pump.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1006,8 +1007,8 @@ def do_hydro_pump(attacker,defender,attacking):
     s.stop()
 
 def do_hyper_beam(attacker,defender,attacking):
-    s = MediaPlayer("Hyper Beam.mp3")
-    s.start()
+    s = Sound("sounds/Hyper Beam.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1015,8 +1016,8 @@ def do_hyper_beam(attacker,defender,attacking):
     s.stop()
 
 def do_hyper_fang(attacker,defender,attacking):
-    s = MediaPlayer("Hyper Fang.mp3")
-    s.start()
+    s = Sound("sounds/Hyper Fang.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1024,8 +1025,8 @@ def do_hyper_fang(attacker,defender,attacking):
     s.stop()
 
 def do_hypnosis(attacker,defender,attacking):
-    s = MediaPlayer("Hypnosis.mp3")
-    s.start()
+    s = Sound("sounds/Hypnosis.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1033,8 +1034,8 @@ def do_hypnosis(attacker,defender,attacking):
     s.stop()
 
 def do_ice_beam(attacker,defender,attacking):
-    s = MediaPlayer("Ice Beam.mp3")
-    s.start()
+    s = Sound("sounds/Ice Beam.ogg")
+    s.play()
     if attacking:
         beam(attacker,defender,type_='ice')
     else:
@@ -1042,8 +1043,8 @@ def do_ice_beam(attacker,defender,attacking):
     s.stop()
 
 def do_ice_punch(attacker,defender,attacking):
-    s = MediaPlayer("Ice Punch.mp3")
-    s.start()
+    s = Sound("sounds/Ice Punch.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1051,8 +1052,8 @@ def do_ice_punch(attacker,defender,attacking):
     s.stop()
 
 def do_jump_kick(attacker,defender,attacking):
-    s = MediaPlayer("Jump Kick.mp3")
-    s.start()
+    s = Sound("sounds/Jump Kick.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1060,8 +1061,8 @@ def do_jump_kick(attacker,defender,attacking):
     s.stop()
 
 def do_karate_chop(attacker,defender,attacking):
-    s = MediaPlayer("Karate Chop.mp3")
-    s.start()
+    s = Sound("sounds/Karate Chop.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1069,8 +1070,8 @@ def do_karate_chop(attacker,defender,attacking):
     s.stop()
 
 def do_kinesis(attacker,defender,attacking):
-    s = MediaPlayer("Kinesis.mp3")
-    s.start()
+    s = Sound("sounds/Kinesis.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1078,8 +1079,8 @@ def do_kinesis(attacker,defender,attacking):
     s.stop()
 
 def do_leech_life(attacker,defender,attacking):
-    s = MediaPlayer("Leach Kiss.mp3")
-    s.start()
+    s = Sound("sounds/Leach Kiss.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1087,8 +1088,8 @@ def do_leech_life(attacker,defender,attacking):
     s.stop()
 
 def do_leech_seed(attacker,defender,attacking):
-    s = MediaPlayer("Leach Seed.mp3")
-    s.start()
+    s = Sound("sounds/Leach Seed.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1096,8 +1097,8 @@ def do_leech_seed(attacker,defender,attacking):
     s.stop()
 
 def do_leer(attacker,defender,attacking):
-    s = MediaPlayer("Leer.mp3")
-    s.start()
+    s = Sound("sounds/Leer.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1105,8 +1106,8 @@ def do_leer(attacker,defender,attacking):
     s.stop()
 
 def do_lick(attacker,defender,attacking):
-    s = MediaPlayer("Lick.mp3")
-    s.start()
+    s = Sound("sounds/Lick.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1114,8 +1115,8 @@ def do_lick(attacker,defender,attacking):
     s.stop()
 
 def do_light_screen(attacker,defender,attacking):
-    s = MediaPlayer("Light Screen.mp3")
-    s.start()
+    s = Sound("sounds/Light Screen.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1123,8 +1124,8 @@ def do_light_screen(attacker,defender,attacking):
     s.stop()
 
 def do_lovely_kiss(attacker,defender,attacking):
-    s = MediaPlayer("Lovely Kiss.mp3")
-    s.start()
+    s = Sound("sounds/Lovely Kiss.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1132,8 +1133,8 @@ def do_lovely_kiss(attacker,defender,attacking):
     s.stop()
 
 def do_low_kick(attacker,defender,attacking):
-    s = MediaPlayer("Low Kick.mp3")
-    s.start()
+    s = Sound("sounds/Low Kick.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1141,8 +1142,8 @@ def do_low_kick(attacker,defender,attacking):
     s.stop()
 
 def do_meditate(attacker,defender,attacking):
-    s = MediaPlayer("Meditate.mp3")
-    s.start()
+    s = Sound("sounds/Meditate.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1150,8 +1151,8 @@ def do_meditate(attacker,defender,attacking):
     s.stop()
 
 def do_mega_drain(attacker,defender,attacking):
-    s = MediaPlayer("Meaga Drain.mp3")
-    s.start()
+    s = Sound("sounds/Meaga Drain.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1159,8 +1160,8 @@ def do_mega_drain(attacker,defender,attacking):
     s.stop()
 
 def do_mega_kick(attacker,defender,attacking):
-    s = MediaPlayer("Mega Kick.mp3")
-    s.start()
+    s = Sound("sounds/Mega Kick.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1168,8 +1169,8 @@ def do_mega_kick(attacker,defender,attacking):
     s.stop()
 
 def do_mega_punch(attacker,defender,attacking):
-    s = MediaPlayer("Mega Punch.mp3")
-    s.start()
+    s = Sound("sounds/Mega Punch.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1177,8 +1178,8 @@ def do_mega_punch(attacker,defender,attacking):
     s.stop()
 
 def do_metronome(attacker,defender,attacking):
-    s = MediaPlayer("Metronome.mp3")
-    s.start()
+    s = Sound("sounds/Metronome.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1186,8 +1187,8 @@ def do_metronome(attacker,defender,attacking):
     s.stop()
 
 def do_mimic(attacker,defender,attacking):
-    s = MediaPlayer("Mimic.mp3")
-    s.start()
+    s = Sound("sounds/Mimic.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1195,8 +1196,8 @@ def do_mimic(attacker,defender,attacking):
     s.stop()
 
 def do_minimize(attacker,defender,attacking):
-    s = MediaPlayer("Minimize.mp3")
-    s.start()
+    s = Sound("sounds/Minimize.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1205,7 +1206,7 @@ def do_minimize(attacker,defender,attacking):
 
 def do_mirror_move(attacker,defender,attacking):
     pass #TODO mirror opp last move
-    s.start()
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1213,8 +1214,8 @@ def do_mirror_move(attacker,defender,attacking):
     s.stop()
 
 def do_mist(attacker,defender,attacking):
-    s = MediaPlayer("Mist.mp3")
-    s.start()
+    s = Sound("sounds/Mist.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1222,8 +1223,8 @@ def do_mist(attacker,defender,attacking):
     s.stop()
 
 def do_night_shade(attacker,defender,attacking):
-    s = MediaPlayer("Night Shade.mp3")
-    s.start()
+    s = Sound("sounds/Night Shade.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1231,8 +1232,8 @@ def do_night_shade(attacker,defender,attacking):
     s.stop()
 
 def do_pay_day(attacker,defender,attacking):
-    s = MediaPlayer("Pay Day.mp3")
-    s.start()
+    s = Sound("sounds/Pay Day.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1240,8 +1241,8 @@ def do_pay_day(attacker,defender,attacking):
     s.stop()
 
 def do_peck(attacker,defender,attacking):
-    s = MediaPlayer("Peck.mp3")
-    s.start()
+    s = Sound("sounds/Peck.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1249,8 +1250,8 @@ def do_peck(attacker,defender,attacking):
     s.stop()
 
 def do_petal_dance(attacker,defender,attacking):
-    s = MediaPlayer("Petal Dance.mp3")
-    s.start()
+    s = Sound("sounds/Petal Dance.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1258,8 +1259,8 @@ def do_petal_dance(attacker,defender,attacking):
     s.stop()
 
 def do_pin_missile(attacker,defender,attacking):
-    s = MediaPlayer("Pin Missle.mp3")
-    s.start()
+    s = Sound("sounds/Pin Missle.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1267,8 +1268,8 @@ def do_pin_missile(attacker,defender,attacking):
     s.stop()
 
 def do_poison_gas(attacker,defender,attacking):
-    s = MediaPlayer("Posion Gas.mp3")
-    s.start()
+    s = Sound("sounds/Posion Gas.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1276,8 +1277,8 @@ def do_poison_gas(attacker,defender,attacking):
     s.stop()
 
 def do_poison_sting(attacker,defender,attacking):
-    s = MediaPlayer("Poision Sting.mp3")
-    s.start()
+    s = Sound("sounds/Poision Sting.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1285,8 +1286,8 @@ def do_poison_sting(attacker,defender,attacking):
     s.stop()
 
 def do_poisonpowder(attacker,defender,attacking):
-    s = MediaPlayer("Poison Powder.mp3")
-    s.start()
+    s = Sound("sounds/Poison Powder.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1294,8 +1295,8 @@ def do_poisonpowder(attacker,defender,attacking):
     s.stop()
 
 def do_pound(attacker,defender,attacking):
-    s = MediaPlayer("Pound.mp3")
-    s.start()
+    s = Sound("sounds/Pound.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1303,8 +1304,8 @@ def do_pound(attacker,defender,attacking):
     s.stop()
 
 def do_psybeam(attacker,defender,attacking):
-    s = MediaPlayer("Psybeam.mp3")
-    s.start()
+    s = Sound("sounds/Psybeam.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1312,8 +1313,8 @@ def do_psybeam(attacker,defender,attacking):
     s.stop()
 
 def do_psychic(attacker,defender,attacking):
-    s = MediaPlayer("Psychic.mp3")
-    s.start()
+    s = Sound("sounds/Psychic.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1321,8 +1322,8 @@ def do_psychic(attacker,defender,attacking):
     s.stop()
 
 def do_psywave(attacker,defender,attacking):
-    s = MediaPlayer("Psywave.mp3")
-    s.start()
+    s = Sound("sounds/Psywave.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1330,8 +1331,8 @@ def do_psywave(attacker,defender,attacking):
     s.stop()
 
 def do_quick_attack(attacker,defender,attacking):
-    s = MediaPlayer("Quick Attack.mp3")
-    s.start()
+    s = Sound("sounds/Quick Attack.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1339,8 +1340,8 @@ def do_quick_attack(attacker,defender,attacking):
     s.stop()
 
 def do_rage(attacker,defender,attacking):
-    s = MediaPlayer("Rage.mp3")
-    s.start()
+    s = Sound("sounds/Rage.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1348,8 +1349,8 @@ def do_rage(attacker,defender,attacking):
     s.stop()
 
 def do_razor_leaf(attacker,defender,attacking):
-    s = MediaPlayer("Razor Leaf.mp3")
-    s.start()
+    s = Sound("sounds/Razor Leaf.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1357,7 +1358,7 @@ def do_razor_leaf(attacker,defender,attacking):
     s.stop()
 
 def do_razor_wind_prep(attacker,defender,attacking):
-    s.start()
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1365,8 +1366,8 @@ def do_razor_wind_prep(attacker,defender,attacking):
     s.stop()
 
 def do_razor_wind(attacker,defender,attacking):
-    s = MediaPlayer("Razor Wind.mp")
-    s.start()
+    s = Sound("sounds/Razor Wind.mp")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1374,8 +1375,8 @@ def do_razor_wind(attacker,defender,attacking):
     s.stop()
 
 def do_recover(attacker,defender,attacking):
-    s = MediaPlayer("Recover.mp3")
-    s.start()
+    s = Sound("sounds/Recover.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1383,8 +1384,8 @@ def do_recover(attacker,defender,attacking):
     s.stop()
 
 def do_reflect(attacker,defender,attacking):
-    s = MediaPlayer("Reflect.mp3")
-    s.start()
+    s = Sound("sounds/Reflect.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1392,8 +1393,8 @@ def do_reflect(attacker,defender,attacking):
     s.stop()
 
 def do_rest(attacker,defender,attacking):
-    s = MediaPlayer("Rest.mp3")
-    s.start()
+    s = Sound("sounds/Rest.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1401,8 +1402,8 @@ def do_rest(attacker,defender,attacking):
     s.stop()
 
 def do_roar(attacker,defender,attacking):
-    s = MediaPlayer(attacker.base.name + '.mp3')
-    s.start()
+    s = Sound(attacker.base.name + '.ogg')
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1410,8 +1411,8 @@ def do_roar(attacker,defender,attacking):
     s.stop()
 
 def do_rock_slide(attacker,defender,attacking):
-    s = MediaPlayer("Rock Slide.mp3")
-    s.start()
+    s = Sound("sounds/Rock Slide.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1419,8 +1420,8 @@ def do_rock_slide(attacker,defender,attacking):
     s.stop()
 
 def do_rock_throw(attacker,defender,attacking):
-    s = MediaPlayer("Rock Throw.mp3")
-    s.start()
+    s = Sound("sounds/Rock Throw.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1428,8 +1429,8 @@ def do_rock_throw(attacker,defender,attacking):
     s.stop()
 
 def do_rolling_kick(attacker,defender,attacking):
-    s = MediaPlayer("Rolling Kick.mp3")
-    s.start()
+    s = Sound("sounds/Rolling Kick.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1437,8 +1438,8 @@ def do_rolling_kick(attacker,defender,attacking):
     s.stop()
 
 def do_sand_attack(attacker,defender,attacking):
-    s = MediaPlayer("Sand Attack.mp3")
-    s.start()
+    s = Sound("sounds/Sand Attack.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1446,8 +1447,8 @@ def do_sand_attack(attacker,defender,attacking):
     s.stop()
 
 def do_scratch(attacker,defender,attacking):
-    s = MediaPlayer("Scratch.mp3")
-    s.start()
+    s = Sound("sounds/Scratch.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1455,8 +1456,8 @@ def do_scratch(attacker,defender,attacking):
     s.stop()
 
 def do_screech(attacker,defender,attacking):
-    s = MediaPlayer("Screech.mp3")
-    s.start()
+    s = Sound("sounds/Screech.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1464,8 +1465,8 @@ def do_screech(attacker,defender,attacking):
     s.stop()
 
 def do_seismic_toss(attacker,defender,attacking):
-    s = MediaPlayer("Seismic Toss.mp3")
-    s.start()
+    s = Sound("sounds/Seismic Toss.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1473,8 +1474,8 @@ def do_seismic_toss(attacker,defender,attacking):
     s.stop()
 
 def do_selfdestruct(attacker,defender,attacking):
-    s = MediaPlayer("Selfdestruct.mp3")
-    s.start()
+    s = Sound("sounds/Selfdestruct.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1482,8 +1483,8 @@ def do_selfdestruct(attacker,defender,attacking):
     s.stop()
 
 def do_sharpen(attacker,defender,attacking):
-    s = MediaPlayer("Sharpen.mp3")
-    s.start()
+    s = Sound("sounds/Sharpen.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1491,8 +1492,8 @@ def do_sharpen(attacker,defender,attacking):
     s.stop()
 
 def do_sing(attacker,defender,attacking):
-    s = MediaPlayer("Sing.mp3")
-    s.start()
+    s = Sound("sounds/Sing.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1500,8 +1501,8 @@ def do_sing(attacker,defender,attacking):
     s.stop()
 
 def do_skull_bash(attacker,defender,attacking):
-    s = MediaPlayer("Skull Bash.mp3")
-    s.start()
+    s = Sound("sounds/Skull Bash.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1509,7 +1510,7 @@ def do_skull_bash(attacker,defender,attacking):
     s.stop()
 
 def do_skull_bash_prep(attacker,defender,attacking):
-    s.start()
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1517,8 +1518,8 @@ def do_skull_bash_prep(attacker,defender,attacking):
     s.stop()
 
 def do_sky_attack(attacker,defender,attacking):
-    s = MediaPlayer("Sky Attack.mp3")
-    s.start()
+    s = Sound("sounds/Sky Attack.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1526,7 +1527,7 @@ def do_sky_attack(attacker,defender,attacking):
     s.stop()
 
 def do_sky_attack_prep(attacker,defender,attacking):
-    s.start()
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1534,8 +1535,8 @@ def do_sky_attack_prep(attacker,defender,attacking):
     s.stop()
 
 def do_slam(attacker,defender,attacking):
-    s = MediaPlayer("Slam.mp3")
-    s.start()
+    s = Sound("sounds/Slam.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1543,8 +1544,8 @@ def do_slam(attacker,defender,attacking):
     s.stop()
 
 def do_slash(attacker,defender,attacking):
-    s = MediaPlayer("Slash.mp3")
-    s.start()
+    s = Sound("sounds/Slash.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1552,8 +1553,8 @@ def do_slash(attacker,defender,attacking):
     s.stop()
 
 def do_sleep_powder(attacker,defender,attacking):
-    s = MediaPlayer("Sleep Powder.mp")
-    s.start()
+    s = Sound("sounds/Sleep Powder.mp")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1561,8 +1562,8 @@ def do_sleep_powder(attacker,defender,attacking):
     s.stop()
 
 def do_sludge(attacker,defender,attacking):
-    s = MediaPlayer("Sludge.mp3")
-    s.start()
+    s = Sound("sounds/Sludge.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1570,8 +1571,8 @@ def do_sludge(attacker,defender,attacking):
     s.stop()
 
 def do_smog(attacker,defender,attacking):
-    s = MediaPlayer("Smog.mp3")
-    s.start()
+    s = Sound("sounds/Smog.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1579,8 +1580,8 @@ def do_smog(attacker,defender,attacking):
     s.stop()
 
 def do_smokescreen(attacker,defender,attacking):
-    s = MediaPlayer("Smokescreen.mp3")
-    s.start()
+    s = Sound("sounds/Smokescreen.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1588,8 +1589,8 @@ def do_smokescreen(attacker,defender,attacking):
     s.stop()
 
 def do_softboiled(attacker,defender,attacking):
-    s = MediaPlayer("Softboilied.mp3")
-    s.start()
+    s = Sound("sounds/Softboilied.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1597,7 +1598,7 @@ def do_softboiled(attacker,defender,attacking):
     s.stop()
 
 def do_solarbeam_prep(attacker,defender,attacking):
-    s.start()
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1605,8 +1606,8 @@ def do_solarbeam_prep(attacker,defender,attacking):
     s.stop()
 
 def do_solarbeam(attacker,defender,attacking):
-    s = MediaPlayer("SolarBeam.mp3")
-    s.start()
+    s = Sound("sounds/SolarBeam.ogg")
+    s.play()
     if attacking:
         beam(attacker,defender,type_='solar')
     else:
@@ -1614,8 +1615,8 @@ def do_solarbeam(attacker,defender,attacking):
     s.stop()
 
 def do_sonicboom(attacker,defender,attacking):
-    s = MediaPlayer("Sonic Boom.mp3")
-    s.start()
+    s = Sound("sounds/Sonic Boom.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1623,8 +1624,8 @@ def do_sonicboom(attacker,defender,attacking):
     s.stop()
 
 def do_spike_cannon(attacker,defender,attacking):
-    s = MediaPlayer("Spike Cannon.mp3")
-    s.start()
+    s = Sound("sounds/Spike Cannon.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1632,8 +1633,8 @@ def do_spike_cannon(attacker,defender,attacking):
     s.stop()
 
 def do_splash(attacker,defender,attacking):
-    s = MediaPlayer("Spash.mp3")
-    s.start()
+    s = Sound("sounds/Spash.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1641,8 +1642,8 @@ def do_splash(attacker,defender,attacking):
     s.stop()
 
 def do_spore(attacker,defender,attacking):
-    s = MediaPlayer("Spore.mp3")
-    s.start()
+    s = Sound("sounds/Spore.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1650,8 +1651,8 @@ def do_spore(attacker,defender,attacking):
     s.stop()
 
 def do_stomp(attacker,defender,attacking):
-    s = MediaPlayer("Stomp.mp3")
-    s.start()
+    s = Sound("sounds/Stomp.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1659,8 +1660,8 @@ def do_stomp(attacker,defender,attacking):
     s.stop()
 
 def do_strength(attacker,defender,attacking):
-    s = MediaPlayer("Strength.mp3")
-    s.start()
+    s = Sound("sounds/Strength.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1668,8 +1669,8 @@ def do_strength(attacker,defender,attacking):
     s.stop()
 
 def do_string_shot(attacker,defender,attacking):
-    s = MediaPlayer("String Shot.mp3")
-    s.start()
+    s = Sound("sounds/String Shot.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1677,8 +1678,8 @@ def do_string_shot(attacker,defender,attacking):
     s.stop()
 
 def do_struggle(attacker,defender,attacking):
-    s = MediaPlayer("Struggle.mp3")
-    s.start()
+    s = Sound("sounds/Struggle.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1686,8 +1687,8 @@ def do_struggle(attacker,defender,attacking):
     s.stop()
 
 def do_stun_spore(attacker,defender,attacking):
-    s = MediaPlayer("Stun Spore.mp3")
-    s.start()
+    s = Sound("sounds/Stun Spore.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1695,8 +1696,8 @@ def do_stun_spore(attacker,defender,attacking):
     s.stop()
 
 def do_submission(attacker,defender,attacking):
-    s = MediaPlayer("Submission.mp3")
-    s.start()
+    s = Sound("sounds/Submission.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1704,8 +1705,8 @@ def do_submission(attacker,defender,attacking):
     s.stop()
 
 def do_substitute(attacker,defender,attacking):
-    s = MediaPlayer("Substitute.mp3")
-    s.start()
+    s = Sound("sounds/Substitute.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1713,8 +1714,8 @@ def do_substitute(attacker,defender,attacking):
     s.stop()
 
 def do_super_fang(attacker,defender,attacking):
-    s = MediaPlayer("Super Fang.mp3")
-    s.start()
+    s = Sound("sounds/Super Fang.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1722,8 +1723,8 @@ def do_super_fang(attacker,defender,attacking):
     s.stop()
 
 def do_supersonic(attacker,defender,attacking):
-    s = MediaPlayer("Supersonic.mp3")
-    s.start()
+    s = Sound("sounds/Supersonic.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1731,8 +1732,8 @@ def do_supersonic(attacker,defender,attacking):
     s.stop()
 
 def do_surf(attacker,defender,attacking):
-    s = MediaPlayer("Surf.mp3")
-    s.start()
+    s = Sound("sounds/Surf.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1740,8 +1741,8 @@ def do_surf(attacker,defender,attacking):
     s.stop()
 
 def do_swift(attacker,defender,attacking):
-    s = MediaPlayer("Swift.mp3")
-    s.start()
+    s = Sound("sounds/Swift.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1749,8 +1750,8 @@ def do_swift(attacker,defender,attacking):
     s.stop()
 
 def do_swords_dance(attacker,defender,attacking):
-    s = MediaPlayer("Swords Dance.mp3")
-    s.start()
+    s = Sound("sounds/Swords Dance.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1758,8 +1759,8 @@ def do_swords_dance(attacker,defender,attacking):
     s.stop()
 
 def do_tackle(attacker,defender,attacking):
-    s = MediaPlayer("Tackle.mp3")
-    s.start()
+    s = Sound("sounds/Tackle.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1767,8 +1768,8 @@ def do_tackle(attacker,defender,attacking):
     s.stop()
 
 def do_tail_whip(attacker,defender,attacking):
-    s = MediaPlayer("Tail Whip.mp3")
-    s.start()
+    s = Sound("sounds/Tail Whip.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1776,8 +1777,8 @@ def do_tail_whip(attacker,defender,attacking):
     s.stop()
 
 def do_take_down(attacker,defender,attacking):
-    s = MediaPlayer("Take Down.mp3")
-    s.start()
+    s = Sound("sounds/Take Down.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1785,8 +1786,8 @@ def do_take_down(attacker,defender,attacking):
     s.stop()
 
 def do_teleport(attacker,defender,attacking):
-    s = MediaPlayer("Teleport.mp3")
-    s.start()
+    s = Sound("sounds/Teleport.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1794,8 +1795,8 @@ def do_teleport(attacker,defender,attacking):
     s.stop()
 
 def do_thrash(attacker,defender,attacking):
-    s = MediaPlayer("Thrash.mp3")
-    s.start()
+    s = Sound("sounds/Thrash.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1803,8 +1804,8 @@ def do_thrash(attacker,defender,attacking):
     s.stop()
 
 def do_thunder(attacker,defender,attacking):
-    s = MediaPlayer("Thunder.mp3")
-    s.start()
+    s = Sound("sounds/Thunder.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1812,8 +1813,8 @@ def do_thunder(attacker,defender,attacking):
     s.stop()
 
 def do_thunder_wave(attacker,defender,attacking):
-    s = MediaPlayer("Thunder Wave.mp3")
-    s.start()
+    s = Sound("sounds/Thunder Wave.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1821,8 +1822,8 @@ def do_thunder_wave(attacker,defender,attacking):
     s.stop()
 
 def do_thunderbolt(attacker,defender,attacking):
-    s = MediaPlayer("Thunderbolt.mp3")
-    s.start()
+    s = Sound("sounds/Thunderbolt.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1830,8 +1831,8 @@ def do_thunderbolt(attacker,defender,attacking):
     s.stop()
 
 def do_thunderpunch(attacker,defender,attacking):
-    s = MediaPlayer("Thunder Punch.mp3")
-    s.start()
+    s = Sound("sounds/Thunder Punch.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1839,8 +1840,8 @@ def do_thunderpunch(attacker,defender,attacking):
     s.stop()
 
 def do_thundershock(attacker,defender,attacking):
-    s = MediaPlayer("ThunderShock.mp3")
-    s.start()
+    s = Sound("sounds/ThunderShock.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1848,8 +1849,8 @@ def do_thundershock(attacker,defender,attacking):
     s.stop()
 
 def do_toxic(attacker,defender,attacking):
-    s = MediaPlayer("Toxic.mp3")
-    s.start()
+    s = Sound("sounds/Toxic.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1857,8 +1858,8 @@ def do_toxic(attacker,defender,attacking):
     s.stop()
 
 def do_transform(attacker,defender,attacking):
-    s = MediaPlayer("Transform.mp3")
-    s.start()
+    s = Sound("sounds/Transform.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1866,8 +1867,8 @@ def do_transform(attacker,defender,attacking):
     s.stop()
 
 def do_tri_attack(attacker,defender,attacking):
-    s = MediaPlayer("Tri Attack.mp3")
-    s.start()
+    s = Sound("sounds/Tri Attack.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1875,8 +1876,8 @@ def do_tri_attack(attacker,defender,attacking):
     s.stop()
 
 def do_twineedle(attacker,defender,attacking):
-    s = MediaPlayer("Twineedle.mp3")
-    s.start()
+    s = Sound("sounds/Twineedle.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1884,8 +1885,8 @@ def do_twineedle(attacker,defender,attacking):
     s.stop()
 
 def do_vicegrip(attacker,defender,attacking):
-    s = MediaPlayer("Vice Grip.mp3")
-    s.start()
+    s = Sound("sounds/Vice Grip.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1893,8 +1894,8 @@ def do_vicegrip(attacker,defender,attacking):
     s.stop()
 
 def do_vine_whip(attacker,defender,attacking):
-    s = MediaPlayer("Vine Whip.mp3")
-    s.start()
+    s = Sound("sounds/Vine Whip.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1902,8 +1903,8 @@ def do_vine_whip(attacker,defender,attacking):
     s.stop()
 
 def do_water_gun(attacker,defender,attacking):
-    s = MediaPlayer("Water Gun.mp3")
-    s.start()
+    s = Sound("sounds/Water Gun.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1911,8 +1912,8 @@ def do_water_gun(attacker,defender,attacking):
     s.stop()
 
 def do_waterfall(attacker,defender,attacking):
-    s = MediaPlayer("Waterfall.mp3")
-    s.start()
+    s = Sound("sounds/Waterfall.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1920,8 +1921,8 @@ def do_waterfall(attacker,defender,attacking):
     s.stop()
 
 def do_whirlwind(attacker,defender,attacking):
-    s = MediaPlayer("Whirlwind.mp3")
-    s.start()
+    s = Sound("sounds/Whirlwind.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1929,8 +1930,8 @@ def do_whirlwind(attacker,defender,attacking):
     s.stop()
 
 def do_wing_attack(attacker,defender,attacking):
-    s = MediaPlayer("Wing Attack.mp3")
-    s.start()
+    s = Sound("sounds/Wing Attack.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1938,8 +1939,8 @@ def do_wing_attack(attacker,defender,attacking):
     s.stop()
 
 def do_withdraw(attacker,defender,attacking):
-    s = MediaPlayer("Withdraw.mp3")
-    s.start()
+    s = Sound("sounds/Withdraw.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:
@@ -1947,8 +1948,8 @@ def do_withdraw(attacker,defender,attacking):
     s.stop()
 
 def do_wrap(attacker,defender,attacking):
-    s = MediaPlayer("Wrap.mp3")
-    s.start()
+    s = Sound("sounds/Wrap.ogg")
+    s.play()
     if attacking:
         pass #TODO attacking
     else:

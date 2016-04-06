@@ -112,11 +112,11 @@ def main():
                 opp.current = opp.pkmn[0]
         opp.initialize()
         if mode == 'wild':
-            music = vlc.MediaPlayer("sounds/wild_battle.mp3")
-            music_vict = vlc.MediaPlayer("sounds/wild_victory.mp3")
+            music = Sound("sounds/wild_battle.ogg")
+            music_vict = Sound("sounds/wild_victory.ogg")
         else:
-            music = vlc.MediaPlayer("sounds/trainer_battle.mp3")
-            music_vict = vlc.MediaPlayer("sounds/trainer_victory.mp3")
+            music = Sound("sounds/trainer_battle.ogg")
+            music_vict = Sound("sounds/trainer_victory.ogg")
         music.play()
         new_game_start(me, opp, mode)
         while me.alive() and opp.alive():

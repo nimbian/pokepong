@@ -1,4 +1,5 @@
 from pygame import image, draw, display, event
+from pygame.mixer import Sound
 import pygame
 from util import *
 from time import sleep
@@ -10,8 +11,9 @@ from routes import ROUTES, MAPLIST, MAPROUTE
 from database import db
 import vlc
 
-SHOP = vlc.MediaPlayer("sounds/shop.mp3")
-EVOLVE = vlc.MediaPlayer("sounds/evolve.mp3")
+pygame.mixer.init()
+SHOP = Sound("sounds/shop.ogg")
+EVOLVE = Sound("sounds/evolve.ogg")
 
 r = StrictRedis(host = '127.0.0.1')
 
@@ -956,6 +958,20 @@ def update_using(me, select):
         c += 1
     display.update(dirty)
 
+def update_sell(me, select):
+    dirty = []
+    c = 0
+    dirty.append(draw.rect(SCREEN, WHITE, [460, SIZE[1]-830, 700, 490]))
+    for i in me.all_shown:
+        if c == select:
+            dirty.append(word_builder('>', 460, 200 + c * 120))
+        else:
+            dirty.append(word_builder(' ', 460, 200 + c * 120))
+        dirty.append(word_builder(i.item.name.upper().ljust(12), 520, 200 + c * 120))
+        if i.item.name != 'CANCEL':
+            dirty.append(word_builder('*' + str(i.count).rjust(3), 920, 260 + c * 120))
+        c += 1
+    display.update(dirty)
 
 def draw_use_on(mon,offset,item):
     word_builder(mon.name, 160, offset* 110 + 10)
@@ -1037,6 +1053,105 @@ def use(me, item, mon):
         evolve(me, mon, ABLE[item.item.name][mon.base_id])
 
 
+def update_sell_amount(item, select):
+    dirty = []
+    dirty.append(draw.rect(SCREEN, WHITE, [473, 495, AMOUNT.get_width() + 14, AMOUNT.get_height() + 14]))
+    dirty.append(SCREEN.blit(AMOUNT, (480, 502)))
+    dirty.append(word_builder('*'+ str(select).zfill(2) + ('<' + str(item.item.sellprice * select)).rjust(8),534, 555))
+    display.update(dirty)
+
+def sell_amount(item):
+    selector = 1
+    dirty = []
+    dirty.append(draw.rect(SCREEN, WHITE, [473, 495, AMOUNT.get_width() + 14, AMOUNT.get_height() + 14]))
+    dirty.append(SCREEN.blit(AMOUNT, (480, 502)))
+    dirty.append(word_builder('*'+ str(selector).zfill(2) + ('<' + str(item.item.sellprice)).rjust(8),534, 555))
+    display.update(dirty)
+    pygame.event.clear()
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
+                if selector < item.count:
+                    selector += 1
+                else:
+                    selector = 1
+                update_sell_amount(item, selector)
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
+                if selector > 1:
+                    selector -= 1
+                else:
+                    selector = item.count
+                update_sell_amount(item, selector)
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_RIGHT:
+                selector = (selector + 10) % 100
+                update_sell_amount(item, selector)
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT:
+                selector = (100 + (selector - 10)) % 100
+                update_sell_amount(item, selector)
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_x:
+                return False
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_z:
+                return selector
+
+
+def do_sell(me, item, retval):
+    me.money += item.item.sellprice * retval
+    for i in range(retval):
+        item.use(me)
+    draw_money(me)
+
+def draw_money(me):
+    display.update(SCREEN.blit(MONEY, (724, 0)))
+    display.update(word_builder('<' + str(me.money).rjust(7),772, 45))
+
+
+def sell(me):
+    while True:
+        clear()
+        SCREEN.blit(ITEMS, (10, SIZE[1]-880))
+        write_btm('Which item would', 'you like to sell?')
+        display.flip()
+        selector = 0
+        update_sell(me, selector)
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
+                    if selector > 0:
+                        selector -= 1
+                        update_sell(me, selector)
+                    elif me.all_items[0] != me.all_shown[0]:
+                        me.shift_all_left()
+                        update_sell(me, selector)
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
+                    if selector < 2 and selector < len(me.all_shown) - 1:
+                        selector += 1
+                        update_sell(me, selector)
+                    elif len(me.all_shown) > 3:
+                        me.shift_all_right()
+                        update_sell(me,selector)
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_x:
+                    return False
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_z:
+                    if me.all_shown[selector].item.name == 'CANCEL':
+                        return False
+                    else:
+                        item = me.all_shown[selector]
+                        retval = sell_amount(item)
+                        if retval:
+                            display.update(write_btm('Sell ' + item.item.name, 'for <' + str(item.item.sellprice * retval)+'?'))
+                            ret = conf()
+                            if ret:
+                                do_sell(me, item, retval)
+                                update_sell(me, selector)
+                            else:
+                                display.update(draw.rect(SCREEN, WHITE, [460, SIZE[1]-830, 700, 490]))
+                                update_sell(me, selector)
+                        else:
+                            display.update(draw.rect(SCREEN, WHITE, [460, SIZE[1]-830, 700, 490]))
+                            update_sell(me, selector)
+                        return False
+            sleep(.1)
+
 
 def using(me):
     while True:
@@ -1090,7 +1205,7 @@ def shop_choice():
                 if select > 0:
                     select -= 1
             if event.type == pygame.KEYDOWN and ((event.key == pygame.K_z and select == 3) or event.key == pygame.K_x):
-                return False
+                return -1
             if event.type == pygame.KEYDOWN and event.key == pygame.K_z:
                 return select
 
@@ -1138,20 +1253,20 @@ def do_purchase(me, item, retval):
             else:
                 me.usable.insert(-1,tmp)
                 me.usable_items = me.usable[:4]
+            me.all_items.insert(-1,tmp)
+            me.all_shown = me.all_items[:4]
         wait_for_button()
         clear()
         word_builder('Take your time.', 50, SIZE[1]-250)
         SCREEN.blit(ITEMS, (10, SIZE[1]-880))
-        SCREEN.blit(MONEY, (724, 0))
-        word_builder('<' + str(me.money).rjust(7),772, 45)
+        draw_money(me)
         display.flip()
         selector = 0
 
 def buy(me, shopp):
     word_builder('Take your time.', 50, SIZE[1]-250)
     SCREEN.blit(ITEMS, (10, SIZE[1]-880))
-    SCREEN.blit(MONEY, (724, 0))
-    word_builder('<' + str(me.money).rjust(7),772, 45)
+    draw_money(me)
     display.flip()
     selector = 0
     update_shop(shopp, selector)
@@ -1201,8 +1316,7 @@ def shop(me):
     SHOP.play()
     while True:
         clear()
-        SCREEN.blit(MONEY, (724, 0))
-        word_builder('<' + str(me.money).rjust(7),772, 45)
+        draw_money(me)
         write_btm('Hi there!', 'May I help you?')
         display.flip()
         retval = shop_choice()
@@ -1213,6 +1327,8 @@ def shop(me):
             sell(me)
         elif retval == 2:
             using(me)
+        elif retval == -1:
+            return False
 
 
 
