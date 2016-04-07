@@ -1,30 +1,38 @@
-#TODO remove when done testing
+# TODO remove when done testing
 from time import sleep
 sleep(1)
-from logic import *
-from models import Trainer
-from util import *
+from pygame import display
+from pokepong.util import send_move, recv_move, MyMoveOccuring, OppMoveOccuring
+from pokepong.util import send_team, get_team, loadimg
+from pokepong.logic import shop, get_wild_mon, draw_all_opp, draw_all_me
+from pokepong.logic import win, lost, opp_next_mon, gain_exp, evolve
+from pokepong.logic import battle_logic, run_opp_faint, run_me_faint
+from pokepong.logic import me_next_mon, new_game_start, clear, Sound
+from pokepong.logic import draw_choice, scrolling, choose_loc, intro
+from pokepong.logic import play_again, clearbtm, run_game
+from pokepong.models import Trainer, Owned
 from redis import StrictRedis
-from models import *
+import json
 import zmq
-import vlc
+
 
 def main():
-    #TODO set to True on opposite table
+    # TODO set to True on opposite table
     client = False
-    #TODO set to actual IP
-    r = StrictRedis(host = '127.0.0.1')
+    # TODO set to actual IP
+    r = StrictRedis(host='127.0.0.1')
     r.delete('lock')
-    poss = [1,4,7,25,143,132,129,123,95,92,77,13,17,21,35]
+    poss = [1, 4, 7, 25, 143, 132, 129, 123, 95, 92, 77, 13, 17, 21, 35]
     possible = []
     for p in poss:
         pkmn = loadimg('fronts/{0}.PNG'.format(p)).convert()
-        pkmn.set_colorkey((255,255,255))
+        pkmn.set_colorkey((255, 255, 255))
         possible.append(pkmn)
         if p == 4:
             current = pkmn
     socket = None
     mode = ''
+    #TODO count should be used for play again feature
     count = 0
     king = None
     new_game = True
@@ -35,7 +43,7 @@ def main():
         mode = r.get('mode')
         if not mode:
             mode = 'pong'
-            r.set('mode','pong')
+            r.set('mode', 'pong')
         elif mode != oldmode:
             me = None
             opp = None
@@ -53,28 +61,28 @@ def main():
             r.delete('count')
         if new_game or (not king and mode != 'wild'):
             intro(current)
-            #TODO uncomment for PROD
-            #sleep(5)
+            # TODO uncomment for PROD
+            # sleep(5)
         while new_game or mode != 'wild':
             tmp = None
             try:
                 tmp = json.loads(r.lpop('lineup'))
-            except:
+            except TypeError:
                 pass
             if tmp:
                 myname = tmp['name']
                 mypkmnlist = tmp['pokemon']
                 if mode != 'wild':
-                        send_team(myname, mypkmnlist, socket, client)
+                    send_team(myname, mypkmnlist, socket, client)
                 break
             current = scrolling(current, possible)
-            #TODO uncomment for PROD
-            #sleep(5)
+            # TODO uncomment for PROD
+            # sleep(5)
         if mode != 'pong':
             me = Trainer.query.filter(Trainer.name == myname).one()
             try:
                 me.pkmn
-            except:
+            except AttributeError:
                 me.pkmn = []
                 for mon in mypkmnlist:
                     me.pkmn.append(Owned.query.get(mon))
@@ -93,17 +101,17 @@ def main():
 
         while mode != 'wild':
             try:
-                oppname, opppkmnlist = get_teams(socket, client)
+                oppname, opppkmnlist = get_team(socket, client)
                 opp = Trainer.query.filter(Trainer.name == oppname).one()
                 opp.pkmn = []
                 for mon in opppkmnlist:
                     opp.pkmn.append(Owned.get(mon))
                 opp.current = opp.pkmn[0]
                 break
-            except:
+            except zmq.Again:
                 current = scrolling(current, possible)
-                #TODO uncomment for PROD
-                #sleep(5)
+                # TODO uncomment for PROD
+                # sleep(5)
         if mode == 'wild':
             loc, remember = choose_loc(remember)
             if loc == 'PALLET TOWN':
@@ -140,13 +148,13 @@ def main():
                 display.flip()
                 draw_all_opp(opp.current)
                 draw_all_me(me.current)
-                send_move(move,socket)
+                send_move(move, socket)
                 tmp = battle_logic(me, opp, move, True)
                 r.delete('lock')
             if tmp == 0:
                 run_opp_faint(opp)
                 if mode == 'random' or mode == 'wild':
-                    gain_exp(me,opp,[1.5,1][mode == 'wild'])
+                    gain_exp(me, opp, [1.5, 1][mode == 'wild'])
                 if opp.alive():
                     opp_next_mon(me, opp, mode, socket)
                 else:
@@ -160,13 +168,13 @@ def main():
                     me_next_mon(me, opp, mode, socket)
                 else:
                     music.stop()
-                    lost(me,mode)
+                    lost(me, mode)
             elif tmp == 3:
-                pass
                 break
             elif tmp == 5:
                 break
         if mode == 'pong':
+            #TODO add play_again
             if play_again(me.alive()):
                 if me.alive():
                     king = 'me'
@@ -176,9 +184,9 @@ def main():
             else:
                 king = None
         new_game = False
-        #TODO should only evolve when leveled
+        # TODO should only evolve when leveled
         for mon in me.pkmn:
             mon.clean()
             tmp = mon.check_evolve()
             if tmp:
-                evolve(me, mon, tmp)
+                evolve(mon, tmp)

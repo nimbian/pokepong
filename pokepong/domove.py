@@ -1,52 +1,57 @@
 from pygame import display
-from util import choice,randint, get_random
-from logic import write_btm, draw_opp_hp, draw_my_hp, wait_for_button, clean_me_up
+from pokepong.util import choice, randint, get_random
+from pokepong.logic import write_btm, draw_opp_hp, draw_my_hp, wait_for_button
+from pokepong.models import Move, Pokemon
 from time import sleep
 from copy import deepcopy
 from math import floor
-import move_sandbox
+import pokepong.move_sandbox
 DISABLE = ['Counter', 'Bide', 'Dig', 'Fly']
 FLAT = ['Sonicboom', 'Dragon Rage']
-MULTI = ['Spike Cannon', 'Comet Punch', 'Barrage', 'Doubleslap', 'Fury Attack', 'Pin Missile', 'Fury Swipes']
+MULTI = ['Spike Cannon', 'Comet Punch', 'Barrage',
+         'Doubleslap', 'Fury Attack', 'Pin Missile', 'Fury Swipes']
 CONFUSE = ['Confuse Ray', 'Supersonic']
-ESCAPE = ['Roar','Teleport','Whirlwind']
+ESCAPE = ['Roar', 'Teleport', 'Whirlwind']
 MISSDMG = ['Hi Jump Kick', 'Jump Kick']
-PAR = ['Stun Spore','Thunder Wave','Glare']
-PSN = ['Poison Gas','Poisonpowder']
-SLP = ['Hypnosis','Lovely Kiss','Sing','Sleep Powder','Spore']
-HEAL = ['Recover','Softboiled']
-ABSORB = ['Dream Eater','Mega Drain','Absorb','Leech Life']
-DOUBLE = ['Bonemerang','Double Kick']
-EXPLOSION = ['Explosion','Selfdestruct']
+PAR = ['Stun Spore', 'Thunder Wave', 'Glare']
+PSN = ['Poison Gas', 'Poisonpowder']
+SLP = ['Hypnosis', 'Lovely Kiss', 'Sing', 'Sleep Powder', 'Spore']
+HEAL = ['Recover', 'Softboiled']
+ABSORB = ['Dream Eater', 'Mega Drain', 'Absorb', 'Leech Life']
+DOUBLE = ['Bonemerang', 'Double Kick']
+EXPLOSION = ['Explosion', 'Selfdestruct']
 THRASH = ['Thrash', 'Petal Dance']
-KO = ['Fissure','Guillotine','Horn Drill']
-WRAP = ['Clamp','Bind','Fire Spin','Wrap']
-PREP = ['Sky Attack','Solarbeam','Skull Bash','Razor Wind', 'Dig', 'Fly']
-RECOIL = ['Double-edge','Take Down','Submission', 'Struggle']
-RAISEABILITY = ['Meditate','Sharpen','Swords Dance','Defense Curl','Harden',
-                'Withdraw','Acid Armor','Barrier','Double Team',' Minimize',
-                'Growth','Amnesia','Agility']
+KO = ['Fissure', 'Guillotine', 'Horn Drill']
+WRAP = ['Clamp', 'Bind', 'Fire Spin', 'Wrap']
+PREP = ['Sky Attack', 'Solarbeam', 'Skull Bash', 'Razor Wind', 'Dig', 'Fly']
+RECOIL = ['Double-edge', 'Take Down', 'Submission', 'Struggle']
+RAISEABILITY = ['Meditate', 'Sharpen', 'Swords Dance', 'Defense Curl', 'Harden',
+                'Withdraw', 'Acid Armor', 'Barrier', 'Double Team', ' Minimize',
+                'Growth', 'Amnesia', 'Agility']
 
-LOWERABILITY = ['Flash','Kinesis','Sand-Attack','Smokescreen','Growl','Leer',
-                'Tail Whip','Screech','String Shot']
+LOWERABILITY = ['Flash', 'Kinesis', 'Sand-Attack', 'Smokescreen', 'Growl', 'Leer',
+                'Tail Whip', 'Screech', 'String Shot']
 
-PROC = ['Flamethrower','Fire Punch','Ember','Psybeam','Confusion','Blizzard',
-        'Ice Beam','Ice Punch','Aurora Beam','Acid','Bubblebeam','Bubble',
-        'Constrict','Hyper Fang','Bone Club','Bite','Thunder','Thunderbold',
-        'Thunderpunch','Thundershock','Poison Sting','Fire Blast','Psychic',
-        'Headbutt','Stomp','Rolling Kick','Low Kick','Body Slam','Lick',
-        'Sludge','Smog']
+PROC = ['Flamethrower', 'Fire Punch', 'Ember', 'Psybeam', 'Confusion', 'Blizzard',
+        'Ice Beam', 'Ice Punch', 'Aurora Beam', 'Acid', 'Bubblebeam', 'Bubble',
+        'Constrict', 'Hyper Fang', 'Bone Club', 'Bite', 'Thunder', 'Thunderbold',
+        'Thunderpunch', 'Thundershock', 'Poison Sting', 'Fire Blast', 'Psychic',
+        'Headbutt', 'Stomp', 'Rolling Kick', 'Low Kick', 'Body Slam', 'Lick',
+        'Sludge', 'Smog']
 
 
-#TODO handle confusion mechanics
+# TODO handle confusion mechanics
 
-#TODO disabled Counter
+# TODO disabled Counter
 
-#TODO disable Mirror move?
+# TODO disable Mirror move?
 
-#TODO Substitute stays after switched out?
+# TODO Substitute stays after switched out?
 
 def usable_move(move, mode):
+    """
+    function
+    """
     if mode == 'pongbattle' and (move.name in DISABLE or move.name in WRAP):
         display.update(write_btm('This move is not', 'useable in this mode'))
         wait_for_button()
@@ -60,13 +65,17 @@ def usable_move(move, mode):
         return False
     return True
 
+
 def dmg_pkmn(pkmn, dmg, me):
+    """
+    function
+    """
     if pkmn.substitute == 0:
         if pkmn.bide:
             pkmn.bidedmg += dmg * 2
         if dmg > 0:
             for d in range(dmg):
-                pkmn.sethp(pkmn.hp-1)
+                pkmn.sethp(pkmn.hp - 1)
                 if not me:
                     display.update(draw_my_hp(pkmn))
                 else:
@@ -75,10 +84,10 @@ def dmg_pkmn(pkmn, dmg, me):
                     return 1
                 sleep(.02)
         else:
-            for d in range(0,dmg,-1):
+            for d in range(0, dmg, -1):
                 if pkmn.maxhp == pkmn.hp:
                     break
-                pkmn.sethp(pkmn.hp+1)
+                pkmn.sethp(pkmn.hp + 1)
                 if not me:
                     display.update(draw_my_hp(pkmn))
                 else:
@@ -92,16 +101,20 @@ def dmg_pkmn(pkmn, dmg, me):
             pkmn.substitute = 0
             display.update(write_btm('The substitute broke'))
             sleep(1)
-            #TODO handle breaking of substitute
-
+            # TODO handle breaking of substitute
 
 
 def do_move(attack, defend, move, mode, me, first):
+    """
+    function
+    """
     if mode == 'pong' and move.name != 'Transform':
         if me:
-            display.update(write_btm(attack.name, 'used {0}'.format(move.name.upper())))
+            display.update(
+                write_btm(attack.name, 'used {0}'.format(move.name.upper())))
         else:
-            display.update(write_btm('Enemy ' + attack.name, 'used {0}'.format(move.name.upper())))
+            display.update(
+                write_btm('Enemy ' + attack.name, 'used {0}'.format(move.name.upper())))
         return dmg_pkmn(defend, defend.hp, me)
 
     if attack.wrapped > 0:
@@ -118,13 +131,15 @@ def do_move(attack, defend, move, mode, me, first):
             preping(attack, move)
             return 0
         if me:
-            display.update(write_btm(attack.name, 'used {0}'.format(move.name.upper())))
+            display.update(
+                write_btm(attack.name, 'used {0}'.format(move.name.upper())))
         else:
-            display.update(write_btm('Enemy ' + attack.name, 'used {0}'.format(move.name.upper())))
+            display.update(
+                write_btm('Enemy ' + attack.name, 'used {0}'.format(move.name.upper())))
         sleep(1)
         if move.power:
             if move.name == 'Bide' and attack.bidecnt == -1:
-                attack.bidecnt = choice([2,3])
+                attack.bidecnt = choice([2, 3])
                 attack.controllable = False
                 bide(attack)
                 return 0
@@ -133,48 +148,50 @@ def do_move(attack, defend, move, mode, me, first):
                 attack.controllable = False
             if attack.hit_or_miss(defend, move):
                 if move.name in MULTI:
-                    return multi(attack,defend,move,me)
+                    return multi(attack, defend, move, me)
                 elif move.name in FLAT:
-                    return flat(attack,defend,move,me)
+                    return flat(defend, move, me)
                 elif move.name in KO:
-                    return ko(attack,defend,move,me)
+                    return ko(attack, defend, move, me)
                 elif move.name in ABSORB:
-                    return absorb(attack,defend,move,me)
+                    return absorb(attack, defend, move, me)
                 elif move.name in DOUBLE:
-                    return double(attack,defend,move,me)
+                    return double(attack, defend, move, me)
                 elif move.name in EXPLOSION:
-                    return explosion(attack,defend,move,me)
+                    return explosion(attack, defend, move, me)
                 elif move.name in RECOIL:
-                    return recoil(attack,defend,move,me)
+                    return recoil(attack, defend, move, me)
                 elif move.name in PROC:
-                    return proc(attack,defend,move,me,first)
+                    return proc(attack, defend, move, me, first)
                 elif move.name in ['Seismic Toss', 'Night Shade']:
                     return dmg_pkmn(defend, attack.lvl, me)
                 elif move.name == 'Psywave':
-                    return dmg_pkmn(defend, randint(1,int(floor(attack.lvl*1.5))), me)
+                    return dmg_pkmn(defend, randint(1, int(floor(attack.lvl * 1.5))), me)
                 elif move.name == 'Super Fang':
-                    return dmg_pkmn(defend, defend.hp/2, me)
+                    return dmg_pkmn(defend, defend.hp / 2, me)
                 elif move.name == 'Rage':
                     attack.controllable = False
                     attack.rage = True
-                    return do_attacks(attack,defend,move,me)
+                    return do_attacks(attack, defend, move, me)
                 elif move.name in WRAP:
-                    return wrap(attack,defend,move,me)
+                    return wrap(attack, defend, move, me)
                 elif move.name in THRASH:
-                    return thrash(attack,defend,move,me)
+                    return thrash(attack, defend, move, me)
                 elif move.name == 'Pay Day':
                     attack.payday += attack.lvl * 2
-                    return do_attacks(attack,defend, move, me)
+                    return do_attacks(attack, defend, move, me)
                 else:
-                    return do_attacks(attack,defend, move, me)
+                    return do_attacks(attack, defend, move, me)
 
             else:
                 if me:
-                    display.update(write_btm(attack.name + "'s", 'attack missed!'))
+                    display.update(
+                        write_btm(attack.name + "'s", 'attack missed!'))
                 else:
-                    display.update(write_btm('Enemy ' + attack.name + "'s", 'attack missed!'))
+                    display.update(
+                        write_btm('Enemy ' + attack.name + "'s", 'attack missed!'))
                 sleep(2)
-                #TODO missdmg hyperbeam charge explosion?
+                # TODO missdmg hyperbeam charge explosion?
         elif move.acc:
             if attack.hit_or_miss(defend, move):
                 if move.name in LOWERABILITY:
@@ -182,7 +199,7 @@ def do_move(attack, defend, move, mode, me, first):
                 elif move.name in CONFUSE:
                     confuse(defend)
                 elif move.name in PSN:
-                    poison(defend)
+                    poisoned(defend)
                 elif move.name in PAR:
                     paralyze(defend)
                 elif move.name in SLP:
@@ -194,13 +211,15 @@ def do_move(attack, defend, move, mode, me, first):
                 elif move.name == 'Disabled':
                     disable(defend)
                 elif move.name == 'Mimic':
-                    mimic(move,defend)
+                    mimic(move, defend)
 
             else:
                 if me:
-                    display.update(write_btm(attack.name + "'s", 'attack missed!'))
+                    display.update(
+                        write_btm(attack.name + "'s", 'attack missed!'))
                 else:
-                    display.update(write_btm('Enemy ' + attack.name + "'s", 'attack missed!'))
+                    display.update(
+                        write_btm('Enemy ' + attack.name + "'s", 'attack missed!'))
                 sleep(2)
             return 0
 
@@ -221,11 +240,12 @@ def do_move(attack, defend, move, mode, me, first):
             elif move.name == 'Rest':
                 attack.buffs = ['SLP']
                 attack.sleep = 2
-                return dmg_pkmn(attack, dmg * -1, not me)
+                attack.haze()
+                return dmg_pkmn(attack, (attack.maxhp - attack.hp) * -1, not me)
             elif move.name in HEAL:
-                return dmg_pkmn(attack, int(attack.maxhp/2) * -1, not me)
+                return dmg_pkmn(attack, int(attack.maxhp / 2) * -1, not me)
             elif move.name == 'Substitute':
-                hp = int(attack.maxhp/4)
+                hp = int(attack.maxhp / 4)
                 if hp > attack.hp:
                     display.update(write_btm('but it failed!'))
                 else:
@@ -233,14 +253,11 @@ def do_move(attack, defend, move, mode, me, first):
                     attack.substitute = hp
                 return 0
             elif move.name == 'Metronome':
-                #TODO FIX WITH NEW MODELS
                 name = move.name
-                conn = connect('shawn')
-                c = conn.cursor()
                 while name not in attack.list_moves() and name != 'Struggle':
-                    tmp = c.execute("SELECT move from moves where rowid = '{0}'".format(randint(1,166))).fetchone()
-                    name = tmp[0]
-                return do_move(attack, defend, oneoff(name), mode, me)
+                    tmp = Move.query.get(randint(1, 166))
+                    name = tmp.name
+                return do_move(attack, defend, Move(tmp, 0), mode, me)
             elif move.name == 'Transform':
                 attack.transform(defend)
             elif move.name == 'Conversion':
@@ -255,13 +272,10 @@ def do_move(attack, defend, move, mode, me, first):
                     return 0
             return 0
 
-
-
-
     else:
         if attack.rage:
             retval = do_attacks(attack, defend, move, me)
-            display.update(write_btm(attack.name +"'s", 'rage is building'))
+            display.update(write_btm(attack.name + "'s", 'rage is building'))
             attack.raise_attack(1)
             sleep(1)
             return 0
@@ -271,9 +285,11 @@ def do_move(attack, defend, move, mode, me, first):
             return 0
         elif attack.lastmove.name in PREP:
             if me:
-                display.update(write_btm(attack.name, 'used {0}'.format(move.name.upper())))
+                display.update(
+                    write_btm(attack.name, 'used {0}'.format(move.name.upper())))
             else:
-                display.update(write_btm('Enemy ' + attack.name, 'used {0}'.format(move.name.upper())))
+                display.update(
+                    write_btm('Enemy ' + attack.name, 'used {0}'.format(move.name.upper())))
             if attack.lastmove.name == 'Fly':
                 attack.buffs.pop(attack.buffs.index('FLY'))
             if attack.lastmove.name == 'Dig':
@@ -282,9 +298,11 @@ def do_move(attack, defend, move, mode, me, first):
                 return do_attacks(attack, defend, move, me)
             else:
                 if me:
-                    display.update(write_btm(attack.name + "'s", 'attack missed!'))
+                    display.update(
+                        write_btm(attack.name + "'s", 'attack missed!'))
                 else:
-                    display.update(write_btm('Enemy ' + attack.name + "'s", 'attack missed!'))
+                    display.update(
+                        write_btm('Enemy ' + attack.name + "'s", 'attack missed!'))
                 sleep(2)
                 return 0
             attack.controllable = True
@@ -305,28 +323,29 @@ def do_move(attack, defend, move, mode, me, first):
                 sleep(1)
                 attack.bidecnt -= 1
         elif attack.lastmove.name in WRAP:
-            display.update(write_btm(attack.name+ "'s", 'attack continues'))
+            display.update(write_btm(attack.name + "'s", 'attack continues'))
             defend.wrapped -= 1
             if defend.wrapped == 0:
                 attack.controllable = True
-            return do_attacks(attack,defend,move,me)
+            return do_attacks(attack, defend, move, me)
         elif attack.lastmove.name in THRASH:
             display.update(write_btm(attack.name, 'is thrashing about'))
-            return do_attacks(attack,defend,move,me)
-            if attack.thrashing > 0:
-                attack.thrashing -= 1
-            else:
-                attack.controllable = True
-                confuse(attack)
-                attack.thrashing = -1
+            return do_attacks(attack, defend, move, me)
+        if attack.thrashing > 0:
+            attack.thrashing -= 1
+        else:
+            attack.controllable = True
+            confuse(attack)
+            attack.thrashing = -1
 
 
-
-
-
-def do_attacks(attack, defend, move, me, times = 1):
+def do_attacks(attack, defend, move, me, times=1):
+    """
+    function
+    """
     crit, type_, dmg = attack.calc_dmg(defend, move)
-    meth = getattr(move_sandbox, 'do_'+move.name.lower().replace(' ','_').replace('-','_'))
+    meth = getattr(
+        pokepong.move_sandbox, 'do_' + move.name.lower().replace(' ', '_').replace('-', '_'))
     meth(attack, defend, me)
     for i in range(times):
         retval = dmg_pkmn(defend, dmg, me)
@@ -348,34 +367,57 @@ def do_attacks(attack, defend, move, me, times = 1):
 
 
 def multi(attack, defend, move, me):
-    multi = [2,2,2,3,3,3,4,5]
-    times = choice(multi)
-    retval = do_attacks(attack, defend, move, me, times = times)
+    """
+    function
+    """
+    multi_ = [2, 2, 2, 3, 3, 3, 4, 5]
+    times = choice(multi_)
+    retval = do_attacks(attack, defend, move, me, times=times)
     display.update(write_btm('hit {0} times!'.format(times)))
     sleep(1)
     return retval
 
-def flat(attack, defend, move, me):
+
+def flat(defend, move, me):
+    """
+    function
+    """
     return dmg_pkmn(defend, move.power * -1, me)
 
+
 def wrap(attack, defend, move, me):
+    """
+    function
+    """
     attack.controllable = False
-    defend.wrapped = randint(2,5)
+    defend.wrapped = randint(2, 5)
     return do_attacks(attack, defend, move, me)
 
-def thrash(attack,defend,move, me):
+
+def thrash(attack, defend, move, me):
+    """
+    function
+    """
     attack.controllable = False
-    attack.thrashing = randint(2,3)
-    return do_attacks(attack,defend,move,me)
+    attack.thrashing = randint(2, 3)
+    return do_attacks(attack, defend, move, me)
+
 
 def ko(attack, defend, move, me):
+    """
+    function
+    """
     if defend.calc_speed() > attack.calc_speed() or defend.lvl > attack.lvl:
         display.update(write_btm('but it failed!'))
         return 0
     else:
         return dmg_pkmn(defend, defend.hp, me)
 
+
 def absorb(attack, defend, move, me):
+    """
+    function
+    """
     if move.name == 'Dream Eater':
         if 'SLP' not in defend.buffs:
             display.update(write_btm('but it failed!'))
@@ -398,15 +440,23 @@ def absorb(attack, defend, move, me):
     dmg_pkmn(attack, int(floor(dmg / 2) * -1), not me)
     return retval
 
+
 def double(attack, defend, move, me):
-    retval = do_attacks(attack, defend, move, me, times = 2)
-    display.update(write_btm('hit {0} times!'.format(times)))
+    """
+    function
+    """
+    retval = do_attacks(attack, defend, move, me, times=2)
+    display.update(write_btm('hit {0} times!'.format(2)))
     sleep(1)
     if move.name == 'Twineedle' and get_random() < .2:
         poisoned(defend)
     return retval
 
+
 def explosion(attack, defend, move, me):
+    """
+    function
+    """
     ret1 = do_attacks(attack, defend, move, me)
     ret2 = dmg_pkmn(attack, attack.hp, not me)
     if ret1 and ret2:
@@ -416,7 +466,11 @@ def explosion(attack, defend, move, me):
     else:
         return 2
 
+
 def recoil(attack, defend, move, me):
+    """
+    function
+    """
     crit, type_, dmg = attack.calc_dmg(defend, move)
     if crit:
         display.update(write_btm('Critical Hit!'))
@@ -441,28 +495,32 @@ def recoil(attack, defend, move, me):
     else:
         return 0
 
-def proc(attack,defend,move,me,first):
+
+def proc(attack, defend, move, me, first):
+    """
+    function
+    """
     if move.name == 'Lick' and defend.type1 == 'Psychic':
         display.update(write_btm(defend.name, 'was unaffected'))
     else:
         retval = do_attacks(attack, defend, move, me)
         if not retval:
-            if move.name in ['Flamethrower','Fire Punch','Ember'] and get_random() < .1:
+            if move.name in ['Flamethrower', 'Fire Punch', 'Ember'] and get_random() < .1:
                 burn(defend)
-            elif move.name in ['Psybeam','Confusion'] and get_random() < .1:
+            elif move.name in ['Psybeam', 'Confusion'] and get_random() < .1:
                 confuse(defend)
-            elif move.name in ['Blizzard','Ice Beam','Ice Punch'] and get_random() < .1:
+            elif move.name in ['Blizzard', 'Ice Beam', 'Ice Punch'] and get_random() < .1:
                 freeze(defend)
             elif move.name == 'Aurora Beam' and get_random() < .1:
                 stat_change(defend, -1, 'attack')
             elif move.name == 'Acid' and get_random() < .1:
                 stat_change(defend, -1, 'defense')
-            elif move.name in ['Bubblebeam','Bubble','Constrict'] and get_random() < .1:
+            elif move.name in ['Bubblebeam', 'Bubble', 'Constrict'] and get_random() < .1:
                 stat_change(defend, -1, 'speed')
-            elif move.name in ['Hyper Fang','Bone Club','Bite'] and get_random() < .1:
+            elif move.name in ['Hyper Fang', 'Bone Club', 'Bite'] and get_random() < .1:
                 if first:
                     flinch(defend)
-            elif move.name in ['Thunder','Thunderbold', 'Thunderpunch','Thundershock'] and get_random() < .1:
+            elif move.name in ['Thunder', 'Thunderbold', 'Thunderpunch', 'Thundershock'] and get_random() < .1:
                 paralyze(defend)
             elif move.name == 'Poison Sting' and get_random() < .2:
                 poisoned(defend)
@@ -470,18 +528,22 @@ def proc(attack,defend,move,me,first):
                 burn(defend)
             elif move.name == 'Psychic' and get_random() < .3:
                 stat_change(defend, -1, 'special')
-            elif move.name in ['Headbutt','Stomp','Rolling Kick','Low Kick'] and get_random() < .3:
+            elif move.name in ['Headbutt', 'Stomp', 'Rolling Kick', 'Low Kick'] and get_random() < .3:
                 if first:
                     flinch(defend)
-            elif move.name in ['Lick','Body Slam'] and get_random() < .3:
+            elif move.name in ['Lick', 'Body Slam'] and get_random() < .3:
                 paralyze(defend)
-            elif move.name in ['Sludge','Smog'] and get_random() < .3:
+            elif move.name in ['Sludge', 'Smog'] and get_random() < .3:
                 poisoned(defend)
     return 0
 
+
 def lowerability(defend, move):
+    """
+    function
+    """
     if 'MIST' not in defend.buffs:
-        if move.name in ['Flash','Kinesis','Sand-Attack','Smokescreen']:
+        if move.name in ['Flash', 'Kinesis', 'Sand-Attack', 'Smokescreen']:
             stat_change(defend, -1, 'accuracy')
         elif move.name == 'Growl':
             stat_change(defend, -1, 'attack')
@@ -497,15 +559,18 @@ def lowerability(defend, move):
 
 
 def raiseability(attack, move):
-    if move.name in ['Meditate','Sharpen']:
+    """
+    function
+    """
+    if move.name in ['Meditate', 'Sharpen']:
         stat_change(attack, 1, 'attack')
     elif move.name == 'Swords Dance':
         stat_change(attack, 2, 'attack')
     elif move.name in ['Defense Curl', 'Harden', 'Withdraw']:
         stat_change(attack, 1, 'defense')
-    elif move.name in ['Acid Armor','Barrier']:
+    elif move.name in ['Acid Armor', 'Barrier']:
         stat_change(attack, 2, 'defense')
-    elif move.name in ['Double Team','Minimize']:
+    elif move.name in ['Double Team', 'Minimize']:
         stat_change(attack, 1, 'evasion')
     elif move.name == 'Growth':
         stat_change(attack, 1, 'special')
@@ -517,9 +582,13 @@ def raiseability(attack, move):
 
 
 def stat_change(pokemon, diff, stat):
+    """
+    function
+    """
     if 'MIST' in pokemon.buffs and diff < 0:
         return 0
-    if eval('pokemon.raise_'+stat+'('+str(diff)+')'):
+    meth = getattr(Pokemon, 'raise_' + stat)
+    if meth(stat):
         build = pokemon.name + "'s " + stat
         if diff == 2:
             tmp = 'greatly rose!'
@@ -529,7 +598,7 @@ def stat_change(pokemon, diff, stat):
             tmp = 'fell!'
         if diff == -2:
             tmp = 'greatly fell!'
-        display.update(write_btm(build,tmp))
+        display.update(write_btm(build, tmp))
     else:
         display.update(write_btm('Nothing happened!'))
     sleep(2)
@@ -537,6 +606,9 @@ def stat_change(pokemon, diff, stat):
 
 
 def burn(pokemon):
+    """
+    function
+    """
     if 'BRN' in pokemon.buffs:
         return
     else:
@@ -544,7 +616,11 @@ def burn(pokemon):
         display.update(write_btm(pokemon.name, 'was burned!'))
         sleep(1)
 
+
 def freeze(pokemon):
+    """
+    function
+    """
     if 'FRZ' in pokemon.buffs:
         return
     else:
@@ -552,7 +628,11 @@ def freeze(pokemon):
         display.update(write_btm(pokemon.name, 'has been frozen!'))
         sleep(1)
 
+
 def paralyze(pokemon):
+    """
+    function
+    """
     if 'PAR' in pokemon.buffs:
         display.update(write_btm('but it failed'))
         sleep(1)
@@ -562,7 +642,11 @@ def paralyze(pokemon):
         display.update(write_btm(pokemon.name, 'was paralyzed!'))
         sleep(1)
 
+
 def poisoned(pokemon):
+    """
+    function
+    """
     if 'PSN' in pokemon.buffs:
         return
     else:
@@ -570,34 +654,50 @@ def poisoned(pokemon):
         display.update(write_btm(pokemon.name, 'was poisoned!'))
         sleep(1)
 
-#TODO flinch only if second mon.
+# TODO flinch only if second mon.
+
+
 def flinch(pokemon):
+    """
+    function
+    """
     if 'FLINCH' in pokemon.buffs:
         return
     else:
         pokemon.buffs.append('FLINCH')
 
+
 def confuse(pokemon):
+    """
+    function
+    """
     if pokemon.confused > 0:
         return
     else:
-        pokemon.confused = randint(1,4)
+        pokemon.confused = randint(1, 4)
         display.update(write_btm(pokemon.name, 'became confused!'))
         sleep(1)
 
+
 def sleeper(pokemon):
+    """
+    function
+    """
     if 'SLP' in pokemon.buffs:
         display.update(write_btm('but it failed'))
         sleep(1)
         return
     else:
-        pokemon.sleep = randint(1,7)
+        pokemon.sleep = randint(1, 7)
         pokemon.buffs.append('SLP')
         display.update(write_btm(pokemon.name, 'fell asleep!'))
         sleep(1)
 
 
 def toxic(pokemon):
+    """
+    function
+    """
     if 'TOXIC' in pokemon.buffs:
         display.update(write_btm('but it failed'))
         sleep(1)
@@ -607,7 +707,11 @@ def toxic(pokemon):
         display.update(write_btm(pokemon.name, 'was badly poisoned!'))
         sleep(1)
 
+
 def leech(pokemon):
+    """
+    function
+    """
     if 'SEED' in pokemon.buffs:
         display.update(write_btm('but it failed'))
         sleep(1)
@@ -617,10 +721,14 @@ def leech(pokemon):
         display.update(write_btm(pokemon.name, 'was seeded!'))
         sleep(1)
 
+
 def preping(attack, move):
+    """
+    function
+    """
     attack.controllable = False
     if move.name == 'Skull Bash':
-        display.update(write_btm(attack.name,  "lowered it's head"))
+        display.update(write_btm(attack.name, "lowered it's head"))
     elif move.name == 'Solarbeam':
         display.update(write_btm(attack.name, "is charging up"))
     elif move.name == 'Razor Wind':
@@ -635,19 +743,31 @@ def preping(attack, move):
         display.update(write_btm(attack.name, "dug underground"))
     sleep(1)
 
+
 def disable(defend):
+    """
+    function
+    """
     if defend.disabled > 0:
         display.update(write_btm('but if failed!'))
     else:
-        defend.disabled = randint(1,7)
-        defend.moves[randint(0, len(defend.moves)-1)].disabled = True
+        defend.disabled = randint(1, 7)
+        defend.moves[randint(0, len(defend.moves) - 1)].disabled = True
+
 
 def mimic(move, defend):
+    """
+    function
+    """
     pp = move.pp
-    move = deepcopy(defend.moves[randint(0,len(defend.moves)-1)])
+    move = deepcopy(defend.moves[randint(0, len(defend.moves) - 1)])
     move.pp = pp
 
+
 def convert(defend):
+    """
+    function
+    """
     types = []
     for i in defend.moves:
         if i.type_ != defend.type1 and i.type_ != defend.type2:
@@ -658,5 +778,9 @@ def convert(defend):
         display.update(write_btm('but if failed!'))
         sleep(1)
 
+
 def bide(attack):
+    """
+    function
+    """
     attack.bide = True
