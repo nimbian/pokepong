@@ -29,6 +29,7 @@ def main():
     king = None
     new_game = True
     me = None
+    remember = 0
     while True:
         oldmode = mode
         mode = r.get('mode')
@@ -71,9 +72,12 @@ def main():
             #sleep(5)
         if mode != 'pong':
             me = Trainer.query.filter(Trainer.name == myname).one()
-            me.pkmn = []
-            for mon in mypkmnlist:
-                me.pkmn.append(Owned.query.get(mon))
+            try:
+                me.pkmn
+            except:
+                me.pkmn = []
+                for mon in mypkmnlist:
+                    me.pkmn.append(Owned.query.get(mon))
             me.current = me.pkmn[0]
             me.used = set()
             me.used.add(me.current)
@@ -101,7 +105,7 @@ def main():
                 #TODO uncomment for PROD
                 #sleep(5)
         if mode == 'wild':
-            loc = choose_loc()
+            loc, remember = choose_loc(remember)
             if loc == 'PALLET TOWN':
                 shop(me)
                 new_game = False
@@ -178,5 +182,3 @@ def main():
             tmp = mon.check_evolve()
             if tmp:
                 evolve(me, mon, tmp)
-
-

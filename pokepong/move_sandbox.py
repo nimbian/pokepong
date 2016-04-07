@@ -1,5 +1,7 @@
-from pygame import image, draw, display
+from pygame import image, draw, display, event
 from pygame.mixer import Sound
+from models import Move, Owned
+from database import db
 import pygame
 from util import loadalphaimg, loadimg, alphabet, HIGH_ARC, LOW_ARC
 from math import floor
@@ -34,6 +36,8 @@ SSIZE = [392,392]
 BTM_TUPLE = (10, SIZE[1]-340)
 ALPHA = loadalphaimg('alphafull.png')
 ALPHA_DICT = alphabet()
+CONF = loadalphaimg('conf.png')
+FORGET = loadalphaimg('forget.png')
 
 MYHPBAR_RECT = [SIZE[0] - 700, SIZE[1]-505, MYHP.get_width(), MYHP.get_height()]
 MYHP_RECT = [SIZE[0]-532, SIZE[1]-486, 399, 14]
@@ -68,6 +72,41 @@ CHANGE = {(63, 156, 79): (156, 209, 122),
          (0,0,0):WHITE,
          (24,16,16):WHITE}
 
+def wait_for_button():
+    pygame.event.clear()
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                return
+        sleep(.1)
+
+
+def selecting(select):
+    dirty = []
+    dirty.append(word_builder(['>',' '][select] + 'YES', 50, 465))
+    dirty.append(word_builder([' ','>'][select] + 'NO', 50, 575))
+    display.update(dirty)
+
+def conf():
+    display.update(draw.rect(SCREEN,WHITE, [3,408,CONF.get_width()+14, CONF.get_height()+14]))
+    display.update(SCREEN.blit(CONF,(10,415)))
+    select = 0
+    pygame.event.clear()
+    while True:
+        selecting(select)
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
+                if select == 0:
+                    select = 1
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
+                if select == 1:
+                    select = 0
+            if event.type == pygame.KEYDOWN and ((event.key == pygame.K_z and select == 1) or event.key == pygame.K_x):
+                return False
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_z:
+                return True
+        sleep(.01)
+
 def word_builder(word,start_x, start_y):
     x = start_x
     draw.rect(SCREEN, WHITE, [x, start_y, len(word)*56,60])
@@ -75,6 +114,20 @@ def word_builder(word,start_x, start_y):
         SCREEN.blit(ALPHA,(start_x, start_y),ALPHA_DICT[l])
         start_x+=56
     return [x, start_y, len(word)*56,60]
+
+def write_btm(*args):
+    clearbtm()
+    retval = []
+    retval.append(SCREEN.blit(BTM, BTM_TUPLE))
+    retval.append(word_builder(args[0], 50, SIZE[1]-250))
+    try:
+        retval.append(word_builder(args[1], 50, SIZE[1]-130))
+    except:
+        pass
+    return retval
+
+def clearbtm():
+    draw.rect(SCREEN, WHITE, [0,SIZE[1]-340,SIZE[0],340])
 
 def draw_my_hp_bar():
     draw.rect(SCREEN, WHITE, MYHPBAR_RECT)
@@ -320,32 +373,119 @@ def low_arch_towards(attacker,defender, img):
     draw_my_pkmn_sprite(attacker)
     display.update(old)
 
+def ask_move(pkmn,move):
+    display.update(write_btm(pkmn.name.upper() + ' is', 'trying to learn'))
+    wait_for_button()
+    display.update(write_btm('trying to learn', move.name.upper() + '!'))
+    wait_for_button()
+    display.update(write_btm('but ' + pkmn.name.upper(), "can't learn more"))
+    wait_for_button()
+    display.update(write_btm("can't learn more", 'than 4 moves!'))
+    wait_for_button()
+    display.update(write_btm('Delete an older', 'move to make room'))
+    wait_for_button()
+    display.update(write_btm('move to make room', 'for ' + move.name.upper() + '?'))
+
+
+def update_move(selector):
+    dirty = []
+    dirty.append(word_builder(['>',' ',' ',' '][selector],300, SIZE[1]-573))
+    dirty.append(word_builder([' ','>',' ',' '][selector],300, SIZE[1]-513))
+    dirty.append(word_builder([' ',' ','>',' '][selector],300, SIZE[1]-453))
+    dirty.append(word_builder([' ',' ',' ','>'][selector],300, SIZE[1]-393))
+    display.update(dirty)
+
+def move_choose(pkmn):
+    selector = 0
+    dirty = []
+    dirty.append(word_builder(['>',' ',' ',' '][selector] + pkmn.moves[0].name.upper(),300, SIZE[1]-573))
+    dirty.append(word_builder([' ','>',' ',' '][selector] + pkmn.moves[1].name.upper(),300, SIZE[1]-513))
+    dirty.append(word_builder([' ',' ','>',' '][selector] + pkmn.moves[2].name.upper(),300, SIZE[1]-453))
+    dirty.append(word_builder([' ',' ',' ','>'][selector] + pkmn.moves[3].name.upper(),300, SIZE[1]-393))
+    display.update(dirty)
+    pygame.event.clear()
+    while True:
+        update_move(selector)
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
+                if selector < 3:
+                    selector += 1
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
+                if selector > 0:
+                    selector -= 1
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_x:
+                return -1
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_z:
+                return selector
+
+def new_move(pkmn, move):
+    orig = SCREEN.copy()
+    while True:
+        ask_move(pkmn, move)
+        if conf():
+            SCREEN.blit(orig,(0,0))
+            clearbtm()
+            display.update(pygame.draw.rect(SCREEN, WHITE, (258, 386, SIZE[0]-258, SIZE[1] - 386)))
+            display.flip()
+            tmp = SCREEN.blit(FORGET, (10, 396))
+            word_builder('Which move should', 50, SIZE[1]-250)
+            word_builder('be forgotten?', 50, SIZE[1]-130)
+            display.update(tmp)
+            retval = move_choose(pkmn)
+            if retval > -1:
+                display.update(write_btm('1, 2 and... Poof!'))
+                wait_for_button()
+                display.update(write_btm(pkmn.name.upper() + ' forgot', pkmn.moves[retval].name + '!'))
+                wait_for_button()
+                display.update(write_btm('And...'))
+                wait_for_button()
+                display.update(write_btm(pkmn.name.upper() + ' learned', move.name + '!'))
+                setattr(pkmn, 'pp' + str(retval+1), 0)
+                setattr(pkmn, 'move' + str(retval+1), move)
+                pkmn.moves[retval] = Move(move, 0)
+                db.add(pkmn)
+                db.commit()
+                SCREEN.blit(orig,(0,0))
+                display.flip()
+                return retval
+            else:
+                SCREEN.blit(orig,(0,0))
+                display.flip()
+                continue
+
+        else:
+            display.update(write_btm('Abandon learning', move.name.upper() + '?'))
+            if conf():
+                display.update(write_btm(pkmn.name.upper(), 'did not learn'))
+                wait_for_button()
+                display.update(write_btm('did not learn', move.name.upper()))
+                wait_for_button()
+                SCREEN.blit(orig,(0,0))
+                display.flip()
+                return False
+            else:
+                SCREEN.blit(orig,(0,0))
+                display.flip()
+                continue
+
+
 def sandbox():
     SCREEN.fill(WHITE)
     SCREEN.blit(BTM, BTM_TUPLE)
     display.flip()
-    me = trainer(pokemon())
-    opp = trainer(pokemon())
+    me = trainer(Owned.query.get(152))
+    opp = trainer(Owned.query.get(152))
     draw_all_opp(opp.current)
     draw_all_me(me.current)
-    x = 800
-    y = 204
-    for i in POP[:-1]:
-        tmp = SCREEN.blit(i,(x,y))
-        display.update(tmp)
-        sleep(.1)
-        old = tmp
-        draw.rect(SCREEN, WHITE, old)
-        draw_opp_pkmn_sprite(opp.current)
-        draw_all_me(me.current)
-    tmp = SCREEN.blit(POP[-1],(x-28,y-28))
-    display.update(tmp)
-    sleep(.1)
-    draw.rect(SCREEN, WHITE, tmp)
-    draw_opp_pkmn_sprite(opp.current)
-    draw_all_me(me.current)
-    display.update(tmp)
+    new_move(me.current,Move.query.get(1))
+
     sleep(15)
+
+
+
+
+
+
 
 def wave(count):
     orig = SCREEN.copy()

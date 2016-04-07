@@ -253,7 +253,7 @@ class Owned(Base):
         I = [0, 8][self.attackiv % 2] + [0, 4][self.defenseiv % 2] + \
             [0, 2][self.speediv % 2] + [0, 1][self.specialiv % 2]
         E = min(63, int(floor(floor((max(0, self.hpev-1)**.5)+1)/4.)))
-        stat = floor((2 * self.base.hp + I + E) * self.lvl / 100. + 5)
+        stat = floor((2 * self.base.hp + I + E) * self.lvl / 100. + 10 + self.lvl)
         return int(stat)
 
     def __init__(self, base_id, lvl=5):
@@ -680,7 +680,7 @@ class Owned(Base):
             self.specialev += opp.current.base.special
             c = 0
             while True:
-                lvl = self.lvl + c
+                lvl = self.lvl + c + 1
                 exp = {'f': int(4 * lvl ** 3 / 5.),
                        'mf': lvl ** 3,
                        'ms': int(6/5. * lvl ** 3 - 15 * lvl ** 2 + 100 * lvl - 140),
@@ -694,11 +694,10 @@ class Owned(Base):
 
     def gain_lvl(self, lvl):
         self.lvl = lvl
-        self.maxhp = self.calchp(self.base[0], self.evs[0], self.hpiv)
-        self.attack = self.calcstat(self.base[1], self.evs[1], self.ivs[0])
-        self.defense = self.calcstat(self.base[2], self.evs[2], self.ivs[1])
-        self.speed = self.calcstat(self.base[3], self.evs[3], self.ivs[2])
-        self.special = self.calcstat(self.base[4], self.evs[4], self.ivs[3])
+        self.attack = self.calcstat(self.base.attack, self.attackev, self.attackiv)
+        self.defense = self.calcstat(self.base.defense, self.defenseev, self.defenseiv)
+        self.special = self.calcstat(self.base.special, self.specialev, self.specialiv)
+        self.speed = self.calcstat(self.base.speed, self.speedev, self.speediv)
 
 
     def clean(self):

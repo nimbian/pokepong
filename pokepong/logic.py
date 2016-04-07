@@ -41,6 +41,7 @@ OPPBAR = loadalphaimg('oppbar.png')
 ALIVE = loadalphaimg('alive.png')
 FAINTED = loadalphaimg('fainted.png')
 NOMON = loadalphaimg('nomon.png')
+FORGET = loadalphaimg('forget.png')
 CONF = loadalphaimg('conf.png')
 LOGO = loadalphaimg('logo.png')
 TRAINER = loadalphaimg('trainer.png')
@@ -269,6 +270,7 @@ def pop_ball(name):
         draw.rect(SCREEN, WHITE, old)
     tmp = display.update(SCREEN.blit(POP[-1],(87,422)))
     sleep(.1)
+    display.update(draw.rect(SCREEN,WHITE,tmp))
     display.update(write_btm(''))
 
 def draw_all_me(pkmn):
@@ -419,10 +421,12 @@ def me_next_mon(me, opp, mode, socket):
 
 
 def toss_ball(item, me, pkmn):
+    old = [0,0,0,0]
     for i in HIGH_ARC:
         draw_all_opp(pkmn)
         draw_my_pkmn_sprite(me.current)
-        tmp = SCREEN.blit(BALL[item[1]], (i[0], i[1]+200))
+        tmp = SCREEN.blit(BALL[item][1], (i[0], i[1]+200))
+        display.update([tmp,old])
         sleep(.1)
         old = tmp
         draw.rect(SCREEN, WHITE, old)
@@ -430,7 +434,7 @@ def toss_ball(item, me, pkmn):
     display.update(old)
 
 
-def open_ball(me,pkmn):
+def open_ball(me,opp,pkmn):
     x = 800
     y = 204
     for i in POP[:-1]:
@@ -476,20 +480,24 @@ def wobble(val, item):
         display.update(write_btm('Shoot! It was so', 'close too!'))
 
 
-def catchem(item, pkmn, me):
+def catchem(item, pkmn, me,opp):
     val = pkmn.catch_me(item[0])
     toss_ball(item, me, pkmn)
     if val > 0:
-        open_ball(me,pkmn)
+        open_ball(me,opp,pkmn)
         wobble(val,item)
         if val < 4:
             display.update(draw_all_opp(pkmn))
         else:
-            pkmn.trainer = me
+            pkmn.owner = me
             db.add(pkmn)
+            db.add(me)
             db.commit()
+            print me.pkmn
             if len(me.pkmn) < 6:
+                print 'test'
                 me.pkmn.append(pkmn)
+            print me.pkmn
             display.update(write_btm(pkmn.name + ' was', 'caugt!'))
     else:
         display.update(draw_all_opp(pkmn))
@@ -793,8 +801,8 @@ def shop_selecting(select):
 
 def selecting(select):
     dirty = []
-    dirty.append(word_builder(['>',' '][select] + 'YES', 50, 460))
-    dirty.append(word_builder([' ','>'][select] + 'NO', 50, 570))
+    dirty.append(word_builder(['>',' '][select] + 'YES', 50, 465))
+    dirty.append(word_builder([' ','>'][select] + 'NO', 50, 575))
     display.update(dirty)
 
 def draw_pkmn_choice(mon,offset):
@@ -865,7 +873,7 @@ def draw_choose_items(me):
 
 def choose_loc():
     selector = 0
-    draw_location(0)
+    draw_location(selector)
     pygame.event.clear()
     while True:
         for event in pygame.event.get():
@@ -884,7 +892,7 @@ def choose_loc():
                     selector = len(MAPROUTE) - 1
                     draw_loc_update(0, selector)
             if event.type == pygame.KEYDOWN and event.key == pygame.K_z:
-                return MAPROUTE[selector]
+                return [MAPROUTE[selector], selector]
 
 def update_shop(shopp, select):
     dirty = []
@@ -982,6 +990,7 @@ def draw_use_on(mon,offset,item):
         word_builder( ['NOT ABLE','    ABLE'][able], 520, offset * 110 + 60)
     except:
         #TODO TM/HMS
+        #Use TM on which POKE~MON?
         pass
     return able
 
@@ -1211,8 +1220,8 @@ def shop_choice():
 
 
 def conf():
-    display.update(draw.rect(SCREEN,WHITE, [3,403,CONF.get_width()+14, CONF.get_height()+14]))
-    display.update(SCREEN.blit(CONF,(10,410)))
+    display.update(draw.rect(SCREEN,WHITE, [3,408,CONF.get_width()+14, CONF.get_height()+14]))
+    display.update(SCREEN.blit(CONF,(10,415)))
     select = 0
     pygame.event.clear()
     while True:
@@ -1708,7 +1717,7 @@ def run_game(me, opp, mode, socket):
                             item.use(me)
                             if item.item.name[-4:].upper() == 'BALL':
                                 display.update(write_btm(me.name + ' used', item.item.name.upper()))
-                                ret = catchem(item.item.name.upper(), opp.current, me)
+                                ret = catchem(item.item.name.upper(), opp.current, me,opp)
                                 if ret:
                                     return 5
                                 else:
