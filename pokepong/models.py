@@ -607,7 +607,7 @@ class Owned(Base):
             type_ *= getattr(move.type_, opppkmn.base.type2.lower())
         if move.type_.type_ in normal:
             attack = self.calc_attack() * [1,.5]['burn' in self.buffs]
-            defense = opppkmn.calc_defense()
+            defense = opppkmn.calc_defense() * [1,.5][move.name == 'Explosion' or move.name == 'Selfdestruct']
         else:
             attack = self.calc_special()
             defense = opppkmn.calc_special()

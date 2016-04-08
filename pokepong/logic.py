@@ -72,6 +72,8 @@ POP = [loadalphaimg('pop1.png'), loadalphaimg('pop2.png'),
        loadalphaimg('pop3.png'), loadalphaimg('pop4.png'),
        loadalphaimg('pop5.png')]
 
+VITAMINS = ['Protein', 'Iron', 'HP Up', 'Calcium', 'Carbos']
+
 ABLE = {'Thunderstone': {133: 135, 25: 26},
         'Fire Stone': {133: 136, 37: 38, 58: 59},
         'Water Stone': {133: 134, 90: 91, 120: 121, 61: 62},
@@ -930,7 +932,7 @@ def new_move(pkmn, move):
                 db.commit()
                 SCREEN.blit(orig, (0, 0))
                 display.flip()
-                return retval
+                return True
             else:
                 SCREEN.blit(orig, (0, 0))
                 display.flip()
@@ -1383,13 +1385,36 @@ def draw_use_on(mon, offset, item):
     word_builder(mon.name, 160, offset * 110 + 10)
     word_builder('%' + str(mon.lvl), 800, offset * 110)
     SCREEN.blit(mon.sprite1, (60, offset * 110 + 15))
-    try:
+    if item.item.name in ABLE:
         able = mon.base_id in ABLE[item.item.name]
-        word_builder(['NOT ABLE', '    ABLE'][able], 520, offset * 110 + 60)
-    except KeyError:
-        # TODO TM/HMS
-        # Use TM on which POKE~MON?
-        pass
+    elif item.item.name in VITAMINS
+        if item.item.name == 'Protein':
+            able = mon.attackev < 25600
+        elif item.item.name == 'Iron':
+            able = mon.defenseev < 25600
+        elif item.item.name == 'HP Up':
+            able = mon.hpev < 25600
+        elif item.item.name == 'Calcium':
+            able = mon.specialev < 25600
+        elif item.item.name == 'Carbos':
+            able = mon.speedev < 25600
+    elif item.item.name[:2] == 'TM':
+        tmp = False
+        for tms in mon.base.learnabletms:
+            if tms.tm.name == item.item.name:
+                tmp = True
+                break
+        able = tmp
+    elif item.item.name[:2] == 'HM':
+        tmp = False
+        for hms in mon.base.learnablehms:
+            if hms.hm.name == item.item.name:
+                tmp = True
+                break
+        able = tmp
+    elif item.item.name == 'Rare Candy':
+        able = mon.lvl < 100
+    word_builder(['NOT ABLE', '    ABLE'][able], 520, offset * 110 + 60)
     return able
 
 
@@ -1467,9 +1492,58 @@ def use(me, item, mon):
     """
     function
     """
-    item.use(me)
     if item.item.name in ABLE:
+        item.use(me)
         evolve(mon, ABLE[item.item.name][mon.base_id])
+    elif item.item.name in VITAMINS
+        item.use(me)
+        if item.item.name == 'Protein':
+            mon.attackev += 2560
+        elif item.item.name == 'Iron':
+            mon.defenseev += 2560
+        elif item.item.name == 'HP Up':
+            mon.hpev += 2560
+        elif item.item.name == 'Calcium':
+            mon.specialev += 2560
+        elif item.item.name == 'Carbos':
+            mon.speedev += 2560
+    elif item.item.name[:2] == 'TM' or item.item.name[:2] == 'HM':
+        move = TmHm.query.filter(TmHm.name == item.item.name).one().move
+        if len(mon.moves) < 4:
+            setattr(mon, 'move' + str(len(mon.moves) + 1), move)
+            display.update(
+                write_btm(mon.name + ' learned', move.name))
+            mon.moves.append(Move(move, 0))
+            db.commit()
+            learned = True
+        else:
+            learned = new_move(mon, move)
+        if learned:
+            item.use(me)
+    elif item.item.name == 'Rare Candy':
+        item.use(me)
+        tmp = None
+        lvlup = mon.lvl + 1
+        mon.exp = {'f': int(4 * lvl ** 3 / 5.),
+                   'mf': lvl ** 3,
+                   'ms': int(6/5. * lvl ** 3 - 15 * lvl ** 2 + 100 * lvl - 140),
+                   's': int(5 * lvl ** 3 / 4.)}[mon.base.lvlspeed]
+        for move in mon.base.learns:
+            if mon.lvl < move.learnedat <= lvlup:
+                tmp = move.move
+        mon.gain_lvl(lvlup)
+        display.update(
+            write_btm(mon.name + ' grew', 'to level ' + str(lvlup) + '!'))
+        mon.load_stats()
+        wait_for_button()
+        if tmp:
+            if len(mon.moves) < 4:
+                setattr(mon, 'move' + str(len(mon.moves) + 1), tmp)
+                display.update(
+                    write_btm(mon.name + ' learned', tmp.name))
+                mon.moves.append(Move(tmp, 0))
+            else:
+                new_move(mon, tmp)
 
 
 def update_sell_amount(item, select):
