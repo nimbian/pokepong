@@ -14,6 +14,7 @@ from pokepong.database import Base, db
 from datetime import datetime
 import bcrypt
 from pokepong.util import *
+from pygame import display
 
 normal=['Normal','Fighting','Poison','Ground','Flying','Bug','Rock','Ghost']
 special=['Fire','Water','Electric','Grass','Ice','Psychic','Dragon']
@@ -86,7 +87,7 @@ class Move(Base):
     __tablename__ = 'move'
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
-    type_id = Column(String, ForeignKey('type.id'), nullable=False)
+    type_id = Column(Integer, ForeignKey('type.id'), nullable=False)
     type_ = relationship('Type', backref='moves')
     maxpp = Column(Integer, nullable=False)
     power = Column(Integer)
@@ -453,14 +454,14 @@ class Owned(Base):
 
     def do_status(self, opppkmn, me):
         from pokepong.domove import dmg_pkmn
-        from pokepong.logic import write_btm
+        from pokepong.logic import write_btm, wait_for_button
         if 'BRN' in self.buffs:
             retval = dmg_pkmn(self, int(self.maxhp*(1/8.)), not me)
             if me:
                 display.update(write_btm(self.name + 'was', 'hurt by the burn'))
             else:
                 display.update(write_btm('Enemy' + self.name + 'was', 'hurt by the burn'))
-            sleep(1)
+            wait_for_button()
             if retval:
                 return 1
         if 'PSN' in self.buffs:
@@ -469,7 +470,7 @@ class Owned(Base):
                 display.update(write_btm(self.name + 'was', 'hurt by the poison'))
             else:
                 display.update(write_btm('Enemy' + self.name + 'was', 'hurt by the poison'))
-            sleep(1)
+            wait_for_button()
             if retval:
                 return 1
         if 'SEED' in self.buffs:
@@ -477,7 +478,7 @@ class Owned(Base):
             dmg_pkmn(opppkmn, (int(self.maxhp*(1/16.)) * -1), me)
             #TODO leech words
             display.update(write_btm('Leeched'))
-            sleep(1)
+            wait_for_button()
             if retval:
                 return 1
         if 'TOXIC' in self.buffs:
@@ -488,7 +489,7 @@ class Owned(Base):
             else:
                 display.update(write_btm('Enemy' + self.name + 'was', 'hurt by the poison'))
             tticks += 1
-            sleep(1)
+            wait_for_button()
             if retval:
                 return 1
         if self.disabled > 0:

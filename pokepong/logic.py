@@ -1,7 +1,7 @@
 from pygame import draw, display
 from pygame.mixer import Sound
 import pygame
-from sqlalchemy import NoResultFound
+from sqlalchemy.orm.exc import NoResultFound
 from pokepong.util import MyMoveOccuring, OppMoveOccuring, loadalphaimg, loadimg
 from pokepong.util import alphabet, randint, choice, HIGH_ARC
 from time import sleep
@@ -1387,7 +1387,7 @@ def draw_use_on(mon, offset, item):
     SCREEN.blit(mon.sprite1, (60, offset * 110 + 15))
     if item.item.name in ABLE:
         able = mon.base_id in ABLE[item.item.name]
-    elif item.item.name in VITAMINS
+    elif item.item.name in VITAMINS:
         if item.item.name == 'Protein':
             able = mon.attackev < 25600
         elif item.item.name == 'Iron':
@@ -1495,7 +1495,7 @@ def use(me, item, mon):
     if item.item.name in ABLE:
         item.use(me)
         evolve(mon, ABLE[item.item.name][mon.base_id])
-    elif item.item.name in VITAMINS
+    elif item.item.name in VITAMINS:
         item.use(me)
         if item.item.name == 'Protein':
             mon.attackev += 2560
@@ -1957,7 +1957,7 @@ def draw_choose_pkmn(me, opp, mode, oppdeath=False, mydeath=False):
                     if not mydeath:
                         clear()
                         draw_all_opp(opp.current)
-                        return False
+                        return -1
 
         sleep(.1)
         con1 = count % 2 == 0 and me.pkmn[
@@ -2234,15 +2234,17 @@ def run_game(me, opp, mode, socket):
                                     run_move(me, opp, my_move)
                                     if not opp.current.alive():
                                         return 0
-                                    run_opp_move(me, opp, opp_move, False)
-                                    if not me.current.alive():
+                                    if me.current.alive():
+                                        run_opp_move(me, opp, opp_move, False)
+                                    else:
                                         return 1
                                 else:
                                     run_opp_move(me, opp, opp_move, True)
                                     if not me.current.alive():
                                         return 1
-                                    run_move(me, opp, my_move)
-                                    if not opp.current.alive():
+                                    if opp.current.alive():
+                                        run_move(me, opp, my_move)
+                                    else:
                                         return 0
                             else:
                                 if me.current.calc_speed() > opp.current.calc_speed():
@@ -2250,15 +2252,17 @@ def run_game(me, opp, mode, socket):
                                     run_move(me, opp, my_move, True)
                                     if not opp.current.alive():
                                         return 0
-                                    run_opp_move(me, opp, opp_move, False)
-                                    if not me.current.alive():
+                                    if me.current.alive():
+                                        run_opp_move(me, opp, opp_move, False)
+                                    else:
                                         return 1
                                 else:
                                     run_opp_move(me, opp, opp_move, True)
                                     if not me.current.alive():
                                         return 1
-                                    run_move(me, opp, my_move, False)
-                                    if not opp.current.alive():
+                                    if opp.current.alive()
+                                        run_move(me, opp, my_move, False)
+                                    else:
                                         return 0
                         elif tmp == 'swap':
                             if my_move.name == 'Quick Attack':
@@ -2315,7 +2319,7 @@ def run_game(me, opp, mode, socket):
                     clear()
                     pygame.display.flip()
                     draw_all_opp(opp.current)
-                    if isinstance(select, int):
+                    if select > -1:
                         tmp, opp_move = wait_for_opp_move(
                             opp, ['swap', select], mode, socket)
                         draw_all_me(me.current)
@@ -2372,9 +2376,12 @@ def run_game(me, opp, mode, socket):
                             wait_for_button()
                             return 3
                         else:
+                            tmp, opp_move = wait_for_opp_move(
+                                opp, ['swap', select], mode, socket)
+                            opp_move = opp.current.moves[opp_move]
                             display.update(write_btm("Failed to escape!"))
                             wait_for_button()
-                            run_opp_move(me, opp, opp_move)
+                            run_opp_move(me, opp, opp_move, False)
                             if not me.current.alive():
                                 return 1
                             clearbtm()

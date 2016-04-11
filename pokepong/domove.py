@@ -351,6 +351,8 @@ def do_attacks(attack, defend, move, me, times=1):
         retval = dmg_pkmn(defend, dmg, me)
         if crit:
             display.update(write_btm('Critical Hit!'))
+        if retval == 1:
+            break
         sleep(1)
     if crit:
         sleep(1)
@@ -587,8 +589,8 @@ def stat_change(pokemon, diff, stat):
     """
     if 'MIST' in pokemon.buffs and diff < 0:
         return 0
-    meth = getattr(Pokemon, 'raise_' + stat)
-    if meth(stat):
+    meth = getattr(pokemon, 'raise_' + stat)
+    if meth(diff):
         build = pokemon.name + "'s " + stat
         if diff == 2:
             tmp = 'greatly rose!'

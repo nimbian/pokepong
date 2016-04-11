@@ -9,7 +9,7 @@ from pokepong.logic import win, lost, opp_next_mon, gain_exp, evolve
 from pokepong.logic import battle_logic, run_opp_faint, run_me_faint
 from pokepong.logic import me_next_mon, new_game_start, clear, Sound
 from pokepong.logic import draw_choice, scrolling, choose_loc, intro
-from pokepong.logic import play_again, clearbtm, run_game
+from pokepong.logic import clearbtm, run_game
 from pokepong.models import Trainer, Owned
 from redis import StrictRedis
 import json
@@ -48,6 +48,12 @@ def main():
             me = None
             opp = None
             count = 0
+            if mode == 'wild':
+                music = Sound("sounds/wild_battle.ogg")
+                music_vict = Sound("sounds/wild_victory.ogg")
+            else:
+                music = Sound("sounds/trainer_battle.ogg")
+                music_vict = Sound("sounds/trainer_victory.ogg")
         if mode != 'wild' and new_game:
             r.incr('count')
             while r.get('count') < 2:
@@ -123,12 +129,6 @@ def main():
                 opp.pkmn = [get_wild_mon(loc)]
                 opp.current = opp.pkmn[0]
         opp.initialize()
-        if mode == 'wild':
-            music = Sound("sounds/wild_battle.ogg")
-            music_vict = Sound("sounds/wild_victory.ogg")
-        else:
-            music = Sound("sounds/trainer_battle.ogg")
-            music_vict = Sound("sounds/trainer_victory.ogg")
         music.play()
         new_game_start(me, opp, mode)
         while me.alive() and opp.alive():
