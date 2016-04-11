@@ -286,6 +286,10 @@ class Owned(Base):
         self.pp2 = 0
         self.pp3 = 0
         self.pp4 = 0
+        self.exp = {'f': int(4 * self.lvl ** 3 / 5.),
+               'mf': self.lvl ** 3,
+               'ms': int(6/5. * self.lvl ** 3 - 15 * self.lvl ** 2 + 100 * self.lvl - 140),
+               's': int(5 * self.lvl ** 3 / 4.)}[self.base.lvlspeed]
         self.initialize()
 
     @reconstructor

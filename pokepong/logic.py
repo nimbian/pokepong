@@ -2260,7 +2260,7 @@ def run_game(me, opp, mode, socket):
                                     run_opp_move(me, opp, opp_move, True)
                                     if not me.current.alive():
                                         return 1
-                                    if opp.current.alive()
+                                    if opp.current.alive():
                                         run_move(me, opp, my_move, False)
                                     else:
                                         return 0
@@ -2377,7 +2377,7 @@ def run_game(me, opp, mode, socket):
                             return 3
                         else:
                             tmp, opp_move = wait_for_opp_move(
-                                opp, ['swap', select], mode, socket)
+                                opp, False, mode, socket)
                             opp_move = opp.current.moves[opp_move]
                             display.update(write_btm("Failed to escape!"))
                             wait_for_button()
