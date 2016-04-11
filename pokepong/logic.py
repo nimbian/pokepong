@@ -1131,12 +1131,24 @@ def wait_for_button():
     function
     """
     pygame.event.clear()
+    c = 1
+    tmp = False
+    display.update(word_builder('^',SIZE[0]-120, SIZE[1]-120))
     while True:
         if r.get('lock'):
             raise OppMoveOccuring
         for event_ in pygame.event.get():
             if event_.type == pygame.KEYDOWN:
                 return
+        if c % 4 == 0:
+            if tmp:
+                display.update(word_builder('^',SIZE[0]-120, SIZE[1]-120))
+            else:
+                display.update(word_builder(' ',SIZE[0]-120, SIZE[1]-120))
+            tmp = not tmp
+            c = 1
+        else:
+            c += 1
         sleep(.1)
 
 
@@ -1269,7 +1281,7 @@ def update_shop(shopp, select):
     """
     dirty = []
     c = 0
-    dirty.append(draw.rect(SCREEN, WHITE, [460, SIZE[1] - 830, 700, 490]))
+    dirty.append(draw.rect(SCREEN, WHITE, [460, SIZE[1] - 830, 750, 490]))
     for i in shopp.shownitems:
         if c == select:
             dirty.append(word_builder('>', 460, 200 + c * 120))
@@ -1623,7 +1635,8 @@ def sell(me):
     while True:
         clear()
         SCREEN.blit(ITEMS, (10, SIZE[1] - 880))
-        write_btm('Which item would', 'you like to sell?')
+        word_builder('Which item would', 50, SIZE[1] - 250)
+        word_builder('you like to sell?', 50, SIZE[1] - 130)
         display.flip()
         selector = 0
         update_sell(me, selector)
@@ -1677,7 +1690,8 @@ def using(me):
     while True:
         clear()
         SCREEN.blit(ITEMS, (10, SIZE[1] - 880))
-        write_btm('Which item would', 'you like to use?')
+        word_builder('Which item would', 50, SIZE[1] - 250)
+        word_builder('you like to use?', 50, SIZE[1] - 130)
         display.flip()
         selector = 0
         update_using(me, selector)
@@ -1754,7 +1768,7 @@ def conf():
                 return False
             if event.type == pygame.KEYDOWN and event.key == pygame.K_z:
                 return True
-        sleep(.1)
+        sleep(.02)
 
 
 def do_purchase(me, item, retval):
@@ -1798,6 +1812,7 @@ def buy(me, shopp):
     """
     function
     """
+    clear()
     word_builder('Take your time.', 50, SIZE[1] - 250)
     SCREEN.blit(ITEMS, (10, SIZE[1] - 880))
     draw_money(me)
@@ -2392,4 +2407,4 @@ def run_game(me, opp, mode, socket):
 
 
 from pokepong.domove import do_move, usable_move
-from pokepong.models import Pokemon, Owned, Move, OwnedItem, shoppe
+from pokepong.models import Pokemon, Owned, Move, OwnedItem, shoppe, TmHm
