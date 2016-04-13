@@ -1,6 +1,7 @@
 [dev]
 # SQL connection string
-connection-string=postgresql://postgres:password@localhost/pong
+#connection-string=postgresql://postgres:password@localhost/pong
+connection-string=sqlite://pong
 
 
 # Redis connection string

@@ -1,10 +1,14 @@
 from pygame.image import load
 from pygame import display, draw
+import pygame
 import json
 import random
 import sys
 import zmq
 from math import floor
+from redis import StrictRedis
+from time import sleep
+r = StrictRedis(host='127.0.0.1')
 
 SIZE = (1280, 1024)
 WHITE = (253, 236, 254)

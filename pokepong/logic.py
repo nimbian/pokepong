@@ -7,19 +7,18 @@ from pokepong.util import alphabet, randint, choice, HIGH_ARC
 from time import sleep
 from math import floor
 import json
-from redis import StrictRedis
 from pokepong.routes import ROUTES, MAPLIST, MAPROUTE
 from pokepong.database import db
 from pokepong.util import word_builder, write_btm, draw_my_hp
 from pokepong.util import draw_opp_hp, wait_for_button, clearbtm
 from pokepong.util import WHITE, GREEN, YELLOW, RED, GREY, BLACK, SCREEN, SIZE
 from pokepong.util import BTM, BTM_TUPLE
+from pokepong.util import r
 
 pygame.mixer.init()
 SHOP = Sound("sounds/shop.ogg")
 EVOLVE = Sound("sounds/evolve.ogg")
 
-r = StrictRedis(host='127.0.0.1')
 
 # TODO if speeds are equal me will go first.  me is different on client vs
 # server
@@ -803,7 +802,7 @@ def update_move(selector):
         word_builder([' ', ' ', ' ', '>'][selector], 300, SIZE[1] - 393))
     display.update(dirty)
 
-def draw_moves(selector):
+def draw_moves(selector, pkmn):
     """
     function
     """
@@ -825,7 +824,7 @@ def move_choose(pkmn):
     function
     """
     selector = 0
-    draw_move(selector)
+    draw_moves(selector, pkmn)
     pygame.event.clear()
     while True:
         update_move(selector)
@@ -890,6 +889,7 @@ def new_move(pkmn, move):
                 pkmn.moves[retval] = tmpMove(move, 0)
                 db.add(pkmn)
                 db.commit()
+                wait_for_button()
                 SCREEN.blit(orig, (0, 0))
                 display.flip()
                 return True
@@ -939,6 +939,7 @@ def gain_exp(me, opp, multi):
                         display.update(
                             write_btm(mon.name + ' learned', tmp.name))
                         mon.moves.append(tmpMove(tmp, 0))
+                        wait_for_button()
                     else:
                         new_move(mon, tmp)
     me.used.clear()
@@ -1382,7 +1383,22 @@ def usable_on(me, item):
     function
     """
     clear()
-    write_btm('Use {0} on'.format(item.item.name), 'which POK~MON')
+    if item.item.name[:2] == 'TM' or item.item.name[:2] == 'HM':
+        display.flip()
+        display.update(write_btm('Booted up a '+ item.item.name[:2]))
+        wait_for_button()
+        move = TmHm.query.filter(TmHm.name == item.item.name).one().move.name
+        display.update(write_btm('It contained', move + '!'))
+        wait_for_button()
+        display.update(write_btm('Teach ' + move, 'to a POK~MON?'))
+        if not conf():
+            return -1
+        write_btm('Use {0} on'.format(item.item.name[:2]), 'which POK~MON')
+        display.update(draw.rect(
+            SCREEN, WHITE, [3, 408, CONF.get_width() + 14, CONF.get_height() + 14]))
+    else:
+        write_btm('Use {0} on'.format(item.item.name), 'which POK~MON')
+
     offset = 0
     able_list = []
     for mon in me.pkmn:
@@ -1460,6 +1476,7 @@ def use(me, item, mon):
             display.update(
                 write_btm(mon.name + ' learned', move.name))
             mon.moves.append(tmpMove(move, 0))
+            wait_for_button()
             db.commit()
             learned = True
         else:
