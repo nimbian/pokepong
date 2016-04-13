@@ -1518,6 +1518,7 @@ def sell_amount(item):
                               ('<' + str(item.item.sellprice)).rjust(8), 534, 555))
     display.update(dirty)
     pygame.event.clear()
+    pygame.key.set_repeat(100, 50)
     while True:
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
@@ -1629,6 +1630,7 @@ def using(me):
         display.flip()
         selector = 0
         update_using(me, selector)
+        pygame.key.set_repeat(100, 50)
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
@@ -1755,51 +1757,6 @@ def buy(me, shopp):
     update_shop(shopp, selector)
     pygame.key.set_repeat(100, 50)
     while True:
-        #pygame.time.wait(100)
-        #keys = pygame.key.get_pressed()
-        #if pygame.key.get_pressed()[pygame.K_UP]:
-        #    if selector > 0:
-        #        selector -= 1
-        #        update_shop(shopp, selector)
-        #    elif shopp.items[0] != shopp.shownitems[0]:
-        #        shopp.shift_items_left()
-        #        update_shop(shopp, selector)
-        #    pygame.time.wait(10)
-        #if pygame.key.get_pressed()[pygame.K_DOWN]:
-        #    if selector < 2 and selector < len(shopp.shownitems) - 1:
-        #        selector += 1
-        #        update_shop(shopp, selector)
-        #    elif len(shopp.shownitems) > 3:
-        #        shopp.shift_items_right()
-        #        update_shop(shopp, selector)
-        #    pygame.time.wait(10)
-        #if pygame.key.get_pressed()[pygame.K_x]:
-        #    return False
-        #if pygame.key.get_pressed()[pygame.K_z]:
-        #    item = shopp.shownitems[selector]
-        #    if item.name != 'CANCEL':
-        #        retval = amount(item)
-        #        if retval:
-        #            display.update(
-        #                write_btm(item.name + '?', 'That will be'))
-        #            wait_for_button()
-        #            display.update(
-        #                write_btm('That will be', '<' + str(item.buyprice * retval) + '. OK?'))
-        #            ret = conf()
-        #            if ret:
-        #                do_purchase(me, item, retval)
-        #                update_shop(shopp, selector)
-        #            else:
-        #                display.update(
-        #                    draw.rect(SCREEN, WHITE, [460, SIZE[1] - 830, 700, 490]))
-        #                update_shop(shopp, selector)
-
-        #        else:
-        #            display.update(
-        #                draw.rect(SCREEN, WHITE, [460, SIZE[1] - 830, 700, 490]))
-        #            update_shop(shopp, selector)
-        #    else:
-        #        return False
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
                 if selector > 0:
