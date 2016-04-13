@@ -5,9 +5,10 @@ Unit tests for pokepong.domove
 
 import unittest
 import pygame
+import sqlalchemy
 
-from test.unit import dbutil
 from nose.tools import assert_equal
+from nose import with_setup
 from os import remove
 
 SCREEN = pygame.display.set_mode((0,0))
@@ -16,8 +17,9 @@ class Moves(unittest.TestCase):
     def setUp(self):
         from pokepong.database import init_db, db
         from pokepong.models import Trainer, Owned
-        engine = create_engine('sqlite://test.db')
-        init_db()
+        from sqlalchemy import create_engine
+        engine = create_engine('sqlite:///test.db')
+        init_db(tmp = engine)
         self.me = Owned(1)
         self.opp = Owned(1)
 
@@ -27,519 +29,2549 @@ class Moves(unittest.TestCase):
         engine.dispose()
         remove('test.db')
 
-    @with_setup(setUp, tearDown)
     def test_absorb(self):
         from sqlalchemy import func
-        from pokepong.modes import Move
+        from pokepong.models import Move
         from pokepong.domove import do_move
-        move = Move.query.filter(func.lower(name) == func.lower(inspect.stack()[0][3][5:])).one()
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
+    def test_acid(self):
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
         do_move(self.me, self.opp, move, 'wild', True, True)
         do_move(self.me, self.opp, move, 'wild', True, False)
         do_move(self.opp, self.me, move, 'wild', False, True)
         do_move(self.opp, self.me, move, 'wild', False, False)
 
 
-
-    def test_acid(self):
-        pass
-
     def test_acid_armor(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(3)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_agility(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_amnesia(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_aurora_beam(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(6)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_barrage(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_barrier(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_bide(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move2 = Move.query.get(159)
+        move.disabled = False
+        move2.disabled = False
+        move.pp = move.maxpp
+        move2.pp = move.maxpp
+        move.high_crit = False
+        move2.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.opp, self.me, move2, 'wild', False, True)
+        do_move(self.opp, self.me, move2, 'wild', False, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.me, self.opp, move2, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_bind(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_bite(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_blizzard(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_body_slam(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(13)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_bone_club(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(14)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_bonemerang(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_bubble(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_bubblebeam(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_clamp(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_comet_punch(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(19)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_confuse_ray(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(20)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_confusion(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_constrict(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_conversion(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_counter(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_crabhammer(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_cut(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_defense_curl(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(27)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_dig(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
 
-    def test_dig_prep(self):
-        pass
 
     def test_disable(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_dizzy_punch(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(30)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_double_kick(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(31)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_double_team(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(32)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_double_edge(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(33)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_doubleslap(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_dragon_rage(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(35)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_dream_eater(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(36)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_drill_peck(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(37)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_earthquake(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_egg_bomb(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(39)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_ember(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_explosion(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_fire_blast(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(42)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_fire_punch(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(43)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_fire_spin(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(44)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_fissure(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_flamethrower(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_flash(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_fly(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
 
-    def test_fly_prep(self):
-        pass
 
     def test_focus_energy(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(49)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_fury_attack(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(50)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_fury_swipes(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(51)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_glare(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_growl(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_growth(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_guillotine(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_gust(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_harden(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_haze(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_headbutt(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_hi_jump_kick(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(60)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_horn_attack(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(61)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_horn_drill(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(62)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_hydro_pump(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(63)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_hyper_beam(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(64)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_hyper_fang(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(65)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_hypnosis(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_ice_beam(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(67)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_ice_punch(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(68)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_jump_kick(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(69)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_karate_chop(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(70)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_kinesis(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_leech_life(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(72)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_leech_seed(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(73)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_leer(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_lick(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_light_screen(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(76)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_lovely_kiss(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(77)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_low_kick(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(78)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_meditate(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_mega_drain(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(80)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
     def test_mega_kick(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(81)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_mega_punch(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(82)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_metronome(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_mimic(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_minimize(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_mirror_move(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(86)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_mist(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_night_shade(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(88)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_pay_day(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(89)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_peck(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_petal_dance(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(91)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_pin_missile(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(92)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_poison_gas(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(93)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_poison_sting(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(94)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_poisonpowder(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_pound(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_psybeam(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_psychic(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_psywave(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_quick_attack(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(100)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_rage(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_razor_leaf(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(101)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_razor_wind_prep(self):
-        pass
+        #TODO controllable last move
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(102)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_razor_wind(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(103)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_recover(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_reflect(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_rest(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_roar(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_rock_slide(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(108)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_rock_throw(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(109)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_rolling_kick(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(110)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_sand_attack(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(111)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_scratch(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_screech(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_seismic_toss(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(114)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_selfdestruct(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_sharpen(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_sing(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_skull_bash(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(117)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_skull_bash_prep(self):
-        pass
+        #TODO controllable lastmove
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(117)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
     def test_sky_attack(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(118)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
     def test_sky_attack_prep(self):
-        pass
+        #TODO controllable lastmove
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(118)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
     def test_slam(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_slash(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_sleep_powder(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(121)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_sludge(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_smog(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_smokescreen(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_softboiled(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_solarbeam_prep(self):
-        pass
+        #TODO CONTROLLABLE LAST MOVE
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(126)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
     def test_solarbeam(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
     def test_sonicboom(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_spike_cannon(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(128)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_splash(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_spore(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_stomp(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_strength(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_string_shot(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(133)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_struggle(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_stun_spore(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(135)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_submission(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_substitute(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_super_fang(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(138)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_supersonic(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_surf(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_swift(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_swords_dance(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(142)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_tackle(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_tail_whip(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(144)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
 
-    def test_take_testwn(self):
-        pass
+
+    def test_take_down(self):
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(145)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_teleport(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_thrash(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_thunder(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_thunder_wave(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(149)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_thunderbolt(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_thunderpunch(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_thundershock(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_toxic(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_transform(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_tri_attack(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(155)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_twineedle(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_vicegrip(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_vine_whip(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(158)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_water_gun(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(159)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_waterfall(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_whirlwind(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_wing_attack(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.get(162)
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_withdraw(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+
 
     def test_wrap(self):
-        pass
+        from sqlalchemy import func
+        from pokepong.models import Move
+        from pokepong.domove import do_move
+        import inspect
+        move = Move.query.filter(func.lower(Move.name) == func.lower(inspect.stack()[0][3][5:])).one()
+        move.disabled = False
+        move.pp = move.maxpp
+        move.high_crit = False
+        do_move(self.me, self.opp, move, 'wild', True, True)
+        do_move(self.me, self.opp, move, 'wild', True, False)
+        do_move(self.opp, self.me, move, 'wild', False, True)
+        do_move(self.opp, self.me, move, 'wild', False, False)
+

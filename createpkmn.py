@@ -2,7 +2,6 @@ from pokepong.models import Owned, Move, Pokemon
 from pokepong.database import db
 from argparse import ArgumentParser
 import pygame
-SCREEN = pygame.display.set_mode((0,0))
 
 if __name__ == "__main__":
     PARSER = ArgumentParser('Create a Pokemon')
@@ -15,6 +14,7 @@ if __name__ == "__main__":
     PARSER.add_argument('-lp', '--list_pokemon', help='Will list all pokemon and corresponding numbers', action='store_true')
     PARSER.add_argument('-lm', '--list_moves', help='Will list all moves and corresponding numbers', action='store_true')
     ARGS = PARSER.parse_args()
+    SCREEN = pygame.display.set_mode((0,0))
     if ARGS.list_moves:
         tmp = Move.query.all()
         for i in tmp:
@@ -27,8 +27,9 @@ if __name__ == "__main__":
 
     else:
         try:
-            tmp = Owned(ARGS.pokemon, lvl=ARGS.level)
-            tmp.move1 = Move.query.get(ARGS.move_one)
+            tmp = Owned(ARGS.pokemon, lvl=int(ARGS.level))
+            if ARGS.move_one:
+                tmp.move1 = Move.query.get(ARGS.move_one)
             if ARGS.move_two:
                 tmp.move2 = Move.query.get(ARGS.move_two)
             if ARGS.move_three:

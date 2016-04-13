@@ -10,6 +10,10 @@ import json
 from redis import StrictRedis
 from pokepong.routes import ROUTES, MAPLIST, MAPROUTE
 from pokepong.database import db
+from pokepong.util import word_builder, write_btm, draw_my_hp
+from pokepong.util import draw_opp_hp, wait_for_button, clearbtm
+from pokepong.util import WHITE, GREEN, YELLOW, RED, GREY, BLACK, SCREEN, SIZE
+from pokepong.util import BTM, BTM_TUPLE
 
 pygame.mixer.init()
 SHOP = Sound("sounds/shop.ogg")
@@ -20,22 +24,10 @@ r = StrictRedis(host='127.0.0.1')
 # TODO if speeds are equal me will go first.  me is different on client vs
 # server
 
-SIZE = (1280, 1024)
-WHITE = (253, 236, 254)
-GREEN = (63, 156, 79)
-YELLOW = (255, 228, 104)
-RED = (209, 71, 40)
-GREY = (108, 108, 108)
-BLACK = (0, 0, 0)
-
-SCREEN = display.set_mode(SIZE)
-
-BTM = loadalphaimg('btmclean.png')
 MYHP = loadalphaimg('myhp.png')
 OPPHP = loadalphaimg('opphp.png')
 MOVECHOICE = loadalphaimg('choiceclean.png')
 ATTACK = loadalphaimg('attack.png')
-ALPHA = loadalphaimg('alphafull.png')
 HPBAR = loadalphaimg('hpbar.png')
 MYBAR = loadalphaimg('mybar.png')
 OPPBAR = loadalphaimg('oppbar.png')
@@ -82,7 +74,6 @@ ABLE = {'Thunderstone': {133: 135, 25: 26},
         'Link Stone': {64: 65, 67: 68, 93: 94, 75: 76}}
 
 SSIZE = [392, 392]
-BTM_TUPLE = (10, SIZE[1] - 340)
 
 MYHPBAR_RECT = [
     SIZE[0] - 700, SIZE[1] - 505, MYHP.get_width(), MYHP.get_height()]
@@ -93,26 +84,11 @@ OPPHPBAR_RECT = [80, 120, 602, 91]
 OPPHP_RECT = [227, 141, 399, 15]
 OPPPKMN = [SIZE[0] - 500, 0]
 
-ALPHA_DICT = alphabet()
-
-
 def clear():
     """
     function
     """
     SCREEN.fill(WHITE)
-
-
-def word_builder(word, start_x, start_y):
-    """
-    function
-    """
-    x = start_x
-    draw.rect(SCREEN, WHITE, [x, start_y, len(word) * 56, 60])
-    for l in word:
-        SCREEN.blit(ALPHA, (start_x, start_y), ALPHA_DICT[l])
-        start_x += 56
-    return [x, start_y, len(word) * 56, 60]
 
 
 def draw_map():
@@ -138,28 +114,6 @@ def get_wild_mon(route):
                 'ms': int(6 / 5. * lvl ** 3 - 15 * lvl ** 2 + 100 * lvl - 140),
                 's': int(5 * lvl ** 3 / 4.)}[pkmn.base.lvlspeed]
     return pkmn
-
-
-def write_btm(*args):
-    """
-    function
-    """
-    clearbtm()
-    retval = []
-    retval.append(SCREEN.blit(BTM, BTM_TUPLE))
-    retval.append(word_builder(args[0], 50, SIZE[1] - 250))
-    try:
-        retval.append(word_builder(args[1], 50, SIZE[1] - 130))
-    except IndexError:
-        pass
-    return retval
-
-
-def clearbtm():
-    """
-    function
-    """
-    draw.rect(SCREEN, WHITE, [0, SIZE[1] - 340, SIZE[0], 340])
 
 
 def draw_my_hp_bar():
@@ -250,6 +204,13 @@ def draw_my_poke_balls(team):
     return [MYHPBAR_RECT]
 
 
+def draw_opp_lvl(pkmn):
+    """
+    function
+    """
+    return [word_builder('%' + str(pkmn.lvl) + ' ', 230, 60)]
+
+
 def draw_opp_hp_bar():
     """
     function
@@ -257,14 +218,6 @@ def draw_opp_hp_bar():
     draw.rect(SCREEN, WHITE, OPPHPBAR_RECT)
     SCREEN.blit(OPPHP, OPPHPBAR_RECT[:2])
     return [OPPHPBAR_RECT]
-
-
-def draw_opp_lvl(pkmn):
-    """
-    function
-    """
-    return [word_builder('%' + str(pkmn.lvl) + ' ', 230, 60)]
-
 
 def draw_opp_hp(pkmn):
     """
@@ -850,12 +803,10 @@ def update_move(selector):
         word_builder([' ', ' ', ' ', '>'][selector], 300, SIZE[1] - 393))
     display.update(dirty)
 
-
-def move_choose(pkmn):
+def draw_moves(selector):
     """
     function
     """
-    selector = 0
     dirty = []
     dirty.append(word_builder(
         ['>', ' ', ' ', ' '][selector] + pkmn.moves[0].name.upper(), 300, SIZE[1] - 573))
@@ -866,6 +817,15 @@ def move_choose(pkmn):
     dirty.append(word_builder(
         [' ', ' ', ' ', '>'][selector] + pkmn.moves[3].name.upper(), 300, SIZE[1] - 393))
     display.update(dirty)
+
+
+
+def move_choose(pkmn):
+    """
+    function
+    """
+    selector = 0
+    draw_move(selector)
     pygame.event.clear()
     while True:
         update_move(selector)
@@ -927,7 +887,7 @@ def new_move(pkmn, move):
                     write_btm(pkmn.name.upper() + ' learned', move.name + '!'))
                 setattr(pkmn, 'pp' + str(retval + 1), 0)
                 setattr(pkmn, 'move' + str(retval + 1), move)
-                pkmn.moves[retval] = Move(move, 0)
+                pkmn.moves[retval] = tmpMove(move, 0)
                 db.add(pkmn)
                 db.commit()
                 SCREEN.blit(orig, (0, 0))
@@ -978,7 +938,7 @@ def gain_exp(me, opp, multi):
                         setattr(mon, 'move' + str(len(mon.moves) + 1), tmp)
                         display.update(
                             write_btm(mon.name + ' learned', tmp.name))
-                        mon.moves.append(Move(tmp, 0))
+                        mon.moves.append(tmpMove(tmp, 0))
                     else:
                         new_move(mon, tmp)
     me.used.clear()
@@ -1124,32 +1084,6 @@ def run_opp_swap(opp, val):
     """
     opp.set_current(val)
     draw_all_opp(opp.current)
-
-
-def wait_for_button():
-    """
-    function
-    """
-    pygame.event.clear()
-    c = 1
-    tmp = False
-    display.update(word_builder('^',SIZE[0]-120, SIZE[1]-120))
-    while True:
-        if r.get('lock'):
-            raise OppMoveOccuring
-        for event_ in pygame.event.get():
-            if event_.type == pygame.KEYDOWN:
-                return
-        if c % 4 == 0:
-            if tmp:
-                display.update(word_builder('^',SIZE[0]-120, SIZE[1]-120))
-            else:
-                display.update(word_builder(' ',SIZE[0]-120, SIZE[1]-120))
-            tmp = not tmp
-            c = 1
-        else:
-            c += 1
-        sleep(.1)
 
 
 def shop_selecting(select):
@@ -1525,7 +1459,7 @@ def use(me, item, mon):
             setattr(mon, 'move' + str(len(mon.moves) + 1), move)
             display.update(
                 write_btm(mon.name + ' learned', move.name))
-            mon.moves.append(Move(move, 0))
+            mon.moves.append(tmpMove(move, 0))
             db.commit()
             learned = True
         else:
@@ -1553,7 +1487,7 @@ def use(me, item, mon):
                 setattr(mon, 'move' + str(len(mon.moves) + 1), tmp)
                 display.update(
                     write_btm(mon.name + ' learned', tmp.name))
-                mon.moves.append(Move(tmp, 0))
+                mon.moves.append(tmpMove(tmp, 0))
             else:
                 new_move(mon, tmp)
 
@@ -1819,7 +1753,53 @@ def buy(me, shopp):
     display.flip()
     selector = 0
     update_shop(shopp, selector)
+    pygame.key.set_repeat(100, 50)
     while True:
+        #pygame.time.wait(100)
+        #keys = pygame.key.get_pressed()
+        #if pygame.key.get_pressed()[pygame.K_UP]:
+        #    if selector > 0:
+        #        selector -= 1
+        #        update_shop(shopp, selector)
+        #    elif shopp.items[0] != shopp.shownitems[0]:
+        #        shopp.shift_items_left()
+        #        update_shop(shopp, selector)
+        #    pygame.time.wait(10)
+        #if pygame.key.get_pressed()[pygame.K_DOWN]:
+        #    if selector < 2 and selector < len(shopp.shownitems) - 1:
+        #        selector += 1
+        #        update_shop(shopp, selector)
+        #    elif len(shopp.shownitems) > 3:
+        #        shopp.shift_items_right()
+        #        update_shop(shopp, selector)
+        #    pygame.time.wait(10)
+        #if pygame.key.get_pressed()[pygame.K_x]:
+        #    return False
+        #if pygame.key.get_pressed()[pygame.K_z]:
+        #    item = shopp.shownitems[selector]
+        #    if item.name != 'CANCEL':
+        #        retval = amount(item)
+        #        if retval:
+        #            display.update(
+        #                write_btm(item.name + '?', 'That will be'))
+        #            wait_for_button()
+        #            display.update(
+        #                write_btm('That will be', '<' + str(item.buyprice * retval) + '. OK?'))
+        #            ret = conf()
+        #            if ret:
+        #                do_purchase(me, item, retval)
+        #                update_shop(shopp, selector)
+        #            else:
+        #                display.update(
+        #                    draw.rect(SCREEN, WHITE, [460, SIZE[1] - 830, 700, 490]))
+        #                update_shop(shopp, selector)
+
+        #        else:
+        #            display.update(
+        #                draw.rect(SCREEN, WHITE, [460, SIZE[1] - 830, 700, 490]))
+        #            update_shop(shopp, selector)
+        #    else:
+        #        return False
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
                 if selector > 0:
@@ -1828,6 +1808,7 @@ def buy(me, shopp):
                 elif shopp.items[0] != shopp.shownitems[0]:
                     shopp.shift_items_left()
                     update_shop(shopp, selector)
+                pygame.time.wait(10)
             if event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
                 if selector < 2 and selector < len(shopp.shownitems) - 1:
                     selector += 1
@@ -1835,6 +1816,7 @@ def buy(me, shopp):
                 elif len(shopp.shownitems) > 3:
                     shopp.shift_items_right()
                     update_shop(shopp, selector)
+                pygame.time.wait(10)
             if event.type == pygame.KEYDOWN and event.key == pygame.K_x:
                 return False
             if event.type == pygame.KEYDOWN and event.key == pygame.K_z:
@@ -2407,4 +2389,4 @@ def run_game(me, opp, mode, socket):
 
 
 from pokepong.domove import do_move, usable_move
-from pokepong.models import Pokemon, Owned, Move, OwnedItem, shoppe, TmHm
+from pokepong.models import Pokemon, Owned, tmpMove, OwnedItem, shoppe, TmHm

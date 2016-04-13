@@ -112,6 +112,26 @@ class Move(Base):
     def has_pp(self):
         return self.pp > 0
 
+class tmpMove(object):
+
+    def __init__(self, move, ppup):
+        self.name = move.name
+        self.type_id = move.type_id
+        self.type_ = move.type_
+        self.maxpp = move.maxpp + ppup
+        self.power = move.power
+        self.acc = move.acc
+        self.pp = self.maxpp
+        self.high_crit = False
+        if self.name in ['Crabhammer','Slash','Karate Chop','Razor lear']:
+            self.high_crit = True
+        self.disabled = False
+
+    def usepp(self):
+        self.pp -= 1
+
+    def has_pp(self):
+        return self.pp > 0
 
 class Trainer(Base):
     __tablename__ = 'trainer'
@@ -336,13 +356,13 @@ class Owned(Base):
         self.speed = self.calcstat(self.base.speed, self.speedev, self.speediv)
 
     def load_moves(self):
-        self.moves = [Move(self.move1,self.pp1)]
+        self.moves = [tmpMove(self.move1,self.pp1)]
         if self.move2:
-            self.moves.append(Move(self.move2,self.pp2))
+            self.moves.append(tmpMove(self.move2,self.pp2))
         if self.move3:
-            self.moves.append(Move(self.move3,self.pp3))
+            self.moves.append(tmpMove(self.move3,self.pp3))
         if self.move4:
-            self.moves.append(Move(self.move4,self.pp4))
+            self.moves.append(tmpMove(self.move4,self.pp4))
 
 
     def check_evolve(self):
@@ -664,7 +684,7 @@ class Owned(Base):
         moves = defend.moves
         self.moves = []
         for i in moves:
-            self.moves.append(Move(i,0))
+            self.moves.append(tmpMove(i,0))
         for i in self.moves:
             i.pp = i.maxpp = 5
         self.attack_stage = defend.attack_stage

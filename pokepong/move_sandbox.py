@@ -696,6 +696,12 @@ def do_barrier(attacker, defender, attacking):
     s.stop()
 
 
+def do_bide_prep(attacker, defender, attacking):
+    if attacking:
+        pass
+    else:
+        pass
+
 def do_bide(attacker, defender, attacking):
     s = Sound("sounds/Bide.ogg")
     s.play()
@@ -1157,7 +1163,7 @@ def do_glare(attacker, defender, attacking):
 
 
 def do_growl(attacker, defender, attacking):
-    s = Sound(attacker.base.name + '.ogg')
+    s = Sound('sounds/crys/' + attacker.base.name + '.ogg')
     s.play()
     if attacking:
         pass  # TODO attacking
@@ -1486,11 +1492,6 @@ def do_minimize(attacker, defender, attacking):
     s.stop()
 
 
-def do_mirror_move(attacker, defender, attacking):
-    meth = getattr(sys.modules[__name__], 'do_' + defender.lastmove.name.lower().replace(' ', '_').replace('-', '_'))
-    meth(attacker, defender, attacking)
-
-
 def do_mist(attacker, defender, attacking):
     s = Sound("sounds/Mist.ogg")
     s.play()
@@ -1700,7 +1701,7 @@ def do_rest(attacker, defender, attacking):
 
 
 def do_roar(attacker, defender, attacking):
-    s = Sound(attacker.base.name + '.ogg')
+    s = Sound('sounds/crys/' + attacker.base.name + '.ogg')
     s.play()
     if attacking:
         pass  # TODO attacking

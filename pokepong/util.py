@@ -1,14 +1,111 @@
 from pygame.image import load
+from pygame import display, draw
 import json
 import random
 import sys
 import zmq
+from math import floor
+
+SIZE = (1280, 1024)
+WHITE = (253, 236, 254)
+GREEN = (63, 156, 79)
+YELLOW = (255, 228, 104)
+RED = (209, 71, 40)
+GREY = (108, 108, 108)
+BLACK = (0, 0, 0)
 IMAGES = 'images/'
+MYHP_RECT = [SIZE[0] - 532, SIZE[1] - 486, 399, 14]
+OPPHP_RECT = [227, 141, 399, 15]
 
 HIGH_ARC = [(101, 302), (234, 120), (402, -26), (420, -54), (460, -100), (490, -110),
             (520, -100), (580, -80), (640, -60), (700, -5), (760, 50)]
 LOW_ARC = []
 
+
+def clearbtm():
+    """
+    function
+    """
+    draw.rect(SCREEN, WHITE, [0, SIZE[1] - 340, SIZE[0], 340])
+
+def word_builder(word, start_x, start_y):
+    """
+    function
+    """
+    x = start_x
+    draw.rect(SCREEN, WHITE, [x, start_y, len(word) * 56, 60])
+    for l in word:
+        SCREEN.blit(ALPHA, (start_x, start_y), ALPHA_DICT[l])
+        start_x += 56
+    return [x, start_y, len(word) * 56, 60]
+
+def write_btm(*args):
+    """
+    function
+    """
+    clearbtm()
+    retval = []
+    retval.append(SCREEN.blit(BTM, BTM_TUPLE))
+    retval.append(word_builder(args[0], 50, SIZE[1] - 250))
+    try:
+        retval.append(word_builder(args[1], 50, SIZE[1] - 130))
+    except IndexError:
+        pass
+    return retval
+
+def draw_opp_hp(pkmn):
+    """
+    function
+    """
+    maxhp = pkmn.maxhp
+    hp = pkmn.hp
+    bar_len = floor(hp / float(maxhp) * 399)
+    if bar_len < 100:
+        color = RED
+    elif bar_len < 200:
+        color = YELLOW
+    else:
+        color = GREEN
+    draw.rect(SCREEN, WHITE, OPPHP_RECT)
+    if hp > 0:
+        draw.rect(
+            SCREEN, color, [OPPHP_RECT[0], OPPHP_RECT[1], bar_len, OPPHP_RECT[3]])
+    return [OPPHP_RECT]
+
+def draw_my_hp(pkmn):
+    """
+    function
+    """
+    maxhp = pkmn.maxhp
+    hp = pkmn.hp
+    bar_len = floor(hp / float(maxhp) * 399)
+    if bar_len < 100:
+        color = RED
+    elif bar_len < 200:
+        color = YELLOW
+    else:
+        color = GREEN
+    if 10 <= maxhp < 100:
+        maxhp = ' ' + str(maxhp)
+    elif maxhp < 10:
+        maxhp = '  ' + str(maxhp)
+    else:
+        maxhp = str(maxhp)
+    if 10 <= hp < 100:
+        hp = ' ' + str(hp)
+    elif hp < 10:
+        hp = '  ' + str(hp)
+    else:
+        hp = str(hp)
+    draw.rect(SCREEN, WHITE, MYHP_RECT)
+    if hp > 0:
+        draw.rect(
+            SCREEN, color, [MYHP_RECT[0], MYHP_RECT[1], bar_len, MYHP_RECT[3]])
+    retval = []
+    retval.append(MYHP_RECT)
+    retval.append(
+        word_builder('{0}/{1}'.format(hp, maxhp), SIZE[0] - 570, SIZE[1] - 445))
+    return retval
 
 def send_move(move, socket):
     """
@@ -136,3 +233,41 @@ def get_team(socket, client):
         tmp = json.loads(socket.recv(zmq.NOBLOCK))
         set_seed(tmp[2])
         return tmp[:2]
+
+def wait_for_button():
+    """
+    function
+    """
+    pygame.event.clear()
+    c = 1
+    tmp = False
+    display.update(word_builder('^',SIZE[0]-120, SIZE[1]-120))
+    while True:
+        if r.get('lock'):
+            raise OppMoveOccuring
+        for event_ in pygame.event.get():
+            if event_.type == pygame.KEYDOWN:
+                return
+        if c % 4 == 0:
+            if tmp:
+                display.update(word_builder('^',SIZE[0]-120, SIZE[1]-120))
+            else:
+                display.update(word_builder(' ',SIZE[0]-120, SIZE[1]-120))
+            tmp = not tmp
+            c = 1
+        else:
+            c += 1
+        sleep(.1)
+
+
+SCREEN = display.set_mode(SIZE)
+ALPHA = loadalphaimg('alphafull.png')
+BTM = loadalphaimg('btmclean.png')
+BTM_TUPLE = (10, SIZE[1] - 340)
+MYHP = loadalphaimg('myhp.png')
+OPPHP = loadalphaimg('opphp.png')
+
+ALPHA_DICT = alphabet()
+OPPHP_RECT = [227, 141, 399, 15]
+MYHPBAR_RECT = [
+    SIZE[0] - 700, SIZE[1] - 505, MYHP.get_width(), MYHP.get_height()]
