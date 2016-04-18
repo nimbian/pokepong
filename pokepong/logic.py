@@ -274,7 +274,6 @@ def draw_opp_poke_balls(team):
         else:
             SCREEN.blit(ALIVE, (180 + offset * 65, 132))
         offset += 1
-    print offset
     for i in range(offset, 6):
         SCREEN.blit(NOMON, (180 + i * 65, 132))
     return [OPPHPBAR_RECT]
@@ -1269,7 +1268,12 @@ def choose_loc(selector):
                     return ['S.S. ANNE TRUCK', 'wild', 0]
                 else:
                     if selector > 0:
-                        tmp = wild_or_trainer()
+                        if ROUTES.has_key(MAPROUTE[selector]) and TRAINERS.has_key(MAPROUTE[selector]):
+                            tmp = wild_or_trainer()
+                        elif ROUTES.has_key(MAPROUTE[selector]):
+                            tmp = 0
+                        else:
+                            tmp = 1
                     else:
                         return [MAPROUTE[selector], None, selector]
                     if tmp >= 0:
