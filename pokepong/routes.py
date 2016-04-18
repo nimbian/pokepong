@@ -1,4 +1,5 @@
 ROUTES = {}
+TRAINERS = {}
 MAPLIST = [[273,662],[273,613],[273,390],[273,277],[329,277],
            [385,215],[497,160],[600,160],[721,109],[775,60],[721,221],
            [721,499],[889,160],[945,215],[945,277],[889, 326],
@@ -221,3 +222,13 @@ ROUTES['SAFARI ZONE AREA 3'] = {
 	'Tauros': [[26,26],.08],
 	'Kangashkhan': [[28,28],.04]
 }
+
+ROUTES['S.S. ANNE TRUCK'] = {
+        'Mew': [[5,5],1]
+}
+TRAINERS['ROUTE 1'] = [['Bug Catcher', 60, [['Weedle', 6],
+                                           ['Caterpie', 6]]],
+                       ['Bug Catcher', 70, [['Weedle', 7],
+                                           ['Kakuna', 7],
+                                           ['Weedle', 7]]],
+                       ['Bug Catcher', 60, [['Weedle', 9]]]]

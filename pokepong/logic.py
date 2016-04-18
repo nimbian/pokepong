@@ -7,7 +7,7 @@ from pokepong.util import alphabet, randint, choice, HIGH_ARC
 from time import sleep
 from math import floor
 import json
-from pokepong.routes import ROUTES, MAPLIST, MAPROUTE
+from pokepong.routes import ROUTES, MAPLIST, MAPROUTE, TRAINERS
 from pokepong.database import db
 from pokepong.util import word_builder, write_btm, draw_my_hp
 from pokepong.util import draw_opp_hp, wait_for_button, clearbtm
@@ -96,6 +96,8 @@ def draw_map():
     """
     SCREEN.blit(MAP, (0, 0))
 
+def get_trainers(loc):
+    return choice(TRAINERS[loc])
 
 def get_wild_mon(route):
     """
@@ -107,6 +109,10 @@ def get_wild_mon(route):
         poss.extend([i] * int((tmp[i][1] * 100)))
     name = choice(poss)
     lvl = randint(tmp[name][0][0], tmp[name][0][1])
+    return get_mon(name, lvl)
+
+
+def get_mon(name, lvl):
     pkmn = Owned(Pokemon.query.filter(Pokemon.name == name).one().id, lvl=lvl)
     pkmn.exp = {'f': int(4 * lvl ** 3 / 5.),
                 'mf': lvl ** 3,
@@ -268,8 +274,9 @@ def draw_opp_poke_balls(team):
         else:
             SCREEN.blit(ALIVE, (180 + offset * 65, 132))
         offset += 1
+    print offset
     for i in range(offset, 6):
-        SCREEN.blit(NOMON, (180 + (i - 1) * 65, 132))
+        SCREEN.blit(NOMON, (180 + i * 65, 132))
     return [OPPHPBAR_RECT]
 
 
@@ -1183,6 +1190,41 @@ def draw_choose_items(me):
             if event.type == pygame.KEYDOWN and event.key == pygame.K_z:
                 return selector
 
+def w_or_t(select):
+    """
+    function
+    """
+    dirty = []
+    dirty.append(word_builder(['>', ' '][select] + 'WILD', 50, 465))
+    dirty.append(word_builder([' ', '>'][select] + 'TRAINER', 50, 575))
+    display.update(dirty)
+
+def wild_or_trainer():
+    """
+    function
+    """
+    display.update(draw.rect(
+        SCREEN, WHITE, [3, 408, CONF.get_width() + 14, CONF.get_height() + 14]))
+    display.update(SCREEN.blit(CONF, (10, 415)))
+    select = 0
+    pygame.event.clear()
+    w_or_t(select)
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
+                if select == 0:
+                    select = 1
+                    w_or_t(select)
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
+                if select == 1:
+                    select = 0
+                    w_or_t(select)
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_x:
+                return -1
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_z:
+                return select
+        sleep(.02)
+
 
 def choose_loc(selector):
     """
@@ -1190,9 +1232,14 @@ def choose_loc(selector):
     """
     draw_location(selector)
     pygame.event.clear()
+    tmp = []
+    flag = False
     while True:
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
+                tmp.append('U')
+                tmp = tmp[-8:]
+                flag = False
                 if selector < len(MAPROUTE) - 1:
                     selector += 1
                     draw_loc_update(selector - 1, selector)
@@ -1200,14 +1247,39 @@ def choose_loc(selector):
                     selector = 0
                     draw_loc_update(len(MAPROUTE) - 1, selector)
             if event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
+                tmp.append('D')
+                tmp = tmp[-8:]
+                flag = False
                 if selector > 0:
                     selector -= 1
                     draw_loc_update(selector + 1, selector)
                 else:
                     selector = len(MAPROUTE) - 1
                     draw_loc_update(0, selector)
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT:
+                tmp.append('L')
+                tmp = tmp[-8:]
+                flag = False
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_RIGHT:
+                tmp.append('R')
+                tmp = tmp[-8:]
+                flag = False
             if event.type == pygame.KEYDOWN and event.key == pygame.K_z:
-                return [MAPROUTE[selector], selector]
+                if flag:
+                    return ['S.S. ANNE TRUCK', 'wild', 0]
+                else:
+                    if selector > 0:
+                        tmp = wild_or_trainer()
+                    else:
+                        return [MAPROUTE[selector], None, selector]
+                    if tmp >= 0:
+                        return [MAPROUTE[selector], ['wild', 'random'][tmp], selector]
+                    else:
+                        draw_location(selector)
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_x:
+                if tmp == ['U', 'U', 'D', 'D', 'L', 'R', 'L', 'R']:
+                    flag = True
+
 
 
 def update_shop(shopp, select):
@@ -1684,15 +1756,17 @@ def shop_choice():
     display.update(SCREEN.blit(SHOP_CHOICE, (10, 10)))
     select = 0
     pygame.event.clear()
+    shop_selecting(select)
     while True:
-        shop_selecting(select)
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
                 if select < 3:
                     select += 1
+                    shop_selecting(select)
             if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
                 if select > 0:
                     select -= 1
+                    shop_selecting(select)
             if event.type == pygame.KEYDOWN and ((event.key == pygame.K_z and select == 3) or event.key == pygame.K_x):
                 return -1
             if event.type == pygame.KEYDOWN and event.key == pygame.K_z:
@@ -1708,15 +1782,17 @@ def conf():
     display.update(SCREEN.blit(CONF, (10, 415)))
     select = 0
     pygame.event.clear()
+    selecting(select)
     while True:
-        selecting(select)
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
                 if select == 0:
                     select = 1
+                    selecting(select)
             if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
                 if select == 1:
                     select = 0
+                    selecting(select)
             if event.type == pygame.KEYDOWN and ((event.key == pygame.K_z and select == 1) or event.key == pygame.K_x):
                 return False
             if event.type == pygame.KEYDOWN and event.key == pygame.K_z:
@@ -2094,6 +2170,11 @@ def lost(me, mode):
         wait_for_button()
     else:
         sleep(2)
+    if mode == 'battle':
+        cash = min(me.money, opp.money) / 2
+        display.update(write_btm(me.name + ' lost', '<' + str(cash)))
+        me.money -= cash
+        db.commit()
     SCREEN.fill(GREY)
     display.flip()
     sleep(.5)
@@ -2115,6 +2196,19 @@ def win(me, opp, mode):
         wait_for_button()
     else:
         sleep(2)
+    if mode == 'random':
+        display.update(write_btm(me.name + ' gained', '<' + str(opp.money)))
+        me.money += opp.money
+        db.commit()
+        wait_for_button()
+    elif mode == 'battle':
+        cash = min(me.money, opp.money) / 2
+        display.update(write_btm(me.name + ' gained', '<' + str(cash)))
+        me.money += cash
+        db.commit()
+        wait_for_button()
+
+
 
 
 def run_pong(me, opp):

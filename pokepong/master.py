@@ -9,7 +9,7 @@ from pokepong.logic import win, lost, opp_next_mon, gain_exp, evolve
 from pokepong.logic import battle_logic, run_opp_faint, run_me_faint
 from pokepong.logic import me_next_mon, new_game_start, clear, Sound
 from pokepong.logic import draw_choice, scrolling, choose_loc, intro
-from pokepong.logic import clearbtm, run_game
+from pokepong.logic import clearbtm, run_game, get_trainers, get_mon
 from pokepong.models import Trainer, Owned
 from redis import StrictRedis
 import json
@@ -119,15 +119,25 @@ def main():
                 # TODO uncomment for PROD
                 # sleep(5)
         if mode == 'wild':
-            loc, remember = choose_loc(remember)
+            loc, wild, remember = choose_loc(remember)
             if loc == 'PALLET TOWN':
                 shop(me)
                 new_game = False
                 continue
             else:
-                opp = Trainer('')
-                opp.pkmn = [get_wild_mon(loc)]
-                opp.current = opp.pkmn[0]
+                if wild == 'wild':
+                    opp = Trainer('')
+                    opp.pkmn = [get_wild_mon(loc)]
+                    opp.current = opp.pkmn[0]
+                else:
+                    mode = 'random'
+                    trainer = get_trainers(loc)
+                    opp = Trainer(trainer[0])
+                    opp.money = trainer[1]
+                    opp.pkmn = []
+                    for i in trainer[2]:
+                        opp.pkmn.append(get_mon(i[0], i[1]))
+                    opp.current = opp.pkmn[0]
         opp.initialize()
         music.play()
         new_game_start(me, opp, mode)
@@ -190,3 +200,5 @@ def main():
             tmp = mon.check_evolve()
             if tmp:
                 evolve(mon, tmp)
+        if mode == 'random':
+            mode = 'wild'

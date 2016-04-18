@@ -755,7 +755,7 @@ def freeze(pokemon):
     function
     """
     if 'FRZ' in pokemon.buffs:
-        return
+        return 0
     else:
         pokemon.buffs.append('FRZ')
         display.update(write_btm(pokemon.name, 'has been frozen!'))
@@ -769,7 +769,7 @@ def paralyze(pokemon):
     if 'PAR' in pokemon.buffs:
         display.update(write_btm('but it failed'))
         sleep(1)
-        return
+        return 0
     else:
         pokemon.buffs.append('PAR')
         display.update(write_btm(pokemon.name, 'was paralyzed!'))
@@ -795,7 +795,7 @@ def flinch(pokemon):
     function
     """
     if 'FLINCH' in pokemon.buffs:
-        return
+        return 0
     else:
         pokemon.buffs.append('FLINCH')
 
