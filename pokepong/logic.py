@@ -35,6 +35,7 @@ FAINTED = loadalphaimg('fainted.png')
 NOMON = loadalphaimg('nomon.png')
 FORGET = loadalphaimg('forget.png')
 CONF = loadalphaimg('conf.png')
+WORT = loadalphaimg('wort.png')
 LOGO = loadalphaimg('logo.png')
 TRAINER = loadalphaimg('trainer.png')
 TRAINERBACK = loadalphaimg('trainerback.png')
@@ -1194,8 +1195,8 @@ def w_or_t(select):
     function
     """
     dirty = []
-    dirty.append(word_builder(['>', ' '][select] + 'WILD', 50, 465))
-    dirty.append(word_builder([' ', '>'][select] + 'TRAINER', 50, 575))
+    dirty.append(word_builder(['>', ' '][select] + 'WILD', 50, 810))
+    dirty.append(word_builder([' ', '>'][select] + 'TRAINER', 50, 910))
     display.update(dirty)
 
 def wild_or_trainer():
@@ -1203,8 +1204,8 @@ def wild_or_trainer():
     function
     """
     display.update(draw.rect(
-        SCREEN, WHITE, [3, 408, CONF.get_width() + 14, CONF.get_height() + 14]))
-    display.update(SCREEN.blit(CONF, (10, 415)))
+        SCREEN, WHITE, [0, 748, WORT.get_width() + 14, WORT.get_height() + 17]))
+    display.update(SCREEN.blit(WORT, (10, 755)))
     select = 0
     pygame.event.clear()
     w_or_t(select)
@@ -1269,15 +1270,15 @@ def choose_loc(selector):
                 else:
                     if selector > 0:
                         if ROUTES.has_key(MAPROUTE[selector]) and TRAINERS.has_key(MAPROUTE[selector]):
-                            tmp = wild_or_trainer()
+                            tmps = wild_or_trainer()
                         elif ROUTES.has_key(MAPROUTE[selector]):
-                            tmp = 0
+                            tmps = 0
                         else:
-                            tmp = 1
+                            tmps = 1
                     else:
                         return [MAPROUTE[selector], None, selector]
-                    if tmp >= 0:
-                        return [MAPROUTE[selector], ['wild', 'random'][tmp], selector]
+                    if tmps >= 0:
+                        return [MAPROUTE[selector], ['wild', 'random'][tmps], selector]
                     else:
                         draw_location(selector)
             if event.type == pygame.KEYDOWN and event.key == pygame.K_x:
@@ -1782,7 +1783,7 @@ def conf():
     function
     """
     display.update(draw.rect(
-        SCREEN, WHITE, [3, 408, CONF.get_width() + 14, CONF.get_height() + 14]))
+        SCREEN, WHITE, [3, 407, CONF.get_width() + 14, CONF.get_height() + 15]))
     display.update(SCREEN.blit(CONF, (10, 415)))
     select = 0
     pygame.event.clear()
