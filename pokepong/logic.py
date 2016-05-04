@@ -1270,15 +1270,15 @@ def choose_loc(selector):
                 else:
                     if selector > 0:
                         if ROUTES.has_key(MAPROUTE[selector]) and TRAINERS.has_key(MAPROUTE[selector]):
-                            tmps = wild_or_trainer()
+                            tmp2 = wild_or_trainer()
                         elif ROUTES.has_key(MAPROUTE[selector]):
-                            tmps = 0
+                            tmp2 = 0
                         else:
-                            tmps = 1
+                            tmp2 = 1
                     else:
                         return [MAPROUTE[selector], None, selector]
-                    if tmps >= 0:
-                        return [MAPROUTE[selector], ['wild', 'random'][tmps], selector]
+                    if tmp2 >= 0:
+                        return [MAPROUTE[selector], ['wild', 'random'][tmp2], selector]
                     else:
                         draw_location(selector)
             if event.type == pygame.KEYDOWN and event.key == pygame.K_x:
