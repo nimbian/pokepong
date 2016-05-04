@@ -1921,6 +1921,7 @@ def shop(me):
         elif retval == 2:
             using(me)
         elif retval == -1:
+            SHOP.stop()
             return False
 
 
