@@ -647,6 +647,7 @@ def display_stat(defend, diff, stat):
     if diff == -2:
         tmp = 'greatly fell!'
     display.update(write_btm(build, tmp))
+    wait_for_button()
 
 
 def lowerability(defend, move, attack, me):
@@ -683,6 +684,7 @@ def lowerability(defend, move, attack, me):
 
     else:
         display.update(write_btm('but if failed!'))
+    wait_for_button()
     return 0
 
 
@@ -722,6 +724,7 @@ def raiseability(attack, move, defend, me):
         display.update(write_btm(build, tmp))
     else:
         display.update(write_btm('But nothing happened!'))
+    wait_for_button()
     return 0
 
 

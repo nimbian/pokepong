@@ -239,6 +239,7 @@ def get_team(socket, client):
         return tmp[:2]
 
 def wait_for_button():
+    #TODO only wait on mode != pong
     """
     function
     """
