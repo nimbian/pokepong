@@ -69,16 +69,16 @@ ROUTES['ROUTE 24'] = {
 	'Oddish': [[12,14],.2],
 	'Abra': [[8,12],.15],
 	'Pidgey': [[12,13],.15],
-	'Weedle': [[8],.15],
-	'Caterpie': [[8],.15]
+	'Weedle': [[8,8],.15],
+	'Caterpie': [[8,8],.15]
 }
 ROUTES['ROUTE 25'] = {
 	'Bellsprout': [[12,14],.2],
 	'Oddish': [[12,14],.2],
 	'Abra': [[8,12],.15],
 	'Pidgey': [[12,13],.15],
-	'Weedle': [[8],.15],
-	'Caterpie': [[8],.15]
+	'Weedle': [[8,8],.15],
+	'Caterpie': [[8,8],.15]
 }
 ROUTES['ROUTE 5'] = {
 	'Oddish': [[13,16],.25],
