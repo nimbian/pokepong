@@ -75,13 +75,13 @@ def dmg_pkmn(pkmn, dmg, me):
             pkmn.bidedmg += dmg * 2
         if dmg > 0:
             for d in range(dmg):
+                if pkmn.hp <= 0:
+                    return 1
                 pkmn.sethp(pkmn.hp - 1)
                 if not me:
                     display.update(draw_my_hp(pkmn))
                 else:
                     display.update(draw_opp_hp(pkmn))
-                if pkmn.hp == 0:
-                    return 1
                 sleep(.02)
         else:
             for d in range(0, dmg, -1):
