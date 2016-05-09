@@ -957,6 +957,7 @@ def do_evolve(oldpic, newpic):
     function
     """
     sleep(2)
+    pygame.event.clear()
     for i in range(100):
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN and event.key == pygame.K_x:
@@ -1496,6 +1497,7 @@ def usable_on(me, item):
     count = 0
     select = 0
     tmp = True
+    pygame.event.clear()
     while True:
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
@@ -1679,6 +1681,8 @@ def sell(me):
         display.flip()
         selector = 0
         update_sell(me, selector)
+        pygame.event.clear()
+        pygame.key.set_repeat(100, 50)
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
@@ -1863,6 +1867,7 @@ def buy(me, shopp):
     display.flip()
     selector = 0
     update_shop(shopp, selector)
+    pygame.event.clear()
     pygame.key.set_repeat(100, 50)
     while True:
         for event in pygame.event.get():

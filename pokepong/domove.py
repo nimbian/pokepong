@@ -395,7 +395,7 @@ def do_move(attack, defend, move, mode, me, first):
         elif attack.lastmove.name in WRAP:
             display.update(write_btm(attack.name + "'s", 'attack continues'))
             defend.wrapped -= 1
-            if defend.wrapped == 0:
+            if defend.wrapped <= 0:
                 attack.controllable = True
             return do_attacks(attack, defend, move, me)
         elif attack.lastmove.name in THRASH:
@@ -466,7 +466,7 @@ def wrap(attack, defend, move, me):
     function
     """
     attack.controllable = False
-    defend.wrapped = randint(2, 5)
+    defend.wrapped = randint(3, 7)
     return do_attacks(attack, defend, move, me)
 
 

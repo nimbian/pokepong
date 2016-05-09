@@ -482,18 +482,18 @@ class Owned(Base):
         if 'BRN' in self.buffs:
             retval = dmg_pkmn(self, int(self.maxhp*(1/8.)), not me)
             if me:
-                display.update(write_btm(self.name + 'was', 'hurt by the burn'))
+                display.update(write_btm(self.name + ' was', 'hurt by the burn'))
             else:
-                display.update(write_btm('Enemy' + self.name + 'was', 'hurt by the burn'))
+                display.update(write_btm('Enemy' + self.name + ' was', 'hurt by the burn'))
             wait_for_button()
             if retval:
                 return 1
         if 'PSN' in self.buffs:
             retval = dmg_pkmn(self, int(self.maxhp*(1/8.)), not me)
             if me:
-                display.update(write_btm(self.name + 'was', 'hurt by the poison'))
+                display.update(write_btm(self.name + ' was', 'hurt by the poison'))
             else:
-                display.update(write_btm('Enemy' + self.name + 'was', 'hurt by the poison'))
+                display.update(write_btm('Enemy' + self.name + ' was', 'hurt by the poison'))
             wait_for_button()
             if retval:
                 return 1
@@ -509,9 +509,9 @@ class Owned(Base):
             self.hp -= self.maxhp*(tticks/8.)
             retval = dmg_pkmn(self, int(self.maxhp*(1/8.)), not me)
             if me:
-                display.update(write_btm(self.name + 'was', 'hurt by the poison'))
+                display.update(write_btm(self.name + ' was', 'hurt by the poison'))
             else:
-                display.update(write_btm('Enemy' + self.name + 'was', 'hurt by the poison'))
+                display.update(write_btm('Enemy' + self.name + ' was', 'hurt by the poison'))
             tticks += 1
             wait_for_button()
             if retval:
