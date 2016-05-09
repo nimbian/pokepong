@@ -183,6 +183,7 @@ def main():
                 break
             elif tmp == 5:
                 break
+        music.stop()
         if mode == 'pong':
             #TODO add play_again
             if play_again(me.alive()):
