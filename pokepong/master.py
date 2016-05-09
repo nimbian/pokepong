@@ -169,6 +169,7 @@ def main():
                     opp_next_mon(me, opp, mode, socket)
                 else:
                     music.stop()
+                    #TODO fade in
                     music_vict.play()
                     win(me, opp, mode)
                     music_vict.stop()

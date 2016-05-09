@@ -1921,7 +1921,7 @@ def shop(me):
     function
     """
     shopp = shoppe()
-    SHOP.play()
+    SHOP.play(-1)
     while True:
         clear()
         draw_money(me)
