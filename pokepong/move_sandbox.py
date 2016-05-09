@@ -1163,13 +1163,13 @@ def do_glare(attacker, defender, attacking):
 
 
 def do_growl(attacker, defender, attacking):
-    s = Sound('sounds/crys/' + attacker.base.name + '.ogg')
-    s.play()
+    #s = Sound('sounds/crys/' + attacker.base.name + '.ogg')
+    #s.play()
     if attacking:
         pass  # TODO attacking
     else:
         pass  # TODO defending
-    s.stop()
+    #s.stop()
 
 
 def do_growth(attacker, defender, attacking):
@@ -1701,13 +1701,13 @@ def do_rest(attacker, defender, attacking):
 
 
 def do_roar(attacker, defender, attacking):
-    s = Sound('sounds/crys/' + attacker.base.name + '.ogg')
-    s.play()
+    #s = Sound('sounds/crys/' + attacker.base.name + '.ogg')
+    #s.play()
     if attacking:
         pass  # TODO attacking
     else:
         pass  # TODO defending
-    s.stop()
+    #s.stop()
 
 
 def do_rock_slide(attacker, defender, attacking):

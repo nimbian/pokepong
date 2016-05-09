@@ -419,7 +419,7 @@ def do_attacks(attack, defend, move, me, times=1):
     meth(attack, defend, me)
     for i in range(times):
         retval = dmg_pkmn(defend, dmg, me)
-        if crit:
+        if crit and type_ > 0:
             display.update(write_btm('Critical Hit!'))
         if retval == 1:
             break
@@ -733,12 +733,12 @@ def stat_change(pokemon, diff, stat):
     function
     """
     if 'MIST' in pokemon.buffs and diff < 0:
-        return 0
+        return [0, stat]
     meth = getattr(pokemon, 'raise_' + stat)
     if meth(diff):
         return [diff, stat]
     else:
-        return 0
+        return [0, stat]
 
 
 def burn(pokemon):

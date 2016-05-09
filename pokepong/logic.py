@@ -2066,10 +2066,20 @@ def run_opp_move(me, opp, move, first):
     """
     function
     """
-    opp.current.attempt_move(False)
-    retval = do_move(opp.current, me.current, move, 'tmp', False, first)
-    opp.current.do_status(me.current, False)
-    return retval
+    tmp = opp.current.attempt_move(True)
+    if tmp == 'OK':
+        do_move(opp.current, me.current, move, 'tmp', False, first)
+    elif tmp == 'PAR':
+        display.update(write_btm(me.current.name + ' is paralyzed!', "It can't move!"))
+    elif tmp == 'SLP':
+        display.update(write_btm(me.current.name + ' is fast asleep!'))
+    elif tmp == 'WOKE':
+        display.update(write_btm(me.current.name + ' woke up!'))
+    elif tmp == 1:
+        return
+    if opp.current.alive():
+        opp.current.do_status(opp.current, True)
+    return
 
 
 def change_pokemon(me, opp, mode):
@@ -2309,7 +2319,10 @@ def run_game(me, opp, mode, socket):
                             opp, ['move', me.current.moves.index(my_move)], mode, socket)
                         clean_me_up(me)
                         if tmp == 'move':
-                            opp_move = opp.current.moves[opp_move]
+                            if not opp.current.controllable:
+                                opp_move = opp.current.lastmove
+                            else:
+                                opp_move = opp.current.moves[opp_move]
                             if my_move.name == 'Quick Attack' != opp_move.name == 'Quick Attack':
                                 if my_move.name == 'Quick Attack':
                                     run_move(me, opp, my_move)
