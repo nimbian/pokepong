@@ -1080,10 +1080,20 @@ def run_move(me, opp, move, first):
     """
     function
     """
-    me.current.attempt_move(True)
-    retval = do_move(me.current, opp.current, move, 'tmp', True, first)
-    me.current.do_status(opp.current, True)
-    return retval
+    tmp = me.current.attempt_move(True)
+    if tmp == 'OK':
+        do_move(me.current, opp.current, move, 'tmp', True, first)
+    elif tmp == 'PAR':
+        display.update(write_btm(me.current.name + ' is paralyzed!', "It can't move!"))
+    elif tmp == 'SLP':
+        display.update(write_btm(me.current.name + ' is fast asleep!'))
+    elif tmp == 'WOKE':
+        display.update(write_btm(me.current.name + ' woke up!'))
+    elif tmp == 1:
+        return
+    if me.current.alive():
+        me.current.do_status(opp.current, True)
+    return
 
 
 def run_opp_swap(opp, val):

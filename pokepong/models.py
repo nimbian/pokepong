@@ -528,8 +528,8 @@ class Owned(Base):
         if 'FRZ' in self.buffs:
             return 'FRZ'
         if 'PAR' in self.buffs:
-            if get_random() < .5:
-                return True
+            if get_random() < .25:
+                return 'OK'
             else:
                 return 'PAR'
         if 'SLP' in self.buffs:
@@ -545,14 +545,15 @@ class Owned(Base):
             self.confused -= 1
             if choice([True, False]):
                 display.update(write_btm(self.name + 'hurt itself', "in it's confusion"))
-                return dmg_pkmn(self, self.calc_dmg(self, 'CNF'))
+                dmg = (((2 * tmp.lvl / 5 + 2) * tmp.calc_attack() * 40) / tmp.calc_defense()) / 50 + 2
+                return dmg_pkmn(self, dmg, me)
             else:
-                return True
+                return 'OK'
         elif self.confused == 0:
             display.update(write_btm(self.name, 'is confused no more'))
             self.confused -= 1
-            return True
-        return True
+            return 'OK'
+        return 'OK'
 
 
     def crit_hit(self, high_crit):
