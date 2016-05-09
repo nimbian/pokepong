@@ -75,13 +75,13 @@ def dmg_pkmn(pkmn, dmg, me):
             pkmn.bidedmg += dmg * 2
         if dmg > 0:
             for d in range(dmg):
+                if pkmn.hp <= 0:
+                    return 1
                 pkmn.sethp(pkmn.hp - 1)
                 if not me:
                     display.update(draw_my_hp(pkmn))
                 else:
                     display.update(draw_opp_hp(pkmn))
-                if pkmn.hp == 0:
-                    return 1
                 sleep(.02)
         else:
             for d in range(0, dmg, -1):
@@ -395,7 +395,7 @@ def do_move(attack, defend, move, mode, me, first):
         elif attack.lastmove.name in WRAP:
             display.update(write_btm(attack.name + "'s", 'attack continues'))
             defend.wrapped -= 1
-            if defend.wrapped == 0:
+            if defend.wrapped <= 0:
                 attack.controllable = True
             return do_attacks(attack, defend, move, me)
         elif attack.lastmove.name in THRASH:
@@ -419,7 +419,7 @@ def do_attacks(attack, defend, move, me, times=1):
     meth(attack, defend, me)
     for i in range(times):
         retval = dmg_pkmn(defend, dmg, me)
-        if crit:
+        if crit and type_ > 0:
             display.update(write_btm('Critical Hit!'))
         if retval == 1:
             break
@@ -466,7 +466,7 @@ def wrap(attack, defend, move, me):
     function
     """
     attack.controllable = False
-    defend.wrapped = randint(2, 5)
+    defend.wrapped = randint(3, 7)
     return do_attacks(attack, defend, move, me)
 
 
@@ -647,6 +647,7 @@ def display_stat(defend, diff, stat):
     if diff == -2:
         tmp = 'greatly fell!'
     display.update(write_btm(build, tmp))
+    wait_for_button()
 
 
 def lowerability(defend, move, attack, me):
@@ -683,6 +684,7 @@ def lowerability(defend, move, attack, me):
 
     else:
         display.update(write_btm('but if failed!'))
+    wait_for_button()
     return 0
 
 
@@ -722,6 +724,7 @@ def raiseability(attack, move, defend, me):
         display.update(write_btm(build, tmp))
     else:
         display.update(write_btm('But nothing happened!'))
+    wait_for_button()
     return 0
 
 
@@ -730,12 +733,12 @@ def stat_change(pokemon, diff, stat):
     function
     """
     if 'MIST' in pokemon.buffs and diff < 0:
-        return 0
+        return [0, stat]
     meth = getattr(pokemon, 'raise_' + stat)
     if meth(diff):
         return [diff, stat]
     else:
-        return 0
+        return [0, stat]
 
 
 def burn(pokemon):

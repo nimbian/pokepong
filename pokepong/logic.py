@@ -35,6 +35,7 @@ FAINTED = loadalphaimg('fainted.png')
 NOMON = loadalphaimg('nomon.png')
 FORGET = loadalphaimg('forget.png')
 CONF = loadalphaimg('conf.png')
+WORT = loadalphaimg('wort.png')
 LOGO = loadalphaimg('logo.png')
 TRAINER = loadalphaimg('trainer.png')
 TRAINERBACK = loadalphaimg('trainerback.png')
@@ -335,6 +336,37 @@ def draw_all_opp(pkmn):
     x.extend(draw_opp_hp(pkmn))
     x.extend(draw_opp_lvl(pkmn))
     display.update(x)
+
+def wild_intro():
+    speed = 1
+    for x in range(1280 / speed+1):
+        tmp = []
+        for z in range(16):
+            if z % 2:
+                tmp.append(draw.rect(SCREEN, BLACK, [1280 - speed * x, z * 64, speed, 64]))
+            else:
+                tmp.append(draw.rect(SCREEN, BLACK, [speed * x, z * 64, speed, 64]))
+        display.update(tmp)
+
+def trainer_intro():
+    speed = 64
+    count = 0
+    for tmp in range(1024/speed):
+        for x in range((count - 1) * speed, 1025-count*speed,speed):
+            display.update(draw.rect(SCREEN, BLACK, [count*speed,x,speed,speed]))
+            sleep(.005)
+        for x in range((count + 1) * speed, 1281-count*speed, speed):
+            display.update(draw.rect(SCREEN, BLACK, [x,1024-speed*(count+1),speed,speed]))
+            sleep(.005)
+        for x in range(1024-count*speed, count * speed - 1, -speed):
+            display.update(draw.rect(SCREEN, BLACK, [1280-speed * (count+1),x-speed, speed, speed]))
+            sleep(.005)
+        for x in range(1280-count*speed, count * speed, -speed):
+            display.update(draw.rect(SCREEN, BLACK, [x-speed,count*speed, speed, speed]))
+            sleep(.005)
+        count += 1
+
+
 
 
 def intro(current):
@@ -956,6 +988,7 @@ def do_evolve(oldpic, newpic):
     function
     """
     sleep(2)
+    pygame.event.clear()
     for i in range(100):
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN and event.key == pygame.K_x:
@@ -1079,10 +1112,20 @@ def run_move(me, opp, move, first):
     """
     function
     """
-    me.current.attempt_move(True)
-    retval = do_move(me.current, opp.current, move, 'tmp', True, first)
-    me.current.do_status(opp.current, True)
-    return retval
+    tmp = me.current.attempt_move(True)
+    if tmp == 'OK':
+        do_move(me.current, opp.current, move, 'tmp', True, first)
+    elif tmp == 'PAR':
+        display.update(write_btm(me.current.name + ' is paralyzed!', "It can't move!"))
+    elif tmp == 'SLP':
+        display.update(write_btm(me.current.name + ' is fast asleep!'))
+    elif tmp == 'WOKE':
+        display.update(write_btm(me.current.name + ' woke up!'))
+    elif tmp == 1:
+        return
+    if me.current.alive():
+        me.current.do_status(opp.current, True)
+    return
 
 
 def run_opp_swap(opp, val):
@@ -1194,8 +1237,8 @@ def w_or_t(select):
     function
     """
     dirty = []
-    dirty.append(word_builder(['>', ' '][select] + 'WILD', 50, 465))
-    dirty.append(word_builder([' ', '>'][select] + 'TRAINER', 50, 575))
+    dirty.append(word_builder(['>', ' '][select] + 'WILD', 50, 810))
+    dirty.append(word_builder([' ', '>'][select] + 'TRAINER', 50, 910))
     display.update(dirty)
 
 def wild_or_trainer():
@@ -1203,8 +1246,8 @@ def wild_or_trainer():
     function
     """
     display.update(draw.rect(
-        SCREEN, WHITE, [3, 408, CONF.get_width() + 14, CONF.get_height() + 14]))
-    display.update(SCREEN.blit(CONF, (10, 415)))
+        SCREEN, WHITE, [0, 748, WORT.get_width() + 14, WORT.get_height() + 17]))
+    display.update(SCREEN.blit(WORT, (10, 755)))
     select = 0
     pygame.event.clear()
     w_or_t(select)
@@ -1487,6 +1530,7 @@ def usable_on(me, item):
     count = 0
     select = 0
     tmp = True
+    pygame.event.clear()
     while True:
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
@@ -1670,6 +1714,8 @@ def sell(me):
         display.flip()
         selector = 0
         update_sell(me, selector)
+        pygame.event.clear()
+        pygame.key.set_repeat(100, 50)
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
@@ -1784,7 +1830,7 @@ def conf():
     function
     """
     display.update(draw.rect(
-        SCREEN, WHITE, [3, 408, CONF.get_width() + 14, CONF.get_height() + 14]))
+        SCREEN, WHITE, [3, 407, CONF.get_width() + 14, CONF.get_height() + 15]))
     display.update(SCREEN.blit(CONF, (10, 415)))
     select = 0
     pygame.event.clear()
@@ -1854,6 +1900,7 @@ def buy(me, shopp):
     display.flip()
     selector = 0
     update_shop(shopp, selector)
+    pygame.event.clear()
     pygame.key.set_repeat(100, 50)
     while True:
         for event in pygame.event.get():
@@ -1907,7 +1954,7 @@ def shop(me):
     function
     """
     shopp = shoppe()
-    SHOP.play()
+    SHOP.play(-1)
     while True:
         clear()
         draw_money(me)
@@ -1922,6 +1969,7 @@ def shop(me):
         elif retval == 2:
             using(me)
         elif retval == -1:
+            SHOP.stop()
             return False
 
 
@@ -2056,10 +2104,20 @@ def run_opp_move(me, opp, move, first):
     """
     function
     """
-    opp.current.attempt_move(False)
-    retval = do_move(opp.current, me.current, move, 'tmp', False, first)
-    opp.current.do_status(me.current, False)
-    return retval
+    tmp = opp.current.attempt_move(True)
+    if tmp == 'OK':
+        do_move(opp.current, me.current, move, 'tmp', False, first)
+    elif tmp == 'PAR':
+        display.update(write_btm(me.current.name + ' is paralyzed!', "It can't move!"))
+    elif tmp == 'SLP':
+        display.update(write_btm(me.current.name + ' is fast asleep!'))
+    elif tmp == 'WOKE':
+        display.update(write_btm(me.current.name + ' woke up!'))
+    elif tmp == 1:
+        return
+    if opp.current.alive():
+        opp.current.do_status(opp.current, True)
+    return
 
 
 def change_pokemon(me, opp, mode):
@@ -2299,7 +2357,10 @@ def run_game(me, opp, mode, socket):
                             opp, ['move', me.current.moves.index(my_move)], mode, socket)
                         clean_me_up(me)
                         if tmp == 'move':
-                            opp_move = opp.current.moves[opp_move]
+                            if not opp.current.controllable:
+                                opp_move = opp.current.lastmove
+                            else:
+                                opp_move = opp.current.moves[opp_move]
                             if my_move.name == 'Quick Attack' != opp_move.name == 'Quick Attack':
                                 if my_move.name == 'Quick Attack':
                                     run_move(me, opp, my_move)

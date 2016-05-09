@@ -8,12 +8,15 @@ from pokepong.logic import shop, get_wild_mon, draw_all_opp, draw_all_me
 from pokepong.logic import win, lost, opp_next_mon, gain_exp, evolve
 from pokepong.logic import battle_logic, run_opp_faint, run_me_faint
 from pokepong.logic import me_next_mon, new_game_start, clear, Sound
-from pokepong.logic import draw_choice, scrolling, choose_loc, intro
-from pokepong.logic import clearbtm, run_game, get_trainers, get_mon
+from pokepong.logic import draw_choice, scrolling, choose_loc, intro, trainer_intro
+from pokepong.logic import clearbtm, run_game, get_trainers, get_mon, wild_intro
 from pokepong.models import Trainer, Owned
 from redis import StrictRedis
 import json
 import zmq
+
+MINI = Sound("sounds/miniOpening.ogg")
+OPENING = Sound("sounds/intro.ogg")
 
 
 def main():
@@ -66,9 +69,12 @@ def main():
                 socket.bind("tcp://*:7777")
             r.delete('count')
         if new_game or (not king and mode != 'wild'):
+            MINI.play()
             intro(current)
+            MINI.stop()
             # TODO uncomment for PROD
             # sleep(5)
+        OPENING.play(-1)
         while new_game or mode != 'wild':
             tmp = None
             try:
@@ -120,6 +126,7 @@ def main():
                 # sleep(5)
         if mode == 'wild':
             loc, wild, remember = choose_loc(remember)
+            OPENING.stop()
             if loc == 'PALLET TOWN':
                 shop(me)
                 new_game = False
@@ -129,6 +136,7 @@ def main():
                     opp = Trainer('')
                     opp.pkmn = [get_wild_mon(loc)]
                     opp.current = opp.pkmn[0]
+                    wild_intro()
                 else:
                     mode = 'random'
                     trainer = get_trainers(loc)
@@ -138,6 +146,7 @@ def main():
                     for i in trainer[2]:
                         opp.pkmn.append(get_mon(i[0], i[1]))
                     opp.current = opp.pkmn[0]
+                    trainer_intro()
         opp.initialize()
         music.play()
         new_game_start(me, opp, mode)
@@ -169,6 +178,7 @@ def main():
                     opp_next_mon(me, opp, mode, socket)
                 else:
                     music.stop()
+                    #TODO fade in
                     music_vict.play()
                     win(me, opp, mode)
                     music_vict.stop()
@@ -183,6 +193,7 @@ def main():
                 break
             elif tmp == 5:
                 break
+        music.stop()
         if mode == 'pong':
             #TODO add play_again
             if play_again(me.alive()):

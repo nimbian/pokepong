@@ -482,18 +482,18 @@ class Owned(Base):
         if 'BRN' in self.buffs:
             retval = dmg_pkmn(self, int(self.maxhp*(1/8.)), not me)
             if me:
-                display.update(write_btm(self.name + 'was', 'hurt by the burn'))
+                display.update(write_btm(self.name + ' was', 'hurt by the burn'))
             else:
-                display.update(write_btm('Enemy' + self.name + 'was', 'hurt by the burn'))
+                display.update(write_btm('Enemy' + self.name + ' was', 'hurt by the burn'))
             wait_for_button()
             if retval:
                 return 1
         if 'PSN' in self.buffs:
             retval = dmg_pkmn(self, int(self.maxhp*(1/8.)), not me)
             if me:
-                display.update(write_btm(self.name + 'was', 'hurt by the poison'))
+                display.update(write_btm(self.name + ' was', 'hurt by the poison'))
             else:
-                display.update(write_btm('Enemy' + self.name + 'was', 'hurt by the poison'))
+                display.update(write_btm('Enemy' + self.name + ' was', 'hurt by the poison'))
             wait_for_button()
             if retval:
                 return 1
@@ -509,9 +509,9 @@ class Owned(Base):
             self.hp -= self.maxhp*(tticks/8.)
             retval = dmg_pkmn(self, int(self.maxhp*(1/8.)), not me)
             if me:
-                display.update(write_btm(self.name + 'was', 'hurt by the poison'))
+                display.update(write_btm(self.name + ' was', 'hurt by the poison'))
             else:
-                display.update(write_btm('Enemy' + self.name + 'was', 'hurt by the poison'))
+                display.update(write_btm('Enemy' + self.name + ' was', 'hurt by the poison'))
             tticks += 1
             wait_for_button()
             if retval:
@@ -528,8 +528,8 @@ class Owned(Base):
         if 'FRZ' in self.buffs:
             return 'FRZ'
         if 'PAR' in self.buffs:
-            if get_random() < .5:
-                return True
+            if get_random() < .25:
+                return 'OK'
             else:
                 return 'PAR'
         if 'SLP' in self.buffs:
@@ -545,14 +545,15 @@ class Owned(Base):
             self.confused -= 1
             if choice([True, False]):
                 display.update(write_btm(self.name + 'hurt itself', "in it's confusion"))
-                return dmg_pkmn(self, self.calc_dmg(self, 'CNF'))
+                dmg = (((2 * tmp.lvl / 5 + 2) * tmp.calc_attack() * 40) / tmp.calc_defense()) / 50 + 2
+                return dmg_pkmn(self, dmg, me)
             else:
-                return True
+                return 'OK'
         elif self.confused == 0:
             display.update(write_btm(self.name, 'is confused no more'))
             self.confused -= 1
-            return True
-        return True
+            return 'OK'
+        return 'OK'
 
 
     def crit_hit(self, high_crit):
