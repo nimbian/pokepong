@@ -1283,6 +1283,8 @@ def choose_loc(selector):
             if event.type == pygame.KEYDOWN and event.key == pygame.K_x:
                 if tmp == ['U', 'U', 'D', 'D', 'L', 'R', 'L', 'R']:
                     flag = True
+                else:
+                    return False
 
 
 
