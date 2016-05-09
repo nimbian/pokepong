@@ -337,6 +337,37 @@ def draw_all_opp(pkmn):
     x.extend(draw_opp_lvl(pkmn))
     display.update(x)
 
+def wild_intro():
+    speed = 1
+    for x in range(1280 / speed+1):
+        tmp = []
+        for z in range(16):
+            if z % 2:
+                tmp.append(draw.rect(SCREEN, BLACK, [1280 - speed * x, z * 64, speed, 64]))
+            else:
+                tmp.append(draw.rect(SCREEN, BLACK, [speed * x, z * 64, speed, 64]))
+        display.update(tmp)
+
+def trainer_intro():
+    speed = 64
+    count = 0
+    for tmp in range(1024/speed):
+        for x in range((count - 1) * speed, 1025-count*speed,speed):
+            display.update(draw.rect(SCREEN, BLACK, [count*speed,x,speed,speed]))
+            sleep(.005)
+        for x in range((count + 1) * speed, 1281-count*speed, speed):
+            display.update(draw.rect(SCREEN, BLACK, [x,1024-speed*(count+1),speed,speed]))
+            sleep(.005)
+        for x in range(1024-count*speed, count * speed - 1, -speed):
+            display.update(draw.rect(SCREEN, BLACK, [1280-speed * (count+1),x-speed, speed, speed]))
+            sleep(.005)
+        for x in range(1280-count*speed, count * speed, -speed):
+            display.update(draw.rect(SCREEN, BLACK, [x-speed,count*speed, speed, speed]))
+            sleep(.005)
+        count += 1
+
+
+
 
 def intro(current):
     """

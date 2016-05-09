@@ -8,8 +8,8 @@ from pokepong.logic import shop, get_wild_mon, draw_all_opp, draw_all_me
 from pokepong.logic import win, lost, opp_next_mon, gain_exp, evolve
 from pokepong.logic import battle_logic, run_opp_faint, run_me_faint
 from pokepong.logic import me_next_mon, new_game_start, clear, Sound
-from pokepong.logic import draw_choice, scrolling, choose_loc, intro
-from pokepong.logic import clearbtm, run_game, get_trainers, get_mon
+from pokepong.logic import draw_choice, scrolling, choose_loc, intro, trainer_intro
+from pokepong.logic import clearbtm, run_game, get_trainers, get_mon, wild_intro
 from pokepong.models import Trainer, Owned
 from redis import StrictRedis
 import json
@@ -129,6 +129,7 @@ def main():
                     opp = Trainer('')
                     opp.pkmn = [get_wild_mon(loc)]
                     opp.current = opp.pkmn[0]
+                    wild_intro()
                 else:
                     mode = 'random'
                     trainer = get_trainers(loc)
@@ -138,6 +139,7 @@ def main():
                     for i in trainer[2]:
                         opp.pkmn.append(get_mon(i[0], i[1]))
                     opp.current = opp.pkmn[0]
+                    trainer_intro()
         opp.initialize()
         music.play()
         new_game_start(me, opp, mode)
