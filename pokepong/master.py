@@ -15,6 +15,9 @@ from redis import StrictRedis
 import json
 import zmq
 
+MINI = Sound("sounds/miniOpening.ogg")
+OPENING = Sound("sounds/intro.ogg")
+
 
 def main():
     # TODO set to True on opposite table
@@ -66,9 +69,12 @@ def main():
                 socket.bind("tcp://*:7777")
             r.delete('count')
         if new_game or (not king and mode != 'wild'):
+            MINI.play()
             intro(current)
+            MINI.stop()
             # TODO uncomment for PROD
             # sleep(5)
+        OPENING.play(-1)
         while new_game or mode != 'wild':
             tmp = None
             try:
@@ -120,6 +126,7 @@ def main():
                 # sleep(5)
         if mode == 'wild':
             loc, wild, remember = choose_loc(remember)
+            OPENING.stop()
             if loc == 'PALLET TOWN':
                 shop(me)
                 new_game = False
