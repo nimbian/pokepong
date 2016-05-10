@@ -3,15 +3,16 @@ from time import sleep
 sleep(1)
 from pygame import display
 from pokepong.util import send_move, recv_move, MyMoveOccuring, OppMoveOccuring
-from pokepong.util import send_team, get_team, loadimg
+from pokepong.util import send_team, get_team, loadimg, set_client, get_client
 from pokepong.logic import shop, get_wild_mon, draw_all_opp, draw_all_me
-from pokepong.logic import win, lost, opp_next_mon, gain_exp, evolve
+from pokepong.logic import win, lost, opp_next_mon, gain_exp, evolve, play_again
 from pokepong.logic import battle_logic, run_opp_faint, run_me_faint
 from pokepong.logic import me_next_mon, new_game_start, clear, Sound
 from pokepong.logic import draw_choice, scrolling, choose_loc, intro, trainer_intro
 from pokepong.logic import clearbtm, run_game, get_trainers, get_mon, wild_intro
 from pokepong.models import Trainer, Owned
 from redis import StrictRedis
+from .config import _cfg
 import json
 import zmq
 
@@ -21,7 +22,10 @@ OPENING = Sound("sounds/intro.ogg")
 
 def main():
     # TODO set to True on opposite table
-    client = False
+    if int(_cfg('table-number')) == 1:
+        set_client(False)
+    else:
+        set_client(True)
     # TODO set to actual IP
     r = StrictRedis(host='127.0.0.1')
     r.delete('lock')
@@ -59,14 +63,17 @@ def main():
                 music_vict = Sound("sounds/trainer_victory.ogg")
         if mode != 'wild' and new_game:
             r.incr('count')
-            while r.get('count') < 2:
-                sleep(1)
+            while int(r.get('count')) < 2:
+                sleep(.5)
             context = zmq.Context()
             socket = context.socket(zmq.PAIR)
-            if client:
+            if get_client():
                 socket.connect("tcp://127.0.0.1:7777")
             else:
                 socket.bind("tcp://*:7777")
+            sleep(1)
+            socket.send('')
+            socket.recv()
             r.delete('count')
         if new_game or (not king and mode != 'wild'):
             MINI.play()
@@ -85,7 +92,7 @@ def main():
                 myname = tmp['name']
                 mypkmnlist = tmp['pokemon']
                 if mode != 'wild':
-                    send_team(myname, mypkmnlist, socket, client)
+                    send_team(myname, mypkmnlist, socket, get_client())
                 break
             current = scrolling(current, possible)
             # TODO uncomment for PROD
@@ -113,11 +120,14 @@ def main():
 
         while mode != 'wild':
             try:
-                oppname, opppkmnlist = get_team(socket, client)
-                opp = Trainer.query.filter(Trainer.name == oppname).one()
+                oppname, opppkmnlist = get_team(socket, get_client())
+                if mode != 'pong':
+                    opp = Trainer.query.filter(Trainer.name == oppname).one()
+                else:
+                    opp = Trainer(oppname)
                 opp.pkmn = []
                 for mon in opppkmnlist:
-                    opp.pkmn.append(Owned.get(mon))
+                    opp.pkmn.append(Owned.query.get(mon))
                 opp.current = opp.pkmn[0]
                 break
             except zmq.Again:
@@ -147,8 +157,11 @@ def main():
                         opp.pkmn.append(get_mon(i[0], i[1]))
                     opp.current = opp.pkmn[0]
                     trainer_intro()
+        OPENING.stop()
         opp.initialize()
         music.play()
+        r.delete('table1')
+        r.delete('table2')
         new_game_start(me, opp, mode)
         while me.alive() and opp.alive():
             try:
@@ -196,7 +209,7 @@ def main():
         music.stop()
         if mode == 'pong':
             #TODO add play_again
-            if play_again(me.alive()):
+            if play_again(me.alive(), socket):
                 if me.alive():
                     king = 'me'
                 else:
@@ -205,11 +218,12 @@ def main():
             else:
                 king = None
         new_game = False
-        # TODO should only evolve when leveled
-        for mon in me.pkmn:
-            mon.clean()
-            tmp = mon.check_evolve()
-            if tmp:
-                evolve(mon, tmp)
         if mode == 'random':
             mode = 'wild'
+        # TODO should only evolve when leveled
+        if mode == 'wild':
+            for mon in me.pkmn:
+                mon.clean()
+                tmp = mon.check_evolve()
+                if tmp:
+                    evolve(mon, tmp)

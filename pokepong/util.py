@@ -8,6 +8,8 @@ import zmq
 from math import floor
 from redis import StrictRedis
 from time import sleep
+
+CLIENT = False
 r = StrictRedis(host='127.0.0.1')
 
 SIZE = (1280, 1024)
@@ -25,6 +27,14 @@ HIGH_ARC = [(101, 302), (234, 120), (402, -26), (420, -54), (460, -100), (490, -
             (520, -100), (580, -80), (640, -60), (700, -5), (760, 50)]
 LOW_ARC = []
 
+
+def set_client(tmp):
+    global CLIENT
+    CLIENT = tmp
+
+def get_client():
+    global CLIENT
+    return CLIENT
 
 def clearbtm():
     """

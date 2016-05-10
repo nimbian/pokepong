@@ -12,13 +12,12 @@ from pokepong.database import db
 from pokepong.util import word_builder, write_btm, draw_my_hp
 from pokepong.util import draw_opp_hp, wait_for_button, clearbtm
 from pokepong.util import WHITE, GREEN, YELLOW, RED, GREY, BLACK, SCREEN, SIZE
-from pokepong.util import BTM, BTM_TUPLE
+from pokepong.util import BTM, BTM_TUPLE, get_client
 from pokepong.util import r
 
 pygame.mixer.init()
 SHOP = Sound("sounds/shop.ogg")
 EVOLVE = Sound("sounds/evolve.ogg")
-
 
 # TODO if speeds are equal me will go first.  me is different on client vs
 # server
@@ -1971,6 +1970,15 @@ def shop(me):
             return False
 
 
+def play_again(alive, socket):
+    if alive:
+        socket.send('True')
+        return True
+    else:
+        if socket.recv() == 'True':
+            return True
+    return False
+
 def draw_choose_pkmn(me, opp, mode, oppdeath=False, mydeath=False):
     """
     function
@@ -2001,6 +2009,7 @@ def draw_choose_pkmn(me, opp, mode, oppdeath=False, mydeath=False):
                 pygame.display.flip()
                 draw_all_opp(opp.current)
                 me.set_current(select)
+                me.used.add(me.current)
                 sleep(2)
                 pop_ball(me.current.name)
                 draw_all_me(me.current)
@@ -2134,9 +2143,9 @@ def change_pokemon(me, opp, mode):
         sleep(.1)
         selecting(select)
         if mode == 'pong':
-            sleep(1)
+            sleep(.5)
             selecting(1)
-            sleep(1)
+            sleep(.5)
             dirty.append(draw.rect(SCREEN, WHITE, [0, 403, 375, 280]))
             dirty.extend(draw_my_pkmn_sprite(me.current))
             display.update(dirty)
@@ -2281,18 +2290,32 @@ def run_pong(me, opp):
     # TODO set tablenames with client
     draw_choice(0)
     while True:
-        if opp.num_fainted() < int(r.get(opp.name) or 0):
-            attacking(me)
-            sleep(2)
-            clean_me_up(me)
-            do_move(
-                me.current, opp.current, me.current.moves[0], 'pong', True, True)
-            return 0
-        elif me.num_fainted() < int(r.get(me.name) or 0):
-            sleep(2)
-            do_move(
-                opp.current, me.current, opp.current.moves[0], 'pong', False, True)
-            return 1
+        if get_client():
+            if opp.num_fainted() < int(r.get('table1') or 0):
+                attacking(me)
+                sleep(2)
+                clean_me_up(me)
+                do_move(
+                    me.current, opp.current, me.current.moves[0], 'pong', True, True)
+                return 0
+            elif me.num_fainted() < int(r.get('table2') or 0):
+                sleep(3)
+                do_move(
+                    opp.current, me.current, opp.current.moves[0], 'pong', False, True)
+                return 1
+        else:
+            if me.num_fainted() < int(r.get('table1') or 0):
+                sleep(3)
+                do_move(
+                    opp.current, me.current, opp.current.moves[0], 'pong', False, True)
+                return 1
+            elif opp.num_fainted() < int(r.get('table2') or 0):
+                attacking(me)
+                sleep(2)
+                clean_me_up(me)
+                do_move(
+                    me.current, opp.current, me.current.moves[0], 'pong', True, True)
+                return 0
         sleep(.1)
 
 
