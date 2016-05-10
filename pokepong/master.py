@@ -85,7 +85,10 @@ def main():
         while new_game or mode != 'wild':
             tmp = None
             try:
-                tmp = json.loads(r.lpop('lineup'))
+                if king != 'me':
+                    tmp = json.loads(r.lpop('lineup'))
+                else:
+                    tmp = {'name':myname, 'pokemon':mypkmnlist}
             except TypeError:
                 pass
             if tmp:
@@ -217,6 +220,9 @@ def main():
                 count = 1
             else:
                 king = None
+            socket.send('')
+            socket.recv()
+            intro(current)
         new_game = False
         if mode == 'random':
             mode = 'wild'

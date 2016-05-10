@@ -544,6 +544,7 @@ def me_next_mon(me, opp, mode, socket):
         if opp.current != opp.pkmn[tmp]:
             opp.set_current(tmp)
             # TODO animate swap
+    sleep(1)
     draw_all_opp(opp.current)
 
 
@@ -2301,13 +2302,13 @@ def run_pong(me, opp):
                     me.current, opp.current, me.current.moves[0], 'pong', True, True)
                 return 0
             elif me.num_fainted() < int(r.get('table2') or 0):
-                sleep(3)
+                sleep(2)
                 do_move(
                     opp.current, me.current, opp.current.moves[0], 'pong', False, True)
                 return 1
         else:
             if me.num_fainted() < int(r.get('table1') or 0):
-                sleep(3)
+                sleep(2)
                 do_move(
                     opp.current, me.current, opp.current.moves[0], 'pong', False, True)
                 return 1
