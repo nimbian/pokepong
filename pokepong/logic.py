@@ -2045,11 +2045,29 @@ def draw_choose_pkmn(me, opp, mode, oppdeath=False, mydeath=False):
                     else:
                         if mode == 'battle':
                             if mydeath:
+                                clear()
+                                draw_all_opp(opp.current())
+                                pygame.display.flip()
+                                me.set_current(select)
+                                me.used.add(me.current)
+                                pop_ball(me.current.name)
+                                draw_all_me(me.current)
+                                sleep(.5)
                                 return select
-                            if r.lock('lock').acquire():
-                                raise MyMoveOccuring('swap', str(select))
+                            if get_client():
+                                x = 'table1'
                             else:
-                                raise OppMoveOccuring
+                                x = 'table2'
+                            if int(r.get(x) or 0) > 0:
+                                if r.lock('lock').acquire():
+                                    r.decr(x)
+                                    raise MyMoveOccuring('swap', str(select))
+                                else:
+                                    raise OppMoveOccuring
+                            else:
+                                display.update(write_btm('No tokens'))
+                                wait_for_button()
+                                return -1
                         clear()
                         pygame.display.flip()
                         if not oppdeath:
@@ -2202,10 +2220,22 @@ def run_attack(me, mode):
                         clean_me_up(me)
                         if usable_move(me.current.moves[select], mode):
                             if mode == 'battle':
-                                if r.lock('lock').acquire():
-                                    raise MyMoveOccuring('move', str(select))
+                                if get_client():
+                                    x = 'table1'
                                 else:
-                                    raise OppMoveOccuring
+                                    x = 'table2'
+                                if int(r.get(x) or 0) > 0:
+                                    if r.lock('lock').acquire():
+                                        r.decr(x)
+                                        raise MyMoveOccuring('move', str(select))
+                                    else:
+                                        raise OppMoveOccuring
+                                else:
+                                        display.update(write_btm('No tokens'))
+                                        wait_for_button()
+                                        clean_me_up(me)
+                                        draw_choice(0)
+                                        return False
                             return me.current.moves[select]
                         else:
                             attacking(me)
