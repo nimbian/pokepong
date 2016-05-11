@@ -433,10 +433,14 @@ def build_team(testpkmn, me=False):
     return team
 
 
-def move_opp_trainer_in():
+def move_opp_trainer_in(oppname):
     """
     function
     """
+    try:
+        TRAINER = loadalphaimg(oppname + '.png')
+    except:
+        TRAINER = loadalphaimg('trainer.png')
     width = TRAINER.get_width()
     height = TRAINER.get_height()
     for i in range(SIZE[0] + 10, SIZE[0] - 501, -1):
@@ -445,10 +449,14 @@ def move_opp_trainer_in():
         display.update(i, 0, width + 1, height)
 
 
-def move_opp_trainer_out():
+def move_opp_trainer_out(oppname):
     """
     function
     """
+    try:
+        TRAINER = loadalphaimg(oppname + '.png')
+    except:
+        TRAINER = loadalphaimg('trainer.png')
     width = TRAINER.get_width()
     height = TRAINER.get_height()
     for i in range(SIZE[0] - 500, SIZE[0] + 10, 1):
@@ -697,9 +705,9 @@ def new_game_start(me, opp, mode):
         dirty.extend(draw_opp_poke_balls(opp.pkmn))
         dirty.extend(write_btm(opp.name + ' wants', 'to fight!'))
         display.update(dirty)
-        move_opp_trainer_in()
-        # sleep(2)
-        move_opp_trainer_out()
+        move_opp_trainer_in(opp.name)
+        sleep(2)
+        move_opp_trainer_out(opp.name)
         draw_all_opp(opp.current)
         dirty.extend(
             write_btm(opp.name + ' sent', 'out ' + opp.current.name + '!'))
