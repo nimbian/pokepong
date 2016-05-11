@@ -1,7 +1,7 @@
 # TODO remove when done testing
 from time import sleep
 sleep(1)
-from pygame import display
+from pygame import display, joystick
 from pokepong.util import send_move, recv_move, MyMoveOccuring, OppMoveOccuring
 from pokepong.util import send_team, get_team, loadimg, set_client, get_client
 from pokepong.logic import shop, get_wild_mon, draw_all_opp, draw_all_me
@@ -15,6 +15,12 @@ from redis import StrictRedis
 from .config import _cfg
 import json
 import zmq
+joystick.init()
+try:
+        tmp = joystick.Joystick(0)
+        tmp.init()
+except:
+        pass
 
 MINI = Sound("sounds/miniOpening.ogg")
 OPENING = Sound("sounds/intro.ogg")
