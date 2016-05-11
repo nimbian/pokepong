@@ -12,13 +12,13 @@ from pokepong.database import db
 from pokepong.util import word_builder, write_btm, draw_my_hp
 from pokepong.util import draw_opp_hp, wait_for_button, clearbtm
 from pokepong.util import WHITE, GREEN, YELLOW, RED, GREY, BLACK, SCREEN, SIZE
-from pokepong.util import BTM, BTM_TUPLE
+from pokepong.util import BTM, BTM_TUPLE, get_client
 from pokepong.util import r
+from pokepong.joy import get_input
 
 pygame.mixer.init()
 SHOP = Sound("sounds/shop.ogg")
 EVOLVE = Sound("sounds/evolve.ogg")
-
 
 # TODO if speeds are equal me will go first.  me is different on client vs
 # server
@@ -433,10 +433,14 @@ def build_team(testpkmn, me=False):
     return team
 
 
-def move_opp_trainer_in():
+def move_opp_trainer_in(oppname):
     """
     function
     """
+    try:
+        TRAINER = loadalphaimg(oppname + '.png')
+    except:
+        TRAINER = loadalphaimg('trainer.png')
     width = TRAINER.get_width()
     height = TRAINER.get_height()
     for i in range(SIZE[0] + 10, SIZE[0] - 501, -1):
@@ -445,10 +449,14 @@ def move_opp_trainer_in():
         display.update(i, 0, width + 1, height)
 
 
-def move_opp_trainer_out():
+def move_opp_trainer_out(oppname):
     """
     function
     """
+    try:
+        TRAINER = loadalphaimg(oppname + '.png')
+    except:
+        TRAINER = loadalphaimg('trainer.png')
     width = TRAINER.get_width()
     height = TRAINER.get_height()
     for i in range(SIZE[0] - 500, SIZE[0] + 10, 1):
@@ -545,6 +553,7 @@ def me_next_mon(me, opp, mode, socket):
         if opp.current != opp.pkmn[tmp]:
             opp.set_current(tmp)
             # TODO animate swap
+    sleep(1)
     draw_all_opp(opp.current)
 
 
@@ -696,9 +705,9 @@ def new_game_start(me, opp, mode):
         dirty.extend(draw_opp_poke_balls(opp.pkmn))
         dirty.extend(write_btm(opp.name + ' wants', 'to fight!'))
         display.update(dirty)
-        move_opp_trainer_in()
-        # sleep(2)
-        move_opp_trainer_out()
+        move_opp_trainer_in(opp.name)
+        sleep(2)
+        move_opp_trainer_out(opp.name)
         draw_all_opp(opp.current)
         dirty.extend(
             write_btm(opp.name + ' sent', 'out ' + opp.current.name + '!'))
@@ -867,15 +876,16 @@ def move_choose(pkmn):
     while True:
         update_move(selector)
         for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
+            button = get_intput(event)
+            if button == 'DOWN':
                 if selector < 3:
                     selector += 1
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
+            elif button == 'UP':
                 if selector > 0:
                     selector -= 1
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_x:
+            elif button == 'B':
                 return -1
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_z:
+            elif button == 'A':
                 return selector
 
 def ask_move(pkmn, move):
@@ -991,7 +1001,8 @@ def do_evolve(oldpic, newpic):
     pygame.event.clear()
     for i in range(100):
         for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_x:
+            button = get_input(event)
+            if button == 'B':
                 return False
         if (i + 2) % 12 == 0:
             draw.rect(SCREEN, WHITE, [444, 120] + SSIZE)
@@ -1002,7 +1013,8 @@ def do_evolve(oldpic, newpic):
         sleep(.01)
     for i in range(100):
         for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_x:
+            button = get_input(event)
+            if button == 'B':
                 return False
         if (i + 2) % 8 == 0:
             draw.rect(SCREEN, WHITE, [444, 120] + SSIZE)
@@ -1013,7 +1025,8 @@ def do_evolve(oldpic, newpic):
         sleep(.01)
     for i in range(100):
         for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_x:
+            button = get_input(event)
+            if button == 'B':
                 return False
         if (i + 2) % 4 == 0:
             draw.rect(SCREEN, WHITE, [444, 120] + SSIZE)
@@ -1213,24 +1226,26 @@ def draw_choose_items(me):
     pygame.event.clear()
     while True:
         for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
+            button = get_input(event)
+            if button == 'UP':
                 if selector > 0:
                     selector -= 1
                     update_items(me, selector)
                 elif me.shownitems[0] != me.items[0]:
                     me.shift_items_left()
                     update_items(me, selector)
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
+            elif button == 'DOWN':
                 if selector < 2 and selector < len(me.shownitems) - 1:
                     selector += 1
                     update_items(me, selector)
                 elif len(me.shownitems) > 3:
                     me.shift_items_right()
                     update_items(me, selector)
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_x:
+            elif button == 'B':
                 return -1
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_z:
+            elif button == 'A':
                 return selector
+        sleep(.02)
 
 def w_or_t(select):
     """
@@ -1253,17 +1268,18 @@ def wild_or_trainer():
     w_or_t(select)
     while True:
         for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
+            button = get_input(event)
+            if button == 'DOWN':
                 if select == 0:
                     select = 1
                     w_or_t(select)
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
+            elif button == 'UP':
                 if select == 1:
                     select = 0
                     w_or_t(select)
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_x:
+            elif button == 'B':
                 return -1
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_z:
+            elif button == 'A':
                 return select
         sleep(.02)
 
@@ -1278,7 +1294,8 @@ def choose_loc(selector):
     flag = False
     while True:
         for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
+            button = get_input(event)
+            if button == 'UP':
                 tmp.append('U')
                 tmp = tmp[-8:]
                 flag = False
@@ -1288,7 +1305,7 @@ def choose_loc(selector):
                 else:
                     selector = 0
                     draw_loc_update(len(MAPROUTE) - 1, selector)
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
+            elif button == 'DOWN':
                 tmp.append('D')
                 tmp = tmp[-8:]
                 flag = False
@@ -1298,15 +1315,15 @@ def choose_loc(selector):
                 else:
                     selector = len(MAPROUTE) - 1
                     draw_loc_update(0, selector)
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT:
+            elif button == 'LEFT':
                 tmp.append('L')
                 tmp = tmp[-8:]
                 flag = False
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_RIGHT:
+            elif button == 'RIGHT':
                 tmp.append('R')
                 tmp = tmp[-8:]
                 flag = False
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_z:
+            elif button == 'A':
                 if flag:
                     return ['S.S. ANNE TRUCK', 'wild', 0]
                 else:
@@ -1323,11 +1340,12 @@ def choose_loc(selector):
                         return [MAPROUTE[selector], ['wild', 'random'][tmp2], selector]
                     else:
                         draw_location(selector)
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_x:
+            elif button == 'B':
                 if tmp == ['U', 'U', 'D', 'D', 'L', 'R', 'L', 'R']:
                     flag = True
                 else:
                     return False
+        sleep(.02)
 
 
 
@@ -1378,29 +1396,31 @@ def amount(item):
         '*' + str(selector).zfill(2) + ('<' + str(item.buyprice)).rjust(8), 534, 555))
     display.update(dirty)
     pygame.event.clear()
+    pygame.key.set_repeat(100, 50)
     while True:
         for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
+            button = get_input(event)
+            if button == 'UP':
                 if selector < 99:
                     selector += 1
                 else:
                     selector = 1
                 update_amount(item, selector)
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
+            elif button == 'DOWN':
                 if selector > 1:
                     selector -= 1
                 else:
                     selector = 99
                 update_amount(item, selector)
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_RIGHT:
+            elif button == 'RIGHT':
                 selector = (selector + 10) % 100
                 update_amount(item, selector)
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT:
+            elif button == 'LEFT':
                 selector = (100 + (selector - 10)) % 100
                 update_amount(item, selector)
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_x:
+            elif button == 'B':
                 return False
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_z:
+            elif button == 'A':
                 return selector
 
 
@@ -1533,19 +1553,20 @@ def usable_on(me, item):
     pygame.event.clear()
     while True:
         for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
+            button = get_input(event)
+            if button == 'UP':
                 if select > 0:
                     select -= 1
                     update_usable(select + 1, select, me)
                     count = 1
                     tmp = True
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
+            elif button == 'DOWN':
                 if select < len(me.pkmn) - 1:
                     select += 1
                     update_usable(select - 1, select, me)
                     count = 1
                     tmp = True
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_z:
+            elif button == 'A':
                 if able_list[select]:
                     if conf():
                         return select
@@ -1554,7 +1575,7 @@ def usable_on(me, item):
                 else:
                     # TODO reject
                     pass
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_x:
+            elif button == 'B':
                 return -1
 
         sleep(.1)
@@ -1660,27 +1681,28 @@ def sell_amount(item):
     pygame.key.set_repeat(100, 50)
     while True:
         for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
+            button = get_input(event)
+            if button == 'UP':
                 if selector < item.count:
                     selector += 1
                 else:
                     selector = 1
                 update_sell_amount(item, selector)
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
+            elif button == 'DOWN':
                 if selector > 1:
                     selector -= 1
                 else:
                     selector = item.count
                 update_sell_amount(item, selector)
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_RIGHT:
+            elif button == 'RIGHT':
                 selector = (selector + 10) % 100
                 update_sell_amount(item, selector)
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_LEFT:
+            elif button == 'LEFT':
                 selector = (100 + (selector - 10)) % 100
                 update_sell_amount(item, selector)
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_x:
+            elif button == 'B':
                 return False
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_z:
+            elif button == 'A':
                 return selector
 
 
@@ -1718,23 +1740,24 @@ def sell(me):
         pygame.key.set_repeat(100, 50)
         while True:
             for event in pygame.event.get():
-                if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
+                button = get_input(event)
+                if button == 'UP':
                     if selector > 0:
                         selector -= 1
                         update_sell(me, selector)
                     elif me.all_items[0] != me.all_shown[0]:
                         me.shift_all_left()
                         update_sell(me, selector)
-                if event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
+                elif button == 'DOWN':
                     if selector < 2 and selector < len(me.all_shown) - 1:
                         selector += 1
                         update_sell(me, selector)
                     elif len(me.all_shown) > 3:
                         me.shift_all_right()
                         update_sell(me, selector)
-                if event.type == pygame.KEYDOWN and event.key == pygame.K_x:
+                elif button == 'B':
                     return False
-                if event.type == pygame.KEYDOWN and event.key == pygame.K_z:
+                elif button == 'A':
                     if me.all_shown[selector].item.name == 'CANCEL':
                         return False
                     else:
@@ -1774,23 +1797,24 @@ def using(me):
         pygame.key.set_repeat(100, 50)
         while True:
             for event in pygame.event.get():
-                if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
+                button = get_input(event)
+                if button == 'UP':
                     if selector > 0:
                         selector -= 1
                         update_using(me, selector)
                     elif me.usable[0] != me.usable_items[0]:
                         me.shift_usable_left()
                         update_using(me, selector)
-                if event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
+                elif button == 'DOWN':
                     if selector < 2 and selector < len(me.usable_items) - 1:
                         selector += 1
                         update_using(me, selector)
                     elif len(me.usable_items) > 3:
                         me.shift_usable_right()
                         update_using(me, selector)
-                if event.type == pygame.KEYDOWN and event.key == pygame.K_x:
+                elif button == 'B':
                     return False
-                if event.type == pygame.KEYDOWN and event.key == pygame.K_z:
+                elif button == 'A':
                     if me.usable_items[selector].item.name == 'CANCEL':
                         return False
                     else:
@@ -1811,18 +1835,23 @@ def shop_choice():
     shop_selecting(select)
     while True:
         for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
+            button = get_input(event)
+            if button == 'DOWN':
                 if select < 3:
                     select += 1
                     shop_selecting(select)
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
+            elif button == 'UP':
                 if select > 0:
                     select -= 1
                     shop_selecting(select)
-            if event.type == pygame.KEYDOWN and ((event.key == pygame.K_z and select == 3) or event.key == pygame.K_x):
+            elif button == 'B':
                 return -1
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_z:
-                return select
+            elif button == 'A':
+                if select != 3:
+                    return select
+                else:
+                    return -1
+
 
 
 def conf():
@@ -1837,18 +1866,22 @@ def conf():
     selecting(select)
     while True:
         for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
+            button = get_input(event)
+            if button == 'DOWN':
                 if select == 0:
                     select = 1
                     selecting(select)
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
+            elif button == 'UP':
                 if select == 1:
                     select = 0
                     selecting(select)
-            if event.type == pygame.KEYDOWN and ((event.key == pygame.K_z and select == 1) or event.key == pygame.K_x):
+            elif button == 'B':
                 return False
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_z:
-                return True
+            elif button == 'A':
+                if select == 0:
+                    return True
+                else:
+                    return False
         sleep(.02)
 
 
@@ -1904,7 +1937,8 @@ def buy(me, shopp):
     pygame.key.set_repeat(100, 50)
     while True:
         for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
+            button = get_input(event)
+            if button == 'UP':
                 if selector > 0:
                     selector -= 1
                     update_shop(shopp, selector)
@@ -1912,7 +1946,7 @@ def buy(me, shopp):
                     shopp.shift_items_left()
                     update_shop(shopp, selector)
                 pygame.time.wait(10)
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
+            elif button == 'DOWN':
                 if selector < 2 and selector < len(shopp.shownitems) - 1:
                     selector += 1
                     update_shop(shopp, selector)
@@ -1920,9 +1954,9 @@ def buy(me, shopp):
                     shopp.shift_items_right()
                     update_shop(shopp, selector)
                 pygame.time.wait(10)
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_x:
+            elif button == 'B':
                 return False
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_z:
+            elif button == 'A':
                 item = shopp.shownitems[selector]
                 if item.name != 'CANCEL':
                     retval = amount(item)
@@ -1973,6 +2007,15 @@ def shop(me):
             return False
 
 
+def play_again(alive, socket):
+    if alive:
+        socket.send('True')
+        return True
+    else:
+        if socket.recv() == 'True':
+            return True
+    return False
+
 def draw_choose_pkmn(me, opp, mode, oppdeath=False, mydeath=False):
     """
     function
@@ -2003,6 +2046,7 @@ def draw_choose_pkmn(me, opp, mode, oppdeath=False, mydeath=False):
                 pygame.display.flip()
                 draw_all_opp(opp.current)
                 me.set_current(select)
+                me.used.add(me.current)
                 sleep(2)
                 pop_ball(me.current.name)
                 draw_all_me(me.current)
@@ -2010,19 +2054,20 @@ def draw_choose_pkmn(me, opp, mode, oppdeath=False, mydeath=False):
 
         else:
             for event in pygame.event.get():
-                if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
+                button = get_input(event)
+                if button == 'UP':
                     if select > 0:
                         select -= 1
                         update_choose(select + 1, select, me)
                         count = 1
                         tmp = True
-                elif event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
+                elif button == 'DOWN':
                     if select < len(me.pkmn) - 1:
                         select += 1
                         update_choose(select - 1, select, me)
                         count = 1
                         tmp = True
-                elif event.type == pygame.KEYDOWN and event.key == pygame.K_z:
+                elif button == 'A':
                     if select == me.get_current_index():
                         display.update(
                             write_btm(me.current.name, 'is already out!'))
@@ -2035,11 +2080,29 @@ def draw_choose_pkmn(me, opp, mode, oppdeath=False, mydeath=False):
                     else:
                         if mode == 'battle':
                             if mydeath:
+                                clear()
+                                draw_all_opp(opp.current())
+                                pygame.display.flip()
+                                me.set_current(select)
+                                me.used.add(me.current)
+                                pop_ball(me.current.name)
+                                draw_all_me(me.current)
+                                sleep(.5)
                                 return select
-                            if r.lock('lock').acquire():
-                                raise MyMoveOccuring('swap', str(select))
+                            if get_client():
+                                x = 'table1'
                             else:
-                                raise OppMoveOccuring
+                                x = 'table2'
+                            if int(r.get(x) or 0) > 0:
+                                if r.lock('lock').acquire():
+                                    r.decr(x)
+                                    raise MyMoveOccuring('swap', str(select))
+                                else:
+                                    raise OppMoveOccuring
+                            else:
+                                display.update(write_btm('No tokens'))
+                                wait_for_button()
+                                return -1
                         clear()
                         pygame.display.flip()
                         if not oppdeath:
@@ -2054,7 +2117,7 @@ def draw_choose_pkmn(me, opp, mode, oppdeath=False, mydeath=False):
                             draw_all_me(me.current)
                             sleep(.5)
                         return select
-                elif event.type == pygame.KEYDOWN and event.key == pygame.K_x:
+                elif button == 'B':
                     if not mydeath:
                         clear()
                         draw_all_opp(opp.current)
@@ -2136,28 +2199,29 @@ def change_pokemon(me, opp, mode):
         sleep(.1)
         selecting(select)
         if mode == 'pong':
-            sleep(1)
+            sleep(.5)
             selecting(1)
-            sleep(1)
+            sleep(.5)
             dirty.append(draw.rect(SCREEN, WHITE, [0, 403, 375, 280]))
             dirty.extend(draw_my_pkmn_sprite(me.current))
             display.update(dirty)
             return False
         else:
             for event in pygame.event.get():
-                if event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
+                button = get_input(event)
+                if button == 'DOWN':
                     if select == 0:
                         select = 1
-                if event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
+                elif button == 'UP':
                     if select == 1:
                         select = 0
-                if event.type == pygame.KEYDOWN and ((event.key == pygame.K_z and select == 1) or event.key == pygame.K_x):
+                elif button == 'B' or (button == 'A' and select == 1):
                     dirty = []
                     dirty.append(draw.rect(SCREEN, WHITE, [0, 403, 375, 280]))
                     dirty.extend(draw_my_pkmn_sprite(me.current))
                     display.update(dirty)
                     return False
-                if event.type == pygame.KEYDOWN and event.key == pygame.K_z:
+                elif button == 'A':
                     draw_choose_pkmn(me, opp, mode, oppdeath=True)
                     clear()
                     display.flip()
@@ -2177,25 +2241,38 @@ def run_attack(me, mode):
             raise OppMoveOccuring
         if me.current.pp_left():
             for event in pygame.event.get():
-                if event.type == pygame.KEYDOWN and event.key == pygame.K_DOWN:
+                button = get_input(event)
+                if button == 'DOWN':
                     if select < len(me.current.moves) - 1:
                         select += 1
-                elif event.type == pygame.KEYDOWN and event.key == pygame.K_UP:
+                elif button == 'UP':
                     if select > 0:
                         select -= 1
-                elif event.type == pygame.KEYDOWN and event.key == pygame.K_x:
+                elif button == 'B':
                     clean_me_up(me)
                     draw_choice(0)
                     return False
-                elif event.type == pygame.KEYDOWN and event.key == pygame.K_z:
+                elif button == 'A':
                     if mode != 'pong':
                         clean_me_up(me)
                         if usable_move(me.current.moves[select], mode):
                             if mode == 'battle':
-                                if r.lock('lock').acquire():
-                                    raise MyMoveOccuring('move', str(select))
+                                if get_client():
+                                    x = 'table1'
                                 else:
-                                    raise OppMoveOccuring
+                                    x = 'table2'
+                                if int(r.get(x) or 0) > 0:
+                                    if r.lock('lock').acquire():
+                                        r.decr(x)
+                                        raise MyMoveOccuring('move', str(select))
+                                    else:
+                                        raise OppMoveOccuring
+                                else:
+                                        display.update(write_btm('No tokens'))
+                                        wait_for_button()
+                                        clean_me_up(me)
+                                        draw_choice(0)
+                                        return False
                             return me.current.moves[select]
                         else:
                             attacking(me)
@@ -2283,18 +2360,32 @@ def run_pong(me, opp):
     # TODO set tablenames with client
     draw_choice(0)
     while True:
-        if opp.num_fainted() < int(r.get(opp.name) or 0):
-            attacking(me)
-            sleep(2)
-            clean_me_up(me)
-            do_move(
-                me.current, opp.current, me.current.moves[0], 'pong', True, True)
-            return 0
-        elif me.num_fainted() < int(r.get(me.name) or 0):
-            sleep(2)
-            do_move(
-                opp.current, me.current, opp.current.moves[0], 'pong', False, True)
-            return 1
+        if get_client():
+            if opp.num_fainted() < int(r.get('table1') or 0):
+                attacking(me)
+                sleep(2)
+                clean_me_up(me)
+                do_move(
+                    me.current, opp.current, me.current.moves[0], 'pong', True, True)
+                return 0
+            elif me.num_fainted() < int(r.get('table2') or 0):
+                sleep(2)
+                do_move(
+                    opp.current, me.current, opp.current.moves[0], 'pong', False, True)
+                return 1
+        else:
+            if me.num_fainted() < int(r.get('table1') or 0):
+                sleep(2)
+                do_move(
+                    opp.current, me.current, opp.current.moves[0], 'pong', False, True)
+                return 1
+            elif opp.num_fainted() < int(r.get('table2') or 0):
+                attacking(me)
+                sleep(2)
+                clean_me_up(me)
+                do_move(
+                    me.current, opp.current, me.current.moves[0], 'pong', True, True)
+                return 0
         sleep(.1)
 
 
@@ -2333,20 +2424,21 @@ def run_game(me, opp, mode, socket):
     while True:
         if r.get('lock'):
             raise OppMoveOccuring
-        for ev in pygame.event.get():
-            if ev.type == pygame.KEYDOWN and ev.key == pygame.K_RIGHT:
+        for event in pygame.event.get():
+            button = get_input(event)
+            if button == 'RIGHT':
                 if selector == 0 or selector == 1:
                     selector += 2
-            elif ev.type == pygame.KEYDOWN and ev.key == pygame.K_LEFT:
+            elif button == 'LEFT':
                 if selector == 2 or selector == 3:
                     selector -= 2
-            elif ev.type == pygame.KEYDOWN and ev.key == pygame.K_DOWN:
+            elif button == 'DOWN':
                 if selector == 0 or selector == 2:
                     selector += 1
-            elif ev.type == pygame.KEYDOWN and ev.key == pygame.K_UP:
+            elif button == 'UP':
                 if selector == 1 or selector == 3:
                     selector -= 1
-            elif ev.type == pygame.KEYDOWN and ev.key == pygame.K_z:
+            elif button == 'A':
                 if selector == 0:
                     if me.current.controllable:
                         my_move = run_attack(me, mode)
