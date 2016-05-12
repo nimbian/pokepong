@@ -223,6 +223,47 @@ ROUTES['SAFARI ZONE AREA 3'] = {
 	'Kangaskhan': [[28,28],.04]
 }
 
+ROUTES['ROUTE 12'] = {
+	'Pidgey': [[23,27],.3],
+	'Venonat': [[24,26],.2],
+	'Bellsprout': [[22,26],.2],
+	'Weepingbell': [[28,30],.05],
+	'Oddish': [[22,26],.2],
+	'Gloom': [[28,30],.05]
+}
+
+ROUTES['ROUTE 13'] = {
+	'Pidgey': [[23,27],.25],
+	'Venonat': [[24,26],.2],
+	'Bellsprout': [[22,26],.2],
+	'Weepingbell': [[28,30],.05],
+	'Oddish': [[22,26],.2],
+	'Gloom': [[28,30],.05],
+	'Ditto': [[25,25],.05]
+}
+
+ROUTES['ROUTE 14'] = {
+	'Pidgey': [[26,26],.15],
+	'Pidgeotto': [[28,30],.05],
+	'Venonat': [[24,26],.15],
+	'Bellsprout': [[22,26],.2],
+	'Weepingbell': [[30,30],.05],
+	'Oddish': [[22,26],.2],
+	'Gloom': [[30,30],.05],
+	'Ditto': [[23,23],.15]
+}
+
+ROUTES['ROUTE 15'] = {
+	'Pidgey': [[23,23],.15],
+	'Pidgeotto': [[28,30],.05],
+	'Venonat': [[26,28],.15],
+	'Bellsprout': [[22,26],.2],
+	'Weepingbell': [[30,30],.05],
+	'Oddish': [[22,26],.2],
+	'Gloom': [[30,30],.05],
+	'Ditto': [[26,26],.15]
+}
+
 ROUTES['S.S. ANNE TRUCK'] = {
         'Mew': [[5,5],1]
 }
