@@ -1,5 +1,4 @@
 from pygame import draw, display
-from pygame.mixer import Sound
 import pygame
 from sqlalchemy.orm.exc import NoResultFound
 from pokepong.util import MyMoveOccuring, OppMoveOccuring, loadalphaimg, loadimg
@@ -13,10 +12,9 @@ from pokepong.util import word_builder, write_btm, draw_my_hp
 from pokepong.util import draw_opp_hp, wait_for_button, clearbtm
 from pokepong.util import WHITE, GREEN, YELLOW, RED, GREY, BLACK, SCREEN, SIZE
 from pokepong.util import BTM, BTM_TUPLE, get_client
-from pokepong.util import r
+from pokepong.util import r, Sound
 from pokepong.joy import get_input
 
-pygame.mixer.init()
 SHOP = Sound("sounds/shop.ogg")
 EVOLVE = Sound("sounds/evolve.ogg")
 
@@ -718,6 +716,7 @@ def new_game_start(me, opp, mode):
 
     move_my_trainer()
     pop_ball(me.current.name)
+    me.current.cry.play()
     draw_all_me(me.current)
 
 
@@ -2049,6 +2048,7 @@ def draw_choose_pkmn(me, opp, mode, oppdeath=False, mydeath=False):
                 me.used.add(me.current)
                 sleep(2)
                 pop_ball(me.current.name)
+                me.current.cry.play()
                 draw_all_me(me.current)
                 return select
 
@@ -2086,6 +2086,7 @@ def draw_choose_pkmn(me, opp, mode, oppdeath=False, mydeath=False):
                                 me.set_current(select)
                                 me.used.add(me.current)
                                 pop_ball(me.current.name)
+                                me.current.cry.play()
                                 draw_all_me(me.current)
                                 sleep(.5)
                                 return select
@@ -2114,6 +2115,7 @@ def draw_choose_pkmn(me, opp, mode, oppdeath=False, mydeath=False):
                             me.set_current(select)
                             me.used.add(me.current)
                             pop_ball(me.current.name)
+                            me.current.cry.play()
                             draw_all_me(me.current)
                             sleep(.5)
                         return select
@@ -2407,6 +2409,7 @@ def battle_logic(me, opp, move, my):
             return_my_pokemon(me)
             me.set_current(int(move[1]))
             pop_ball(me.current.name)
+            me.current.cry.play()
             draw_all_me(me.current)
         else:
             run_opp_swap(opp, move[1])
@@ -2556,11 +2559,13 @@ def run_game(me, opp, mode, socket):
                                 return_my_pokemon(me)
                                 me.set_current(select)
                                 pop_ball(me.current.name)
+                                me.current.cry.play()
                                 draw_all_me(me.current)
                             else:
                                 return_my_pokemon(me)
                                 me.set_current(select)
                                 pop_ball(me.current.name)
+                                me.current.cry.play()
                                 draw_all_me(me.current)
                                 run_opp_move(me, opp, opp_move, True)
                                 if not me.current.alive:
@@ -2571,11 +2576,13 @@ def run_game(me, opp, mode, socket):
                                 return_my_pokemon(me)
                                 me.set_current(select)
                                 pop_ball(me.current.name)
+                                me.current.cry.play()
                                 draw_all_me(me.current)
                             else:
                                 return_my_pokemon(me)
                                 me.set_current(select)
                                 pop_ball(me.current.name)
+                                me.current.cry.play()
                                 draw_all_me(me.current)
                                 run_opp_swap(opp, opp_move)
                         me.used.add(me.current)

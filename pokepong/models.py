@@ -339,6 +339,7 @@ class Owned(Base):
         self.bidecnt = -1
         self.sprite1 = self.set_sprite1()
         self.sprite2 = self.set_sprite2()
+        self.cry = Sound('sounds/crys/{0}.ogg'.format(self.base.name))
 
     def load_images(self):
         frontimg = loadimg('fronts/{0}.PNG'.format(self.base_id)).convert()

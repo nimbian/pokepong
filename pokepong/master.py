@@ -4,10 +4,11 @@ sleep(1)
 from pygame import display, joystick
 from pokepong.util import send_move, recv_move, MyMoveOccuring, OppMoveOccuring
 from pokepong.util import send_team, get_team, loadimg, set_client, get_client
+from pokepong.util import Sound
 from pokepong.logic import shop, get_wild_mon, draw_all_opp, draw_all_me
 from pokepong.logic import win, lost, opp_next_mon, gain_exp, evolve, play_again
 from pokepong.logic import battle_logic, run_opp_faint, run_me_faint
-from pokepong.logic import me_next_mon, new_game_start, clear, Sound
+from pokepong.logic import me_next_mon, new_game_start, clear
 from pokepong.logic import draw_choice, scrolling, choose_loc, intro, trainer_intro
 from pokepong.logic import clearbtm, run_game, get_trainers, get_mon, wild_intro
 from pokepong.models import Trainer, Owned

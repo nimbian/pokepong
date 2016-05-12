@@ -8,6 +8,8 @@ import zmq
 from math import floor
 from redis import StrictRedis
 from time import sleep
+from pygame.mixer import Sound
+pygame.mixer.init()
 
 CLIENT = False
 r = StrictRedis(host='127.0.0.1')
