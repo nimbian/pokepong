@@ -545,7 +545,7 @@ def me_next_mon(me, opp, mode, socket):
     function
     """
     send_val = draw_choose_pkmn(me, opp, mode, mydeath=True)
-    if mode == 'battle':
+    if mode ==  'battle' or mode == 'gym':
         socket.send(str(send_val))
         tmp = int(socket.recv())
         if opp.current != opp.pkmn[tmp]:
@@ -660,7 +660,7 @@ def opp_next_mon(me, opp, mode, socket):
         opp.get_next_pkmn()
     elif mode == 'pong':
         opp.get_next_pkmn()
-    elif mode == 'battle':
+    elif mode ==  'battle' or mode == 'gym':
         opp.set_current(wait_for_opp_next_mon(socket))
     display.update(write_btm(opp.name + ' is', 'about to use'))
     if mode != 'pong':
@@ -672,8 +672,9 @@ def opp_next_mon(me, opp, mode, socket):
         wait_for_button()
     else:
         sleep(1)
-    change_pokemon(me, opp, mode)
-    if mode == 'battle':
+    if me.alive() > 1:
+        change_pokemon(me, opp, mode)
+    if mode ==  'battle' or mode == 'gym':
         socket.send(str(me.get_current_index()))
     dirty = []
     dirty.extend(
@@ -1292,58 +1293,61 @@ def choose_loc(selector):
     tmp = []
     flag = False
     while True:
-        for event in pygame.event.get():
-            button = get_input(event)
-            if button == 'UP':
-                tmp.append('U')
-                tmp = tmp[-8:]
-                flag = False
-                if selector < len(MAPROUTE) - 1:
-                    selector += 1
-                    draw_loc_update(selector - 1, selector)
-                else:
-                    selector = 0
-                    draw_loc_update(len(MAPROUTE) - 1, selector)
-            elif button == 'DOWN':
-                tmp.append('D')
-                tmp = tmp[-8:]
-                flag = False
-                if selector > 0:
-                    selector -= 1
-                    draw_loc_update(selector + 1, selector)
-                else:
-                    selector = len(MAPROUTE) - 1
-                    draw_loc_update(0, selector)
-            elif button == 'LEFT':
-                tmp.append('L')
-                tmp = tmp[-8:]
-                flag = False
-            elif button == 'RIGHT':
-                tmp.append('R')
-                tmp = tmp[-8:]
-                flag = False
-            elif button == 'A':
-                if flag:
-                    return ['S.S. ANNE TRUCK', 'wild', 0]
-                else:
+        if r.get('leader'):
+            return False, 'leader', False
+        else:
+            for event in pygame.event.get():
+                button = get_input(event)
+                if button == 'UP':
+                    tmp.append('U')
+                    tmp = tmp[-8:]
+                    flag = False
+                    if selector < len(MAPROUTE) - 1:
+                        selector += 1
+                        draw_loc_update(selector - 1, selector)
+                    else:
+                        selector = 0
+                        draw_loc_update(len(MAPROUTE) - 1, selector)
+                elif button == 'DOWN':
+                    tmp.append('D')
+                    tmp = tmp[-8:]
+                    flag = False
                     if selector > 0:
-                        if ROUTES.has_key(MAPROUTE[selector]) and TRAINERS.has_key(MAPROUTE[selector]):
-                            tmp2 = wild_or_trainer()
-                        elif ROUTES.has_key(MAPROUTE[selector]):
-                            tmp2 = 0
+                        selector -= 1
+                        draw_loc_update(selector + 1, selector)
+                    else:
+                        selector = len(MAPROUTE) - 1
+                        draw_loc_update(0, selector)
+                elif button == 'LEFT':
+                    tmp.append('L')
+                    tmp = tmp[-8:]
+                    flag = False
+                elif button == 'RIGHT':
+                    tmp.append('R')
+                    tmp = tmp[-8:]
+                    flag = False
+                elif button == 'A':
+                    if flag:
+                        return ['S.S. ANNE TRUCK', 'wild', 0]
+                    else:
+                        if selector > 0:
+                            if ROUTES.has_key(MAPROUTE[selector]) and TRAINERS.has_key(MAPROUTE[selector]):
+                                tmp2 = wild_or_trainer()
+                            elif ROUTES.has_key(MAPROUTE[selector]):
+                                tmp2 = 0
+                            else:
+                                tmp2 = 1
                         else:
-                            tmp2 = 1
+                            return [MAPROUTE[selector], None, selector]
+                        if tmp2 >= 0:
+                            return [MAPROUTE[selector], ['wild', 'random'][tmp2], selector]
+                        else:
+                            draw_location(selector)
+                elif button == 'B':
+                    if tmp == ['U', 'U', 'D', 'D', 'L', 'R', 'L', 'R']:
+                        flag = True
                     else:
-                        return [MAPROUTE[selector], None, selector]
-                    if tmp2 >= 0:
-                        return [MAPROUTE[selector], ['wild', 'random'][tmp2], selector]
-                    else:
-                        draw_location(selector)
-            elif button == 'B':
-                if tmp == ['U', 'U', 'D', 'D', 'L', 'R', 'L', 'R']:
-                    flag = True
-                else:
-                    return False
+                        return False
         sleep(.02)
 
 
@@ -2078,10 +2082,10 @@ def draw_choose_pkmn(me, opp, mode, oppdeath=False, mydeath=False):
                         # TODO can't bring out fainted
                         pass
                     else:
-                        if mode == 'battle':
+                        if mode ==  'battle' or mode == 'gym':
                             if mydeath:
                                 clear()
-                                draw_all_opp(opp.current())
+                                draw_all_opp(opp.current)
                                 pygame.display.flip()
                                 me.set_current(select)
                                 me.used.add(me.current)
@@ -2258,7 +2262,7 @@ def run_attack(me, mode):
                     if mode != 'pong':
                         clean_me_up(me)
                         if usable_move(me.current.moves[select], mode):
-                            if mode == 'battle':
+                            if mode ==  'battle' or mode == 'gym':
                                 if get_client():
                                     x = 'table1'
                                 else:
@@ -2299,7 +2303,7 @@ def draw_move(move):
     return retval
 
 
-def lost(me, mode):
+def lost(me, opp, mode):
     """
     function
     """
@@ -2313,7 +2317,7 @@ def lost(me, mode):
         wait_for_button()
     else:
         sleep(2)
-    if mode == 'battle':
+    if mode ==  'battle' or mode == 'gym':
         cash = min(me.money, opp.money) / 2
         display.update(write_btm(me.name + ' lost', '<' + str(cash)))
         me.money -= cash
@@ -2344,7 +2348,7 @@ def win(me, opp, mode):
         me.money += opp.money
         db.commit()
         wait_for_button()
-    elif mode == 'battle':
+    elif mode ==  'battle' or mode == 'gym':
         cash = min(me.money, opp.money) / 2
         display.update(write_btm(me.name + ' gained', '<' + str(cash)))
         me.money += cash

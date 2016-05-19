@@ -8,7 +8,7 @@ from pokepong.util import Sound
 from pokepong.logic import shop, get_wild_mon, draw_all_opp, draw_all_me
 from pokepong.logic import win, lost, opp_next_mon, gain_exp, evolve, play_again
 from pokepong.logic import battle_logic, run_opp_faint, run_me_faint
-from pokepong.logic import me_next_mon, new_game_start, clear
+from pokepong.logic import me_next_mon, new_game_start, clear, conf
 from pokepong.logic import draw_choice, scrolling, choose_loc, intro, trainer_intro
 from pokepong.logic import clearbtm, run_game, get_trainers, get_mon, wild_intro
 from pokepong.models import Trainer, Owned
@@ -68,7 +68,7 @@ def main():
             else:
                 music = Sound("sounds/trainer_battle.ogg")
                 music_vict = Sound("sounds/trainer_victory.ogg")
-        if mode != 'wild' and new_game:
+        if new_game:
             r.incr('count')
             while int(r.get('count')) < 2:
                 sleep(.5)
@@ -125,8 +125,8 @@ def main():
             for mon in mypkmnlist:
                 me.pkmn.append(Owned.query.get(mon))
                 me.current = me.pkmn[0]
-                me.used = set()
-                me.used.add(me.current)
+            me.used = set()
+            me.used.add(me.current)
 
         while mode != 'wild':
             try:
@@ -146,27 +146,73 @@ def main():
                 # sleep(5)
         if mode == 'wild':
             loc, wild, remember = choose_loc(remember)
-            OPENING.stop()
-            if loc == 'PALLET TOWN':
-                shop(me)
-                new_game = False
-                continue
+            if wild == 'leader':
+                mode = 'gym'
+                tmp = r.get('leader')
+                if tmp == 'brock':
+                    name = 'BROCK'
+                    team = [152,153]
+                send_team(name, team, socket, get_client())
+                me = Trainer('BROCK')
+                me.money = 2400
+                me.initialize()
+                me.pkmn = []
+                for mon in team:
+                    me.pkmn.append(Owned.query.get(mon))
+                    me.current = me.pkmn[0]
+                me.used = set()
+                me.used.add(me.current)
+                while True:
+                    try:
+                        oppname, opppkmnlist = get_team(socket, get_client())
+                        opp = Trainer.query.filter(Trainer.name == oppname).one()
+                        opp.pkmn = []
+                        for mon in opppkmnlist:
+                            opp.pkmn.append(Owned.query.get(mon))
+                        opp.current = opp.pkmn[0]
+                        break
+                    except zmq.Again:
+                        pass
             else:
-                if wild == 'wild':
-                    opp = Trainer('')
-                    opp.pkmn = [get_wild_mon(loc)]
-                    opp.current = opp.pkmn[0]
-                    wild_intro()
+
+                OPENING.stop()
+                if loc == 'PALLET TOWN':
+                    shop(me)
+                    new_game = False
+                    continue
+                elif loc == 'PEWTER CITY':
+                    if conf():
+                        mode = 'gym'
+                        r.set('leader', 'brock')
+                        send_team(myname, mypkmnlist, socket, get_client())
+                        while True:
+                            try:
+                                oppname, opppkmnlist = get_team(socket, get_client())
+                                opp = Trainer('BROCK')
+                                opp.money = 2400
+                                opp.pkmn = []
+                                for mon in opppkmnlist:
+                                    opp.pkmn.append(Owned.query.get(mon))
+                                opp.current = opp.pkmn[0]
+                                break
+                            except zmq.Again:
+                                pass
                 else:
-                    mode = 'random'
-                    trainer = get_trainers(loc)
-                    opp = Trainer(trainer[0])
-                    opp.money = trainer[1]
-                    opp.pkmn = []
-                    for i in trainer[2]:
-                        opp.pkmn.append(get_mon(i[0], i[1]))
-                    opp.current = opp.pkmn[0]
-                    trainer_intro()
+                    if wild == 'wild':
+                        opp = Trainer('')
+                        opp.pkmn = [get_wild_mon(loc)]
+                        opp.current = opp.pkmn[0]
+                        wild_intro()
+                    else:
+                        mode = 'random'
+                        trainer = get_trainers(loc)
+                        opp = Trainer(trainer[0])
+                        opp.money = trainer[1]
+                        opp.pkmn = []
+                        for i in trainer[2]:
+                            opp.pkmn.append(get_mon(i[0], i[1]))
+                        opp.current = opp.pkmn[0]
+                        trainer_intro()
         OPENING.stop()
         opp.initialize()
         music.play()
@@ -211,7 +257,7 @@ def main():
                     me_next_mon(me, opp, mode, socket)
                 else:
                     music.stop()
-                    lost(me, mode)
+                    lost(me, opp, mode)
             elif tmp == 3:
                 break
             elif tmp == 5:
@@ -233,6 +279,9 @@ def main():
         new_game = False
         if mode == 'random':
             mode = 'wild'
+        if mode == 'gym':
+            mode = 'wild'
+            r.delete('leader')
         # TODO should only evolve when leveled
         if mode == 'wild':
             for mon in me.pkmn:
