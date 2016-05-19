@@ -138,6 +138,19 @@ class Trainer(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String, unique=True, nullable=False)
     money = Column(Integer, default=1500)
+    bb = Column(Boolean, default=False)
+    cb = Column(Boolean, default=False)
+    tb = Column(Boolean, default=False)
+    rb = Column(Boolean, default=False)
+    sb = Column(Boolean, default=False)
+    mb = Column(Boolean, default=False)
+    vb = Column(Boolean, default=False)
+    eb = Column(Boolean, default=False)
+    e1 = Column(Boolean, default=False)
+    e2 = Column(Boolean, default=False)
+    e3 = Column(Boolean, default=False)
+    e4 = Column(Boolean, default=False)
+    champion = Column(Boolean, default=False)
 
     def __init__(self, name):
         self.name = name

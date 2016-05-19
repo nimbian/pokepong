@@ -7,7 +7,7 @@ from pokepong.util import send_team, get_team, loadimg, set_client, get_client
 from pokepong.util import Sound
 from pokepong.logic import shop, get_wild_mon, draw_all_opp, draw_all_me
 from pokepong.logic import win, lost, opp_next_mon, gain_exp, evolve, play_again
-from pokepong.logic import battle_logic, run_opp_faint, run_me_faint
+from pokepong.logic import battle_logic, run_opp_faint, run_me_faint, get_badge
 from pokepong.logic import me_next_mon, new_game_start, clear, conf
 from pokepong.logic import draw_choice, scrolling, choose_loc, intro, trainer_intro
 from pokepong.logic import clearbtm, run_game, get_trainers, get_mon, wild_intro
@@ -148,6 +148,7 @@ def main():
             loc, wild, remember = choose_loc(remember)
             if wild == 'leader':
                 mode = 'gym'
+                challenger = False
                 tmp = r.get('leader')
                 if tmp == 'brock':
                     name = 'BROCK'
@@ -184,6 +185,7 @@ def main():
                     if conf():
                         mode = 'gym'
                         r.set('leader', 'brock')
+                        challenger = True
                         send_team(myname, mypkmnlist, socket, get_client())
                         while True:
                             try:
@@ -250,6 +252,8 @@ def main():
                     #TODO fade in
                     music_vict.play()
                     win(me, opp, mode)
+                    if mode == 'gym' and challenger:
+                        get_badge(me, opp)
                     music_vict.stop()
             elif tmp == 1:
                 run_me_faint(me)

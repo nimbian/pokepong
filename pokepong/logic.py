@@ -1084,10 +1084,10 @@ def run_me_faint(me):
     function
     """
     for i in range(0, 400, 2):
-        draw.rect(SCREEN, WHITE, [59, SIZE[1] - 740, 392, 392])
+        draw.rect(SCREEN, WHITE, [59, SIZE[1] - 740, 392, 398])
         SCREEN.blit(
             me.current.backimg, (59, SIZE[1] - 740 + i), (0, 0, 392, 392 - i))
-        display.update(59, SIZE[1] - 738 + i, 392, 394 - i)
+        display.update(59, SIZE[1] - 742 + i, 392, 398 - i)
     display.update(write_btm(me.current.name, 'fainted!'))
     me.used.remove(me.current)
 
@@ -1097,10 +1097,10 @@ def run_opp_faint(opp):
     function
     """
     for i in range(0, 393, 2):
-        draw.rect(SCREEN, WHITE, [SIZE[0] - 500, 0, 392, 392])
+        draw.rect(SCREEN, WHITE, [SIZE[0] - 500, 0, 392, 398])
         SCREEN.blit(
             opp.current.frontimg, (SIZE[0] - 500, i), (0, 0, 392, 392 - i))
-        display.update([SIZE[0] - 500, i - 2, 392, 394 - i])
+        display.update([SIZE[0] - 500, i - 2, 392, 398 - i])
     display.update(write_btm('Enemy ' + opp.current.name.upper(), 'fainted!'))
     sleep(2)
 
@@ -2354,6 +2354,59 @@ def win(me, opp, mode):
         me.money += cash
         db.commit()
         wait_for_button()
+
+def get_badge(me, opp):
+    if opp.name == 'BROCK':
+        badge = 'BOULDER'
+        me.bb = True
+    elif opp.name == 'MISTY':
+        badge = 'CASCADE'
+        me.cb = True
+    elif opp.name == 'Lt. SURGE':
+        badge = 'THUNDER'
+        me.tb = True
+    elif opp.name == 'ERIKA':
+        badge = 'RAINBOW'
+        me.rb = True
+    elif opp.name == 'KOGA':
+        badge = 'SOUL'
+        me.sb = True
+    elif opp.name == 'SABRINA':
+        badge = 'MARSH'
+        me.mb = True
+    elif opp.name == 'BLAINE':
+        badge = 'VOLCANO'
+        me.vb = True
+    elif opp.name == 'GIOVANNI':
+        badge = 'EARTH'
+        me.eb = True
+    else:
+        if opp.name in ['LORELEI', 'BRUNO', 'AGATHA', 'LANCE']:
+            if opp.name == 'LORELEI':
+                me.e1 = True
+            if opp.name == 'BRUNO':
+                me.e2 = True
+            if opp.name == 'AGATHA':
+                me.e3 = True
+            if opp.name == 'LANCE':
+                me.e4 = True
+            display.update(write_btm('Congratulations,', '{0}'.format(me.name) + ' the next'))
+            wait_for_button()
+            display.update(write_btm('{0}'.format(me.name) + ' the next', 'challenger awaits!'))
+        else:
+            me.champion = True
+            display.update(write_btm('Congratulations you', 'are the pok~mon'))
+            wait_for_button()
+            display.update(write_btm('are the pok~mon', 'league champion'))
+            wait_for_button()
+            display.update(write_btm('Now defend your title'))
+        wait_for_button()
+        return
+    display.update(write_btm('Congratulations,', '{0}'.format(me.name) +' recieved'))
+    wait_for_button()
+    display.update(write_btm('{0}'.format(me.name) +' recieved', 'the {0} badge!'.format(badge)))
+    db.commit()
+    wait_for_button()
 
 
 
