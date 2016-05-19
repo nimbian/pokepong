@@ -150,11 +150,10 @@ def main():
                 mode = 'gym'
                 challenger = False
                 tmp = r.get('leader')
-                if tmp == 'brock':
-                    name = 'BROCK'
-                    team = [152,153]
+                name = GYMS[tmp][0]
+                team = GYMS[tmp][1]
                 send_team(name, team, socket, get_client())
-                me = Trainer('BROCK')
+                me = Trainer(name)
                 me.money = 2400
                 me.initialize()
                 me.pkmn = []
@@ -181,16 +180,16 @@ def main():
                     shop(me)
                     new_game = False
                     continue
-                elif loc == 'PEWTER CITY':
+                elif loc in GYMS:
                     if conf():
                         mode = 'gym'
-                        r.set('leader', 'brock')
+                        r.set('leader', loc)
                         challenger = True
                         send_team(myname, mypkmnlist, socket, get_client())
                         while True:
                             try:
                                 oppname, opppkmnlist = get_team(socket, get_client())
-                                opp = Trainer('BROCK')
+                                opp = Trainer(oppname)
                                 opp.money = 2400
                                 opp.pkmn = []
                                 for mon in opppkmnlist:
@@ -199,6 +198,8 @@ def main():
                                 break
                             except zmq.Again:
                                 pass
+                    else:
+                        continue
                 else:
                     if wild == 'wild':
                         opp = Trainer('')

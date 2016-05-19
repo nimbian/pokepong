@@ -968,7 +968,7 @@ def gain_exp(me, opp, multi):
     """
     for mon in me.used:
         tmp = None
-        if mon.id > 151:
+        if mon.id > 198:
             lvlup, exp = mon.gain_exp(me, opp, multi)
             display.update(write_btm(mon.name, 'gained ' + str(exp) + ' exp.'))
             wait_for_button()

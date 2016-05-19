@@ -29,6 +29,14 @@ HIGH_ARC = [(101, 302), (234, 120), (402, -26), (420, -54), (460, -100), (490, -
             (520, -100), (580, -80), (640, -60), (700, -5), (760, 50)]
 LOW_ARC = []
 
+GYMS = {'PEWTER CITY': ['BROCK',[152,153]], 'CERULEAN CITY': ['MISTY',[154,155]],
+        'VERMILION CITY': ['Lt. SURGE',[156,157,158]], 'CELADON CITY': ['ERIKA',[159,160,161]],
+        'FUCHSIA CITY': ['KOGA',[166,167,168,169]], 'SAFFRON CITY': ['SABRINA',[162,163,164,165]],
+        'CINNABAR ISLAND': ['BLAINE',[170,171,172,173]], 'VIRIDIAN CITY': ['GIOVANNI',[174,175,176,177,178]],
+        'ELITE 4-1': ['LORELEI',[179,180,181,182,183]], 'ELITE 4-2': ['BRUNO',[184,185,186,187,188]],
+        'ELITE 4-3': ['AGATHA',[189,190,191,192,193]], 'ELITE 4-4': ['LANCE',[194,195,196,197,198]],
+        'CHAMPION': None}
+
 
 def set_client(tmp):
     global CLIENT

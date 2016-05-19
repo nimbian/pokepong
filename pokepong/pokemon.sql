@@ -1603,6 +1603,32 @@ INSERT INTO "learnablemove" VALUES(969,151,154,10);
 INSERT INTO "learnablemove" VALUES(970,151,82,20);
 INSERT INTO "learnablemove" VALUES(971,151,83,30);
 INSERT INTO "learnablemove" VALUES(972,151,98,40);
+
+
+INSERT INTO "learnablemove" VALUES(973,121,8,0);
+INSERT INTO "learnablemove" VALUES(974,121,21,0);
+INSERT INTO "learnablemove" VALUES(976,121,76,23);
+INSERT INTO "learnablemove" VALUES(977,121,34,31);
+INSERT INTO "learnablemove" VALUES(978,121,79,39);
+INSERT INTO "learnablemove" VALUES(979,121,137,47);
+
+
+INSERT INTO "learnablemove" VALUES(980,71,2,0);
+INSERT INTO "learnablemove" VALUES(981,71,102,0);
+INSERT INTO "learnablemove" VALUES(982,71,121,0);
+INSERT INTO "learnablemove" VALUES(983,71,135,0);
+
+
+INSERT INTO "learnablemove" VALUES(984,45,2,0);
+INSERT INTO "learnablemove" VALUES(985,45,102,0);
+INSERT INTO "learnablemove" VALUES(986,45,91,0);
+INSERT INTO "learnablemove" VALUES(987,45,135,0);
+
+INSERT INTO "learnablemove" VALUES(988,59,11,0);
+INSERT INTO "learnablemove" VALUES(989,59,107,0);
+INSERT INTO "learnablemove" VALUES(990,59,40,18);
+INSERT INTO "learnablemove" VALUES(991,59,74,23);
+
 INSERT INTO "tmhm" VALUES(1,'TM01',82);
 INSERT INTO "tmhm" VALUES(2,'TM02',103);
 INSERT INTO "tmhm" VALUES(3,'TM03',142);
