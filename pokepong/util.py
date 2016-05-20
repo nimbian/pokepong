@@ -42,6 +42,8 @@ GYMS = {'PEWTER CITY': ['BROCK',[152,153]], 'CERULEAN CITY': ['MISTY',[154,155]]
         'ELITE 4-3': ['AGATHA',[189,190,191,192,193]], 'ELITE 4-4': ['LANCE',[194,195,196,197,198]],
         'CHAMPION': None}
 
+PRIZES = {'LITTLE':['Bulbasaur', 'Charmander', 'Squirtle', 'Eevee'], 'MEDIUM':['Porygon', 'Nugget', 'Rare Candy'], 'BIG':['Master Ball']}
+
 
 def set_client(tmp):
     global CLIENT
@@ -141,7 +143,6 @@ def send_move(move, socket):
     function
     """
     socket.send(json.dumps(move.args))
-    print 'waiting for response'
     socket.recv()
 
 
@@ -288,6 +289,22 @@ def wait_for_button():
         else:
             c += 1
         sleep(.1)
+
+def get_prize(me, opp):
+    lvls = []
+    for mon in me.pkmn:
+        lvls.append(mon.lvl)
+    avg1 = float(sum(lvls))/len(lvls)
+    lvls = []
+    for mon in opp.pkmn:
+        lvls.append(mon.lvl)
+    avg2 = float(sum(lvls))/len(lvls)
+    if min(avg1, avg2) < 15:
+        return choice(PRIZES['LITTLE'])
+    elif min(avg1, avg2) < 30:
+        return choice(PRIZES['MEDIUM'])
+    elif min(avg1, avg2) >= 30 :
+        return choice(PRIZES['BIG'])
 
 
 SCREEN = display.set_mode(SIZE)

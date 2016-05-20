@@ -4,11 +4,11 @@ sleep(1)
 from pygame import display, joystick
 from pokepong.util import send_move, recv_move, MyMoveOccuring, OppMoveOccuring
 from pokepong.util import send_team, get_team, loadimg, set_client, get_client
-from pokepong.util import Sound, GYMS
+from pokepong.util import Sound, GYMS, get_prize, write_btm
 from pokepong.logic import shop, get_wild_mon, draw_all_opp, draw_all_me, enter_pin
 from pokepong.logic import win, lost, opp_next_mon, gain_exp, evolve, play_again
 from pokepong.logic import battle_logic, run_opp_faint, run_me_faint, get_badge
-from pokepong.logic import me_next_mon, new_game_start, clear, conf
+from pokepong.logic import me_next_mon, new_game_start, clear, conf, recv_prize
 from pokepong.logic import draw_choice, scrolling, choose_loc, intro, trainer_intro
 from pokepong.logic import clearbtm, run_game, get_trainers, get_mon, wild_intro
 from pokepong.models import Trainer, Owned
@@ -37,8 +37,6 @@ def main():
     r = StrictRedis(host='127.0.0.1')
     r.delete('lock')
     r.delete('leader')
-    r.delete('table1')
-    r.delete('table2')
     poss = [1, 4, 7, 25, 143, 132, 129, 123, 95, 92, 77, 13, 17, 21, 35]
     possible = []
     for p in poss:
@@ -110,7 +108,7 @@ def main():
             current = scrolling(current, possible)
             # TODO uncomment for PROD
             # sleep(5)
-        if mode != 'pong':
+        if mode == 'wild' or mode == 'battle':
             me = Trainer.query.filter(Trainer.name == myname).one()
             try:
                 me.pkmn
@@ -158,7 +156,6 @@ def main():
                 team = GYMS[tmp][1]
                 send_team(name, team, socket, get_client())
                 me = Trainer(name)
-                me.money = 2400
                 me.initialize()
                 me.pkmn = []
                 for mon in team:
@@ -220,11 +217,27 @@ def main():
                             opp.pkmn.append(get_mon(i[0], i[1]))
                         opp.current = opp.pkmn[0]
                         trainer_intro()
+        if mode != 'wild' and mode != 'random':
+            socket.send('')
+            socket.recv()
         OPENING.stop()
         opp.initialize()
         music.play()
+        if mode == 'battle':
+            prize = get_prize(me, opp)
+            clear()
+            write_btm('You are playing', 'for a {0}'.format(prize))
+            display.flip()
+            sleep(2)
         r.delete('table1')
         r.delete('table2')
+        for mon in me.pkmn:
+            mon.haze
+            mon.hp = mon.maxhp
+        for mon in opp.pkmn:
+            mon.haze
+            mon.hp = mon.maxhp
+
         new_game_start(me, opp, mode)
         while me.alive() and opp.alive():
             try:
@@ -256,9 +269,13 @@ def main():
                     music.stop()
                     #TODO fade in
                     music_vict.play()
+                    print me
+                    print opp
                     win(me, opp, mode)
                     if mode == 'gym' and challenger:
                         get_badge(me, opp)
+                    elif mode == 'battle':
+                        recv_prize(me, prize)
                     music_vict.stop()
             elif tmp == 1:
                 run_me_faint(me)

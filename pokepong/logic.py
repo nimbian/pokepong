@@ -18,8 +18,10 @@ from pokepong.joy import get_input
 SHOP = Sound("sounds/shop.ogg")
 EVOLVE = Sound("sounds/evolve.ogg")
 
+#TODO issue if opposing trainers pick same pkmn in pong?
 # TODO if speeds are equal me will go first.  me is different on client vs
 # server
+#TODO restart elite 4 on loss
 
 MYHP = loadalphaimg('myhp.png')
 OPPHP = loadalphaimg('opphp.png')
@@ -2466,6 +2468,27 @@ def get_badge(me, opp):
     wait_for_button()
 
 
+def recv_prize(me, prize):
+    try:
+        tmp = Pokemon.query.filter(Pokemon.name == prize).one().id
+        pkmn = Owned(tmp, lvl = 5)
+        pkmn.owner = me
+        db.add(pkmn)
+        db.add(me)
+        db.commit()
+    except NoResultFound:
+        try:
+            item =  Items.query.filter(Items.name == prize).one()
+            o = OwnedItem.query.filter(OwnedItem.item_id == item.id) \
+                               .filter(OwnedItem.owner == me).one()
+            o.count += 1
+            db.commit()
+        except NoResultFound:
+            tmp = OwnedItem(item, me, 1)
+            db.add(tmp)
+            db.commit()
+    display.update(write_btm('Congratulations you', 'won a {0}!'.format(prize)))
+    wait_for_button()
 
 
 def run_pong(me, opp):
@@ -2747,4 +2770,4 @@ def run_game(me, opp, mode, socket):
 
 
 from pokepong.domove import do_move, usable_move
-from pokepong.models import Pokemon, Owned, tmpMove, OwnedItem, shoppe, TmHm
+from pokepong.models import Pokemon, Owned, tmpMove, OwnedItem, shoppe, TmHm, Items
