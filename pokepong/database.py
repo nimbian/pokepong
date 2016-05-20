@@ -28,6 +28,7 @@ def init_db(tmp = None):
                         conn.execute(line)
                     if engine.name == 'postgresql':
                         conn.execute('ALTER TABLE pokemon ENABLE TRIGGER ALL;')
+                        conn.execute('alter sequence owned_id_seq restart with 152;')
     from pokepong.models import Owned
     db.add(Owned(74, lvl=12))
     db.add(Owned(95, lvl=14))
