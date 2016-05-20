@@ -227,7 +227,7 @@ ROUTES['ROUTE 12'] = {
 	'Pidgey': [[23,27],.3],
 	'Venonat': [[24,26],.2],
 	'Bellsprout': [[22,26],.2],
-	'Weepingbell': [[28,30],.05],
+	'Weepinbell': [[28,30],.05],
 	'Oddish': [[22,26],.2],
 	'Gloom': [[28,30],.05]
 }
@@ -236,7 +236,7 @@ ROUTES['ROUTE 13'] = {
 	'Pidgey': [[23,27],.25],
 	'Venonat': [[24,26],.2],
 	'Bellsprout': [[22,26],.2],
-	'Weepingbell': [[28,30],.05],
+	'Weepinbell': [[28,30],.05],
 	'Oddish': [[22,26],.2],
 	'Gloom': [[28,30],.05],
 	'Ditto': [[25,25],.05]
@@ -247,7 +247,7 @@ ROUTES['ROUTE 14'] = {
 	'Pidgeotto': [[28,30],.05],
 	'Venonat': [[24,26],.15],
 	'Bellsprout': [[22,26],.2],
-	'Weepingbell': [[30,30],.05],
+	'Weepinbell': [[30,30],.05],
 	'Oddish': [[22,26],.2],
 	'Gloom': [[30,30],.05],
 	'Ditto': [[23,23],.15]
@@ -258,7 +258,7 @@ ROUTES['ROUTE 15'] = {
 	'Pidgeotto': [[28,30],.05],
 	'Venonat': [[26,28],.15],
 	'Bellsprout': [[22,26],.2],
-	'Weepingbell': [[30,30],.05],
+	'Weepinbell': [[30,30],.05],
 	'Oddish': [[22,26],.2],
 	'Gloom': [[30,30],.05],
 	'Ditto': [[26,26],.15]
@@ -266,6 +266,228 @@ ROUTES['ROUTE 15'] = {
 
 ROUTES['S.S. ANNE TRUCK'] = {
         'Mew': [[5,5],1]
+}
+
+ROUTES['ROUTE 21'] = {
+              'Rattata': [[21,23],.35],
+              'Rattata': [[21,23],.35],
+              'Raticate':[[30,30],.15],
+              'Pidgey':[[21,23],.25],
+              'Pidgeotto':[[30,32],.15],
+              'Tangela':[[28,32],.10]
+}
+
+ROUTES['POK~MON MANSION FLOOR 1'] = {
+              'Koffing':[[30,32],.2],
+              'Weezing':[[37,39],.02],
+              'Grimer':[[30,32],.2],
+              'Muk':[[37,39],.02],
+              'Vulpix':[[34,34],.1],
+              'Growlithe':[[34,34],.1],
+              'Ponyta':[[28,34],.36]
+
+}
+
+ROUTES['POK~MON MANSION FLOOR 2'] = {
+              'Koffing':[[30,34],.2],
+              'Weezing':[[37,39],.02],
+              'Grimer':[[30,34],.2],
+              'Muk':[[37,39],.02],
+              'Vulpix':[[32,32],.1],
+              'Growlithe':[[32,32],.1],
+              'Ponyta':[[28,32],.36]
+}
+
+ROUTES['POK~MON MANSION FLOOR 3'] = {
+              'Koffing':[[31,35],.2],
+              'Weezing':[[38,42],.02],
+              'Grimer':[[31,35],.2],
+              'Muk':[[38,42],.02],
+              'Vulpix':[[33,33],.1],
+              'Growlithe':[[33,33],.1],
+              'Ponyta':[[32,36],.26],
+              'Magmar':[[34,34],.1]
+}
+
+ROUTES['POK~MON MANSION BASEMENT 1'] = {
+              'Koffing':[[31,35],.2],
+              'Weezing':[[40,42],.02],
+              'Grimer':[[31,35],.2],
+              'Muk':[[40,42],.02],
+              'Vulpix':[[35,35],.1],
+              'Growlithe':[[35,35],.1],
+              'Ponyta':[[32,34],.3],
+              'Magmar':[[38,38],.4]
+}
+
+ROUTES['POWER PLANT'] = {
+               'Magnemite':[[21,23],.25],
+               'Magneton':[[32,35],.09],
+               'Pikachu':[[20,24],.25],
+               'Raichu':[[33,36],.05],
+               'Voltorb':[[21,23],.30],
+               'Electabuzz':[[33,36],.05],
+           'Zapdos':[[50,50],.01]
+}
+
+ROUTES['ROUTE 19'] = {
+              'Tentacool':[[5,40],1]
+}
+
+ROUTES['ROUTE 20'] = {
+              'Tentacool':[[5,40],1]
+}
+
+ROUTES['SEAFOAM ISLANDS FLOOR 1'] = {
+               'Zubat':[[21,21],.10],
+               'Golbat':[[29,29],.05],
+               'Psyduck':[[28,30],.05],
+               'Golduck':[[38,38],.01],
+               'Slowpoke':[[28,30],.1],
+               'Slowbro':[[38,38],.01],
+               'Seel':[[30,30],.20],
+               'Shellder':[[28,30],.12],
+               'Krabby':[[28,30],.12],
+               'Horsea':[[28,30],.12],
+               'Staryu':[[28,30],.12]
+}
+
+ROUTES['SEAFOAM ISLANDS BASEMENT 1'] = {
+               'Psyduck':[[28,30],.1],
+               'Slowpoke':[[28,30],.1],
+               'Seel':[[28,30],.10],
+               'Dewgong':[[38,38],.03],
+               'Shellder':[[32,32],.2],
+               'Krabby':[[30,32],.15],
+               'Kingler':[[37,37],.01],
+               'Horsea':[[30,32],.15],
+               'Seadra':[[37,37],.01],
+               'Staryu':[[30,30],.15],
+}
+
+ROUTES['SEAFOAM ISLANDS BASEMENT 2'] = {
+               'Golbat':[[30,30],.04],
+               'Psyduck':[[30,32],.2],
+               'Golduck':[[37,37],.01],
+               'Slowpoke':[[30,32],.2],
+               'Slowbro':[[37,37],.01],
+               'Seel':[[30,32],.20],
+               'Shellder':[[28,30],.07],
+               'Krabby':[[28,30],.1],
+               'Horsea':[[28,30],.1],
+               'Staryu':[[28,30],.07]
+}
+
+ROUTES['SEAFOAM ISLANDS BASEMENT 3'] = {
+               'Psyduck':[[31,33],.2],
+               'Slowpoke':[[31,33],.2],
+               'Seel':[[31,33],.11],
+               'Dewgong':[[37,37],.01],
+               'Shellder':[[29,31],.1],
+               'Krabby':[[29,31],.1],
+               'Kingler':[[39,39],.04],
+               'Horsea':[[29,31],.1],
+               'Seadra':[[39,39],.04],
+               'Staryu':[[29,31],.1]
+}
+
+ROUTES['SEAFOAM ISLANDS BASEMENT 4'] = {
+               'Golbat':[[32,32],.01],
+               'Psyduck':[[29,31],.1],
+               'Golduck':[[39,39],.04],
+               'Slowpoke':[[29,31],.1],
+               'Slowbro':[[39,39],.04],
+               'Seel':[[29,31],.1],
+               'Shellder':[[31,33],.13],
+               'Krabby':[[31,33],.17],
+               'Horsea':[[31,33],.17],
+               'Staryu':[[31,33],.13],
+           'Articuno':[[50,50],.01]
+}
+
+ROUTES['ROUTE 23'] = {
+               'Spearow':[[26,26],.1],
+               'Fearow':[[38,43],.2],
+               'Ekans':[[26,26],.18],
+               'Arbok':[[41,41],.02],
+               'Sandshrew':[[26,26],.18],
+               'Sandslash':[[41,41],.02],
+               'Ditto':[[33,43],.30]
+}
+
+ROUTES['VICTORY ROAD FLOOR 1'] = {
+               'Zubat':[[22,22],.15],
+               'Golbat':[[41,41],.05],
+               'Geodude':[[26,26],.15],
+               'Graveler':[[42,42],.01],
+               'Machop':[[24,24],.25],
+               'Machoke':[[42,42],.05],
+               'Onix':[[36,42],.30],
+               'Marowak':[[43,43],.04]
+}
+
+ROUTES['VICTORY ROAD FLOOR 2'] = {
+               'Zubat':[[26,26],.14],
+               'Golbat':[[40,40],.05],
+               'Geodude':[[24,24],.15],
+               'Graveler':[[43,43],.05],
+               'Machop':[[22,22],.25],
+               'Machoke':[[41,41],.05],
+               'Onix':[[36,42],.20],
+               'Marowak':[[40,40],.05],
+               'Moltres':[[50,50],.01]
+}
+
+ROUTES['VICTORY ROAD FLOOR 3'] = {
+               'Zubat':[[22,22],.15],
+               'Golbat':[[41,41],.05],
+               'Geodude':[[26,26],.15],
+               'Graveler':[[43,43],.05],
+               'Machop':[[24,24],.25],
+               'Machoke':[[42,45],.04],
+               'Onix':[[42,45],.30],
+               'Venomoth':[[40,40],.10]
+}
+
+ROUTES['UNKNOWN DUNGEON SECOND FLOOR'] = {
+               'Venomoth':[[51,51],.15],
+               'Dodrio':[[51,51],.25],
+               'Kadabra':[[51,51],.15],
+               'Electrode':[[52,52],.10],
+               'Marowak':[[52,52],.10],
+               'Rhydon':[[52,52],.10],
+               'Wigglytuff':[[54,54],.05],
+               'Chansey':[[56,56],.05],
+               'Ditto':[[55,60],.05]
+}
+
+ROUTES['UNKNOWN DUNGEON FIRST FLOOR'] = {
+               'Golbat':[[46,46],.25],
+               'Hypno':[[46,46],.15],
+               'Magneton':[[46,46],.15],
+               'Sandslash':[[52,52],.05],
+               'Parasect':[[52,52],.05],
+               'Raichu':[[53,53],.04],
+               'Arbok':[[52,52],.05],
+               'Venomoth':[[49,49],.10],
+               'Dodrio':[[49,49],.10],
+               'Kadabra':[[49,49],.05],
+               'Ditto':[[53,53],.01]
+}
+
+ROUTES['UNKNOWN DUNGEON BASEMENT 1'] = {
+
+               'Marowak':[[55,55],.15],
+               'Rhydon':[[55,55],.25],
+               'Electrode':[[55,55],.15],
+               'Sandslash':[[57,57],.03],
+               'Parasect':[[64,64],.09],
+               'Raichu':[[64,64],.10],
+               'Arbok':[[57,57],.03],
+               'Chansey':[[64,64],.10],
+               'Ditto':[[63,67],.10],
+               'Mewtwo':[[70,70],.01]
+
 }
 
 TRAINERS['SAFFRON CITY'] = [['Blackbelt', 900, [['Primeape', 36],
@@ -986,3 +1208,23 @@ TRAINERS['ROUTE 15'] = [['Jr. Trainer +', 580, [['Pikachu', 29],
                                          ["Farfetch'd", 26],
                                          ['Doduo', 26],
                                          ['Pidgey', 26]]]]
+
+#TODO missing pokemon
+#Aerodactyl
+#Dratini
+#Eevee
+#Farfetch'd
+#Goldeen
+#Hitmonchan
+#Hitmonlee
+#Jynx
+#Kabuto
+#Kabutops
+#Lapras
+#Lickitung
+#Magikarp
+#Mr. Mime
+#Omanyte
+#Poliwag
+#Porygon
+
