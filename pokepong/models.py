@@ -45,6 +45,21 @@ class TmHm(Base):
     move_id = Column(Integer, ForeignKey('move.id'), nullable=False)
     move = relationship('Move', backref=backref('TmHm', uselist=False))
 
+class Caught(Base):
+    __tablename__ = 'caught'
+    id = Column(Integer, primary_key=True)
+    trainer_id = Column(Integer, ForeignKey('trainer.id'))
+    trainer = relationship('Trainer', backref='pokemon')
+    pokemon_id = Column(Integer, ForeignKey('pokemon.id'))
+    pokemon = relationship('Pokemon')
+    seen = Column(Boolean, default = True)
+    caught = Column(Boolean, default = False)
+
+    def __init__(self, trainer, pokemon_id):
+        self.trainer = trainer
+        self.pokemon_id = pokemon_id
+
+
 class Type(Base):
     __tablename__ = 'type'
     id = Column(Integer, primary_key=True)
