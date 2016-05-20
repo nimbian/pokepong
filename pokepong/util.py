@@ -29,6 +29,11 @@ HIGH_ARC = [(101, 302), (234, 120), (402, -26), (420, -54), (460, -100), (490, -
             (520, -100), (580, -80), (640, -60), (700, -5), (760, 50)]
 LOW_ARC = []
 
+PINS = {'BROCK': [1,2,3,4],'MISTY': [1,2,3,4],'Lt. SURGE': [1,2,3,4],
+        'ERIKA': [1,2,3,4],'KOGA': [1,2,3,4],'SABRINA': [1,2,3,4],
+        'BLAINE': [1,2,3,4],'GIOVANNI': [1,2,3,4],'LORELEI': [1,2,3,4],
+        'BRUNO': [1,2,3,4],'AGATHA': [1,2,3,4],'LANCE': [1,2,3,4]}
+
 GYMS = {'PEWTER CITY': ['BROCK',[152,153]], 'CERULEAN CITY': ['MISTY',[154,155]],
         'VERMILION CITY': ['Lt. SURGE',[156,157,158]], 'CELADON CITY': ['ERIKA',[159,160,161]],
         'FUCHSIA CITY': ['KOGA',[166,167,168,169]], 'SAFFRON CITY': ['SABRINA',[162,163,164,165]],

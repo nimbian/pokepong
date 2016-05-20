@@ -5,7 +5,7 @@ from pygame import display, joystick
 from pokepong.util import send_move, recv_move, MyMoveOccuring, OppMoveOccuring
 from pokepong.util import send_team, get_team, loadimg, set_client, get_client
 from pokepong.util import Sound
-from pokepong.logic import shop, get_wild_mon, draw_all_opp, draw_all_me
+from pokepong.logic import shop, get_wild_mon, draw_all_opp, draw_all_me, enter_pin
 from pokepong.logic import win, lost, opp_next_mon, gain_exp, evolve, play_again
 from pokepong.logic import battle_logic, run_opp_faint, run_me_faint, get_badge
 from pokepong.logic import me_next_mon, new_game_start, clear, conf
@@ -150,6 +150,7 @@ def main():
                 mode = 'gym'
                 challenger = False
                 tmp = r.get('leader')
+                ret = enter_pin(tmp)
                 name = GYMS[tmp][0]
                 team = GYMS[tmp][1]
                 send_team(name, team, socket, get_client())

@@ -12,7 +12,7 @@ from pokepong.util import word_builder, write_btm, draw_my_hp
 from pokepong.util import draw_opp_hp, wait_for_button, clearbtm
 from pokepong.util import WHITE, GREEN, YELLOW, RED, GREY, BLACK, SCREEN, SIZE
 from pokepong.util import BTM, BTM_TUPLE, get_client
-from pokepong.util import r, Sound
+from pokepong.util import r, Sound, PINS
 from pokepong.joy import get_input
 
 SHOP = Sound("sounds/shop.ogg")
@@ -960,6 +960,63 @@ def new_move(pkmn, move):
                 SCREEN.blit(orig, (0, 0))
                 display.flip()
                 continue
+
+
+def enter_pin(leader):
+    clear()
+    write_btm('{0} please'.format(leader), 'enter your pin')
+    word_builder('- - - -', 400, 200)
+    word_builder('>1 2 3', 400, 280)
+    word_builder(' 4 5 6', 400, 360)
+    word_builder(' 7 8 9', 400, 440)
+    display.flip()
+    i = 1
+    pin = []
+    while True:
+        for event in pygame.event.get():
+            tmp = get_input(event)
+            if tmp == 'DOWN' and i < 7:
+                i += 3
+            elif tmp == 'UP' and i > 3:
+                i -= 3
+            elif tmp == 'LEFT' and 1 != i != 4 and i != 7:
+                i -= 1
+            elif tmp == 'RIGHT' and 3 != i != 6 and i != 9:
+                i += 1
+            elif tmp == 'A':
+                pin.append(i)
+            elif tmp == 'B':
+                if len(pin) > 0:
+                    pin = pin[:-1]
+                else:
+                    return False
+            display.update(word_builder('{0} {1} {2} {3}'.format(['-','*'][len(pin)>0],
+                                                                 ['-','*'][len(pin)>1],
+                                                                 ['-','*'][len(pin)>2],
+                                                                 ['-','*'][len(pin)>3]),
+                                                                 400, 200))
+            display.update(word_builder('{0}1{1}2{2}3'.format([' ','>'][i == 1],
+                                                              [' ','>'][i == 2],
+                                                              [' ','>'][i == 3]),
+                                                              400, 280))
+            display.update(word_builder('{0}4{1}5{2}6'.format([' ','>'][i == 4],
+                                                              [' ','>'][i == 5],
+                                                              [' ','>'][i == 6]),
+                                                              400, 360))
+            display.update(word_builder('{0}7{1}8{2}9'.format([' ','>'][i == 7],
+                                                              [' ','>'][i == 8],
+                                                              [' ','>'][i == 9]),
+                                                              400, 440))
+            if len(pin) == 4:
+                if pin == PINS[leader]:
+                    return True
+                else:
+                    display.update(write_btm('Invalid pin for', 'leader {0}'.format(leader)))
+                    wait_for_button()
+                    display.update(write_btm('{0} please'.format(leader), 'enter your pin'))
+                    pin = []
+                    pygame.event.clear()
+
 
 
 def gain_exp(me, opp, multi):
