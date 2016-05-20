@@ -4,7 +4,7 @@ sleep(1)
 from pygame import display, joystick
 from pokepong.util import send_move, recv_move, MyMoveOccuring, OppMoveOccuring
 from pokepong.util import send_team, get_team, loadimg, set_client, get_client
-from pokepong.util import Sound
+from pokepong.util import Sound, GYMS
 from pokepong.logic import shop, get_wild_mon, draw_all_opp, draw_all_me, enter_pin
 from pokepong.logic import win, lost, opp_next_mon, gain_exp, evolve, play_again
 from pokepong.logic import battle_logic, run_opp_faint, run_me_faint, get_badge
@@ -36,6 +36,9 @@ def main():
     # TODO set to actual IP
     r = StrictRedis(host='127.0.0.1')
     r.delete('lock')
+    r.delete('leader')
+    r.delete('table1')
+    r.delete('table2')
     poss = [1, 4, 7, 25, 143, 132, 129, 123, 95, 92, 77, 13, 17, 21, 35]
     possible = []
     for p in poss:
@@ -150,8 +153,8 @@ def main():
                 mode = 'gym'
                 challenger = False
                 tmp = r.get('leader')
-                ret = enter_pin(tmp)
                 name = GYMS[tmp][0]
+                ret = enter_pin(name)
                 team = GYMS[tmp][1]
                 send_team(name, team, socket, get_client())
                 me = Trainer(name)

@@ -2539,6 +2539,16 @@ def run_game(me, opp, mode, socket):
     if mode == 'pong':
         return run_pong(me, opp)
     while True:
+        if mode == 'gym' or mode == 'battle':
+            if get_client():
+                t1 = 'table1'
+                t2 = 'table2'
+            else:
+                t2 = 'table1'
+                t1 = 'table2'
+            display.update(word_builder('TOKENS:{0}'.format(r.get(t1) or 0), 50, SIZE[1] - 250))
+            display.update(word_builder('TOKENS:{0}'.format(r.get(t2) or 0), 50, 220))
+
         if r.get('lock'):
             raise OppMoveOccuring
         for event in pygame.event.get():
