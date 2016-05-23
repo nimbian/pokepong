@@ -146,7 +146,7 @@ def main():
                 # TODO uncomment for PROD
                 # sleep(5)
         if mode == 'wild':
-            loc, wild, remember = choose_loc(remember)
+            loc, wild, remember = choose_loc(remember, me)
             if wild == 'leader':
                 mode = 'gym'
                 challenger = False
@@ -269,8 +269,6 @@ def main():
                     music.stop()
                     #TODO fade in
                     music_vict.play()
-                    print me
-                    print opp
                     win(me, opp, mode)
                     if mode == 'gym' and challenger:
                         get_badge(me, opp)

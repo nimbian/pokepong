@@ -37,3 +37,5 @@ def get_input(event):
             return 'A'
         if event.key == pygame.K_x:
             return 'B'
+        if event.key == pygame.K_c:
+            return 'START'

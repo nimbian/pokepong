@@ -49,7 +49,7 @@ class Caught(Base):
     __tablename__ = 'caught'
     id = Column(Integer, primary_key=True)
     trainer_id = Column(Integer, ForeignKey('trainer.id'))
-    trainer = relationship('Trainer', backref='pokemon')
+    trainer = relationship('Trainer', backref='caught')
     pokemon_id = Column(Integer, ForeignKey('pokemon.id'))
     pokemon = relationship('Pokemon')
     seen = Column(Boolean, default = True)
@@ -367,9 +367,9 @@ class Owned(Base):
         self.bidecnt = -1
         self.sprite1 = self.set_sprite1()
         self.sprite2 = self.set_sprite2()
-        self.cry = Sound('sounds/crys/{0}.ogg'.format(self.base.name))
 
     def load_images(self):
+        self.cry = Sound('sounds/crys/{0}.ogg'.format(self.base.name))
         frontimg = loadimg('fronts/{0}.PNG'.format(self.base_id)).convert()
         backimg = loadimg('backs/{0}.PNG'.format(self.base_id)).convert()
         frontimg.set_colorkey((255,255,255))

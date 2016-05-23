@@ -1,5 +1,6 @@
 from pygame import draw, display
 import pygame
+import textwrap
 from sqlalchemy.orm.exc import NoResultFound
 from pokepong.util import MyMoveOccuring, OppMoveOccuring, loadalphaimg, loadimg
 from pokepong.util import alphabet, randint, choice, HIGH_ARC
@@ -42,6 +43,8 @@ TRAINERBACK = loadalphaimg('trainerback.png')
 POKE1 = loadalphaimg('poke1.png')
 POKE2 = loadalphaimg('poke2.png')
 ITEMS = loadalphaimg('items.png')
+DEX = loadalphaimg('dex.png')
+DATA = loadalphaimg('data.png')
 MONEY = loadalphaimg('moneybar.png')
 AMOUNT = loadalphaimg('amount.png')
 SHOP_CHOICE = loadalphaimg('shop_choice.png')
@@ -638,8 +641,11 @@ def catchem(item, pkmn, me, opp):
             display.update(draw_all_opp(pkmn))
         else:
             pkmn.owner = me
+            tmp = Caught.query.filter(Caught.trainer == me).filter(Caught.pokemon_id == pkmn.base_id).one()
+            tmp.caught = True
             db.add(pkmn)
             db.add(me)
+            db.add(tmp)
             db.commit()
             if len(me.pkmn) < 6:
                 me.pkmn.append(pkmn)
@@ -1049,6 +1055,7 @@ def gain_exp(me, opp, multi):
                         wait_for_button()
                     else:
                         new_move(mon, tmp)
+    db.commit()
     me.used.clear()
 
 
@@ -1115,11 +1122,16 @@ def evolve(mon, new):
     EVOLVE.play()
     if do_evolve(oldpic, newpic):
         if mon.base.name == mon.name:
-            mon.name = Pokemon.query.get(new).name
+            flag = True
+        else:
+            flag = False
+        mon.load_images()
         mon.base_id = new
         db.commit()
         display.update(
             write_btm('{0} evolved'.format(mon.name), "into " + mon.base.name))
+        if flag:
+            mon.name = Pokemon.query.get(new).name
     else:
         display.update(
             write_btm('Huh? {0}'.format(mon.name), "stopped evolving!"))
@@ -1343,7 +1355,7 @@ def wild_or_trainer():
         sleep(.02)
 
 
-def choose_loc(selector):
+def choose_loc(selector, me):
     """
     function
     """
@@ -1407,7 +1419,168 @@ def choose_loc(selector):
                         flag = True
                     else:
                         return False
+                elif button == 'START':
+                    pokedex(me)
+                    draw_location(selector)
+                    pygame.event.clear()
+                    tmp = []
+                    flag = False
         sleep(.02)
+
+
+def update_dex(offset, seen, caught):
+    for i in range(1, 8):
+        word_builder(str(i + offset - 1).zfill(3), 50, i * 120)
+        if (i + offset - 1) in seen:
+            word_builder(seen[i + offset - 1], 200, i * 120 + 60)
+        else:
+            word_builder('----------', 200, i * 120 + 60)
+        if (i + offset - 1) in caught:
+            SCREEN.blit(ALIVE, (150, i * 120 + 60))
+
+
+
+def pokedex(me):
+    seen = {}
+    caught = []
+    for i in me.caught:
+        seen[i.pokemon_id] = i.pokemon.name
+        if i.caught:
+            caught.append(i.pokemon_id)
+    print seen
+    print caught
+    offset = 1
+    clear()
+    word_builder('CONTENTS', 50, 50)
+    SCREEN.blit(DEX, (SIZE[0]-DEX.get_width(),0))
+    update_dex(offset, seen, caught)
+    word_builder('>', 10, offset * 120 + 60)
+    word_builder('SEEN', 900, 120)
+    word_builder(str(len(seen)).rjust(3), 900,180)
+    word_builder('OWN', 900, 300)
+    word_builder(str(len(caught)).rjust(3), 900,360)
+    word_builder('DATA', 900, 560)
+    word_builder('CRY', 900, 660)
+    word_builder('AREA', 900, 760)
+    word_builder('QUIT', 900, 860)
+    display.flip()
+    pos = 1
+    pygame.event.clear()
+    while True:
+        for event in pygame.event.get():
+            button = get_input(event)
+            if button == 'DOWN':
+                if pos == 7:
+                    if offset + 7 <= max(seen):
+                        offset += 1
+                        tmp = draw.rect(SCREEN, WHITE, (0,120,800,SIZE[1]-120))
+                        update_dex(offset, seen, caught)
+                        word_builder('>', 10, pos * 120 + 60)
+                        display.update(tmp)
+                else:
+                    display.update(word_builder(' ', 10, pos * 120 + 60))
+                    pos += 1
+                    display.update(word_builder('>', 10, pos * 120 + 60))
+            if button == 'UP':
+                if pos == 1:
+                    if offset != 1:
+                        offset -= 1
+                        tmp = draw.rect(SCREEN, WHITE, (0,120,800,SIZE[1]))
+                        update_dex(offset, seen, caught)
+                        word_builder('>', 10, pos * 120 + 60)
+                        display.update(tmp)
+                else:
+                    display.update(word_builder(' ', 10, pos * 120 + 60))
+                    pos -= 1
+                    display.update(word_builder('>', 10, pos * 120 + 60))
+            if button == 'B':
+                return
+            if button == 'A':
+                if pos + offset - 1 in seen:
+                    dex_choice(seen[pos + offset - 1], pos + offset - 1 in caught)
+                    clear()
+                    word_builder('CONTENTS', 50, 50)
+                    SCREEN.blit(DEX, (SIZE[0]-DEX.get_width(),0))
+                    update_dex(offset, seen, caught)
+                    word_builder('SEEN', 940, 120)
+                    word_builder('>', 10, pos * 120 + 60)
+                    word_builder(str(len(seen)).rjust(3), 940,180)
+                    word_builder('OWN', 940, 300)
+                    word_builder(str(len(caught)).rjust(3), 940,360)
+                    word_builder('DATA', 940, 560)
+                    word_builder('CRY', 940, 660)
+                    word_builder('AREA', 940, 760)
+                    word_builder('QUIT', 940, 860)
+                    display.flip()
+
+def data(mon, caught):
+    clear()
+    tmp = Pokemon.query.filter(Pokemon.name == mon).one()
+    img = loadimg('fronts/{0}.PNG'.format(tmp.id)).convert()
+    img.set_colorkey((255,255,255))
+    tmp = Pokedex.query.get(tmp.id)
+    SCREEN.blit(pygame.transform.flip(img, True, False), (50, 50))
+    SCREEN.blit(DATA,(0,600))
+    word_builder(mon.upper(), 550, 150)
+    word_builder('N.' + str(tmp.id).zfill(3), 100, 450)
+    HT = ["?'??\"", tmp.height][caught]
+    WT = ["???", tmp.weight.split()[0]][caught]
+    word_builder('HT' + HT.rjust(7), 550, 390)
+    word_builder('WT' + WT.rjust(6) + 'lb', 550, 450)
+    word_builder(mon.upper(), 550, 150)
+    display.flip()
+    if not caught:
+        wait_for_button()
+        clear()
+        return
+    else:
+        y = textwrap.wrap(tmp.entry,17)
+        while len(y) % 3 > 0:
+            y.append('')
+        out = [y[i:i+3] for i in xrange(0,len(y),3)]
+        for x in out:
+            tmp = draw.rect(SCREEN, WHITE, (0,700, 1280, SIZE[1] - 700))
+            word_builder(x[0], 20, 700)
+            word_builder(x[1], 20, 800)
+            word_builder(x[2], 20, 900)
+            display.update(tmp)
+            wait_for_button()
+        return
+
+
+def dex_choice(mon, caught):
+    pygame.event.clear()
+    display.update(word_builder('>', 840, 560))
+    pos = 0
+    while True:
+        for event in pygame.event.get():
+            button = get_input(event)
+            if button == 'DOWN' and pos < 3:
+                pos += 1
+                tmp = draw.rect(SCREEN, WHITE, (880, 560, 60, 440))
+                display.update(word_builder('>', 880, 560 + pos * 100))
+                display.update(tmp)
+            elif button == 'UP' and pos > 0:
+                pos -= 1
+                tmp = draw.rect(SCREEN, WHITE, (880, 560, 60, 440))
+                display.update(word_builder('>', 880, 560 + pos * 100))
+                display.update(tmp)
+            elif button == 'B' or (button == 'A' and pos == 3):
+                tmp = draw.rect(SCREEN, WHITE, (880, 560, 60, 440))
+                display.update(tmp)
+                return
+            elif button == 'A':
+                if pos == 0:
+                    data(mon, caught)
+                    return
+                if pos == 1:
+                    print 'sounds/crys/{0}.ogg'.format(mon)
+                    tmp = Sound('sounds/crys/{0}.ogg'.format(mon))
+                    tmp.play()
+                    sleep(tmp.get_length())
+                if pos == 2:
+                    #TODO area?
+                    pass
 
 
 
@@ -1712,6 +1885,7 @@ def use(me, item, mon):
                 mon.moves.append(tmpMove(tmp, 0))
             else:
                 new_move(mon, tmp)
+        db.commit()
 
 
 def update_sell_amount(item, select):
@@ -2557,6 +2731,12 @@ def run_game(me, opp, mode, socket):
     """
     function
     """
+    if mode in ['gym', 'battle', 'wild', 'random']:
+        try:
+            Caught.query.filter(Caught.trainer == me).filter(Caught.pokemon_id == opp.current.base_id).one()
+        except NoResultFound:
+            db.add(Caught(me, opp.current.base_id))
+            db.commit()
     selector = 0
     pygame.event.clear()
     if mode == 'pong':
@@ -2770,4 +2950,4 @@ def run_game(me, opp, mode, socket):
 
 
 from pokepong.domove import do_move, usable_move
-from pokepong.models import Pokemon, Owned, tmpMove, OwnedItem, shoppe, TmHm, Items
+from pokepong.models import Pokemon, Owned, tmpMove, OwnedItem, shoppe, TmHm, Items, Pokedex, Caught
