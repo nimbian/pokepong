@@ -1447,8 +1447,6 @@ def pokedex(me):
         seen[i.pokemon_id] = i.pokemon.name
         if i.caught:
             caught.append(i.pokemon_id)
-    print seen
-    print caught
     offset = 1
     clear()
     word_builder('CONTENTS', 50, 50)
@@ -1574,7 +1572,6 @@ def dex_choice(mon, caught):
                     data(mon, caught)
                     return
                 if pos == 1:
-                    print 'sounds/crys/{0}.ogg'.format(mon)
                     tmp = Sound('sounds/crys/{0}.ogg'.format(mon))
                     tmp.play()
                     sleep(tmp.get_length())

@@ -503,7 +503,10 @@ class Owned(Base):
         self.buffs = []
 
     def heal(self, amount):
-        self.hp += amount
+        if amount > self.maxhp - self.hp:
+            self.hp = self.maxhp
+        else:
+            self.hp += amount
 
     def do_status(self, opppkmn, me):
         from pokepong.domove import dmg_pkmn
