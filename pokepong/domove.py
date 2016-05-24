@@ -101,7 +101,6 @@ def dmg_pkmn(pkmn, dmg, me):
             pkmn.substitute = 0
             display.update(write_btm('The substitute broke'))
             sleep(1)
-            # TODO handle breaking of substitute
 
 
 def do_move(attack, defend, move, mode, me, first):
@@ -789,8 +788,6 @@ def poisoned(pokemon):
         pokemon.buffs.append('PSN')
         display.update(write_btm(pokemon.name, 'was poisoned!'))
         sleep(1)
-
-# TODO flinch only if second mon.
 
 
 def flinch(pokemon):

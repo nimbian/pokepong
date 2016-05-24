@@ -19,11 +19,6 @@ from pokepong.joy import get_input
 SHOP = Sound("sounds/shop.ogg")
 EVOLVE = Sound("sounds/evolve.ogg")
 
-#TODO issue if opposing trainers pick same pkmn in pong?
-# TODO if speeds are equal me will go first.  me is different on client vs
-# server
-#TODO restart elite 4 on loss
-
 MYHP = loadalphaimg('myhp.png')
 OPPHP = loadalphaimg('opphp.png')
 MOVECHOICE = loadalphaimg('choiceclean.png')
@@ -1205,6 +1200,8 @@ def run_move(me, opp, move, first):
         display.update(write_btm(me.current.name + ' is fast asleep!'))
     elif tmp == 'WOKE':
         display.update(write_btm(me.current.name + ' woke up!'))
+    elif tmp == 'FLINCH':
+        display.update(write_btm(me.current.name + ' flinched!'))
     elif tmp == 1:
         return
     if me.current.alive():
@@ -2239,6 +2236,46 @@ def shop(me):
             SHOP.stop()
             return False
 
+def overtime(alive, me, opp, socket):
+    if alive:
+        socket.send('True')
+        me.pkmn[0].hp = 0
+        me.pkmn[1].hp = 0
+        me.pkmn[2].hp = 0
+        me.pkmn[3].hp = me.pkmn[3].maxhp
+        me.pkmn[4].hp = me.pkmn[4].maxhp
+        me.pkmn[5].hp = me.pkmn[5].maxhp
+        opp.pkmn[0].hp = 0
+        opp.pkmn[1].hp = 0
+        opp.pkmn[2].hp = 0
+        opp.pkmn[3].hp = opp.pkmn[3].maxhp
+        opp.pkmn[4].hp = opp.pkmn[4].maxhp
+        opp.pkmn[5].hp = opp.pkmn[5].maxhp
+        me.set_current(3)
+        opp.set_current(3)
+        me.used.add(me.current)
+        socket.send('')
+        return True
+    else:
+        if socket.recv() == 'True':
+            me.pkmn[0].hp = 0
+            me.pkmn[1].hp = 0
+            me.pkmn[2].hp = 0
+            me.pkmn[3].hp = me.pkmn[3].maxhp
+            me.pkmn[4].hp = me.pkmn[4].maxhp
+            me.pkmn[5].hp = me.pkmn[5].maxhp
+            opp.pkmn[0].hp = 0
+            opp.pkmn[1].hp = 0
+            opp.pkmn[2].hp = 0
+            opp.pkmn[3].hp = opp.pkmn[3].maxhp
+            opp.pkmn[4].hp = opp.pkmn[4].maxhp
+            opp.pkmn[5].hp = opp.pkmn[5].maxhp
+            me.set_current(3)
+            opp.set_current(3)
+            me.used.add(me.current)
+            socket.recv()
+            return True
+    return False
 
 def play_again(alive, socket):
     if alive:
@@ -2666,30 +2703,28 @@ def run_pong(me, opp):
     """
     function
     """
-    # TODO switch client order. or use a redis queue
-    # TODO set tablenames with client
     draw_choice(0)
     while True:
         if get_client():
-            if opp.num_fainted() < int(r.get('table1') or 0):
+            if opp.num_fainted() < int(r.get('ptable1') or 0):
                 attacking(me)
                 sleep(2)
                 clean_me_up(me)
                 do_move(
                     me.current, opp.current, me.current.moves[0], 'pong', True, True)
                 return 0
-            elif me.num_fainted() < int(r.get('table2') or 0):
+            elif me.num_fainted() < int(r.get('ptable2') or 0):
                 sleep(2)
                 do_move(
                     opp.current, me.current, opp.current.moves[0], 'pong', False, True)
                 return 1
         else:
-            if me.num_fainted() < int(r.get('table1') or 0):
+            if me.num_fainted() < int(r.get('ptable1') or 0):
                 sleep(2)
                 do_move(
                     opp.current, me.current, opp.current.moves[0], 'pong', False, True)
                 return 1
-            elif opp.num_fainted() < int(r.get('table2') or 0):
+            elif opp.num_fainted() < int(r.get('ptable2') or 0):
                 attacking(me)
                 sleep(2)
                 clean_me_up(me)
@@ -2798,8 +2833,23 @@ def run_game(me, opp, mode, socket):
                                     else:
                                         return 0
                             else:
-                                if me.current.calc_speed() > opp.current.calc_speed():
-
+                                if me.current.calc_speed() == opp.current.calc_speed() and get_client():
+                                    run_move(me, opp, my_move, True)
+                                    if not opp.current.alive():
+                                        return 0
+                                    if me.current.alive():
+                                        run_opp_move(me, opp, opp_move, False)
+                                    else:
+                                        return 1
+                                elif me.current.calc_speed() == opp.current.calc_speed() and not get_client():
+                                    run_opp_move(me, opp, opp_move, True)
+                                    if not me.current.alive():
+                                        return 1
+                                    if opp.current.alive():
+                                        run_move(me, opp, my_move, False)
+                                    else:
+                                        return 0
+                                elif me.current.calc_speed() > opp.current.calc_speed():
                                     run_move(me, opp, my_move, True)
                                     if not opp.current.alive():
                                         return 0
@@ -2822,7 +2872,17 @@ def run_game(me, opp, mode, socket):
                                     return 0
                                 run_opp_swap(opp, opp_move)
                             else:
-                                if me.current.calc_speed() > opp.current.calc_speed():
+                                if me.current.calc_speed() == opp.current.calc_speed() and get_client():
+                                    run_move(me, opp, my_move, True)
+                                    if not opp.current.alive():
+                                        return 0
+                                    run_opp_swap(opp, opp_move)
+                                elif  me.current.calc_speed() == opp.current.calc_speed() and not get_client():
+                                    run_opp_swap(opp, opp_move)
+                                    run_move(me, opp, my_move, False)
+                                    if not opp.current.alive():
+                                        return 0
+                                elif me.current.calc_speed() > opp.current.calc_speed():
                                     run_move(me, opp, my_move, True)
                                     if not opp.current.alive():
                                         return 0
@@ -2876,7 +2936,25 @@ def run_game(me, opp, mode, socket):
                         draw_all_me(me.current)
                         if tmp == 'move':
                             opp_move = opp.current.moves[opp_move]
-                            if opp_move.name == 'Quick Attack' or opp.current.calc_speed() > me.current.calc_speed():
+                            if opp.current.calc_speed() == me.current.calc_speed() and get_client():
+                                run_opp_move(me, opp, opp_move, True)
+                                if not me.current.alive:
+                                    return 1
+                                return_my_pokemon(me)
+                                me.set_current(select)
+                                pop_ball(me.current.name)
+                                me.current.cry.play()
+                                draw_all_me(me.current)
+                            elif opp.current.calc_speed() == me.current.calc_speed() and not get_client():
+                                return_my_pokemon(me)
+                                me.set_current(select)
+                                pop_ball(me.current.name)
+                                me.current.cry.play()
+                                draw_all_me(me.current)
+                                run_opp_move(me, opp, opp_move, True)
+                                if not me.current.alive:
+                                    return 1
+                            elif opp_move.name == 'Quick Attack' or opp.current.calc_speed() > me.current.calc_speed():
                                 run_opp_move(me, opp, opp_move, True)
                                 if not me.current.alive:
                                     return 1
@@ -2895,7 +2973,21 @@ def run_game(me, opp, mode, socket):
                                 if not me.current.alive:
                                     return 1
                         elif tmp == 'swap':
-                            if opp.current.calc_speed() > me.current.calc_speed():
+                            if opp.current.calc_speed() == me.current.calc_speed() and get_client():
+                                run_opp_swap(opp, opp_move)
+                                return_my_pokemon(me)
+                                me.set_current(select)
+                                pop_ball(me.current.name)
+                                me.current.cry.play()
+                                draw_all_me(me.current)
+                            elif opp.current.calc_speed() == me.current.calc_speed() and not get_client():
+                                return_my_pokemon(me)
+                                me.set_current(select)
+                                pop_ball(me.current.name)
+                                me.current.cry.play()
+                                draw_all_me(me.current)
+                                run_opp_swap(opp, opp_move)
+                            elif opp.current.calc_speed() > me.current.calc_speed():
                                 run_opp_swap(opp, opp_move)
                                 return_my_pokemon(me)
                                 me.set_current(select)

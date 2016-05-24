@@ -10,7 +10,7 @@ from pokepong.logic import win, lost, opp_next_mon, gain_exp, evolve, play_again
 from pokepong.logic import battle_logic, run_opp_faint, run_me_faint, get_badge
 from pokepong.logic import me_next_mon, new_game_start, clear, conf, recv_prize
 from pokepong.logic import draw_choice, scrolling, choose_loc, intro, trainer_intro
-from pokepong.logic import clearbtm, run_game, get_trainers, get_mon, wild_intro
+from pokepong.logic import clearbtm, run_game, get_trainers, get_mon, wild_intro, overtime
 from pokepong.models import Trainer, Owned
 from redis import StrictRedis
 from .config import _cfg
@@ -28,7 +28,6 @@ OPENING = Sound("sounds/intro.ogg")
 
 
 def main():
-    # TODO set to True on opposite table
     if int(_cfg('table-number')) == 1:
         set_client(False)
     else:
@@ -47,7 +46,6 @@ def main():
             current = pkmn
     socket = None
     mode = ''
-    #TODO count should be used for play again feature
     count = 0
     king = None
     new_game = True
@@ -124,7 +122,7 @@ def main():
             me.initialize()
             me.pkmn = []
             for mon in mypkmnlist:
-                me.pkmn.append(Owned.query.get(mon))
+                me.pkmn.append(Owned(mon, lvl=10))
                 me.current = me.pkmn[0]
             me.used = set()
             me.used.add(me.current)
@@ -137,8 +135,12 @@ def main():
                 else:
                     opp = Trainer(oppname)
                 opp.pkmn = []
-                for mon in opppkmnlist:
-                    opp.pkmn.append(Owned.query.get(mon))
+                if mode != 'pong':
+                    for mon in opppkmnlist:
+                        opp.pkmn.append(Owned.query.get(mon))
+                else:
+                    for mon in opppkmnlist:
+                        opp.pkmn.append(Owned(mon, lvl=10))
                 opp.current = opp.pkmn[0]
                 break
             except zmq.Again:
@@ -231,6 +233,8 @@ def main():
             sleep(2)
         r.delete('table1')
         r.delete('table2')
+        r.delete('ptable1')
+        r.delete('ptable2')
         for mon in me.pkmn:
             mon.haze
             mon.hp = mon.maxhp
@@ -266,6 +270,10 @@ def main():
                 if opp.alive():
                     opp_next_mon(me, opp, mode, socket)
                 else:
+                    if mode == 'pong':
+                        if overtime(me.alive(), me, opp, socket):
+                            new_game_start(me, opp, mode)
+                            continue
                     music.stop()
                     #TODO fade in
                     music_vict.play()
@@ -280,7 +288,15 @@ def main():
                 if me.alive():
                     me_next_mon(me, opp, mode, socket)
                 else:
+                    if mode == 'pong':
+                        if overtime(me.alive(), me, opp, socket):
+                            new_game_start(me, opp, mode)
+                            continue
                     music.stop()
+                    if mode == 'gym' and challenger:
+                        if not(me.e1 == me.e2 == me.e3 == me.e4):
+                            me.e1 = me.e2 = me.e3 = me.e4 = False
+                            db.commit()
                     lost(me, opp, mode)
             elif tmp == 3:
                 break
@@ -288,7 +304,6 @@ def main():
                 break
         music.stop()
         if mode == 'pong':
-            #TODO add play_again
             if play_again(me.alive(), socket):
                 if me.alive():
                     king = 'me'
@@ -306,7 +321,6 @@ def main():
         if mode == 'gym':
             mode = 'wild'
             r.delete('leader')
-        # TODO should only evolve when leveled
         if mode == 'wild':
             for mon in me.pkmn:
                 mon.clean()

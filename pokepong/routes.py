@@ -1,17 +1,45 @@
 ROUTES = {}
 TRAINERS = {}
-MAPLIST = [[273,662],[273,613],[273,390],[273,277],[329,277],[273,215],
-           [385,215],[497,160],[600,160],[721,109],[775,60],[721,221],
-           [721,499],[889,160],[945,215],[945,277],[889, 326],
-           [610,326],[832,550],[439,326],[385,499],[497,774],
+MAPLIST = [[273,662],[273,613],[273,390],
+           [273,277],[329,277],[273,215],
+           [385,215],[497,160],[600,160],
+           [721,160],[721,109],[775,60],
+           [721,221],[721,499],[721,550],
+           [600,600],[889,160],[945,215],
+           [945,277],[889,326],[610,326],
+           [500,326],[721,326],[832,550],
+           [945,550],[900,650],[800,700],
+           [850,750],[439,326],[385,499],
+           [497,774],[609,774],[609,726],
            [609,726],[609,726],[609,726],
-           [609,726]]
-MAPROUTE = ['PALLET TOWN', 'ROUTE 1', 'ROUTE 2', 'VIRIDIAN FOREST', "DIGLETT's CAVE", 'PEWTER CITY',
-            'ROUTE 3', 'MT.MOON', 'ROUTE 4', 'ROUTE 24', 'ROUTE 25', 'ROUTE 5',
-            'ROUTE 6', 'ROUTE 9', 'ROCK TUNNEL', 'ROUTE 10', 'ROUTE 8',
-            'ROUTE 7', 'ROUTE 11', 'ROUTE 16', 'ROUTE 17', 'ROUTE 18',
-            'SAFARI ZONE MAIN AREA','SAFARI ZONE AREA 1','SAFARI ZONE AREA 2',
-            'SAFARI ZONE AREA 3']
+           [525,886],[440,886],[385,886],
+           [273,886],[273,886],
+           [273,886],[273,886],[273,886],
+           [273,780],[160,500],[160,375],
+           [160,275],[160,275],[160,275],
+           [160,275],[160,160],[160,160],
+           [160,160],[160,160],[1000,277],
+           [675,109],[1000,325]]
+MAPROUTE = ['PALLET TOWN', 'ROUTE 1', 'ROUTE 2',
+            'VIRIDIAN FOREST', "DIGLETT's CAVE", 'PEWTER CITY',
+            'ROUTE 3', 'MT.MOON', 'ROUTE 4',
+            'CERULEAN CITY', 'ROUTE 24', 'ROUTE 25',
+            'ROUTE 5', 'ROUTE 6', 'VERMILION CITY',
+            'S.S.ANNE', 'ROUTE 9', 'ROCK TUNNEL',
+            'ROUTE 10', 'ROUTE 8', 'ROUTE 7',
+            'CELADON CITY', 'SAFFRON CITY', 'ROUTE 11',
+            'ROUTE 12', 'ROUTE 13', 'ROUTE 14',
+            'ROUTE 15', 'ROUTE 16', 'ROUTE 17',
+            'ROUTE 18', 'FUCHSIA CITY', 'SAFARI ZONE MAIN AREA',
+            'SAFARI ZONE AREA 1','SAFARI ZONE AREA 2', 'SAFARI ZONE AREA 3',
+            'SEA ROUTE 19', 'SEAFOAM ISLANDS', 'SEA ROUTE 20',
+            'CINNABAR ISLAND', 'POK~MON MANSION TRAINERS',
+            'POK~MON MANSION FLOOR 1', 'POK~MON MANSION FLOOR 2', 'POK~MON MANSION FLOOR 3',
+            'SEA ROUTE 21', 'ROUTE 22', 'ROUTE 23',
+            'VICTORY ROAD TRAINERS', 'VICTORY ROAD FLOOR 1','VICTORY ROAD FLOOR 2',
+            'VICTORY ROAD FLOOR 3', 'ELITE 4-1','ELITE 4-2',
+            'ELITE 4-3','ELITE 4-4', 'POWER PLANT',
+            'UNKNOWN DUNGEON','POKE~MON TOWER']
 
 #TODO route 12,13,14,15
 
@@ -268,7 +296,7 @@ ROUTES['S.S. ANNE TRUCK'] = {
         'Mew': [[5,5],1]
 }
 
-ROUTES['ROUTE 21'] = {
+ROUTES['SEA ROUTE 21'] = {
               'Rattata': [[21,23],.35],
               'Rattata': [[21,23],.35],
               'Raticate':[[30,30],.15],
@@ -330,11 +358,11 @@ ROUTES['POWER PLANT'] = {
            'Zapdos':[[50,50],.01]
 }
 
-ROUTES['ROUTE 19'] = {
+ROUTES['SEA ROUTE 19'] = {
               'Tentacool':[[5,40],1]
 }
 
-ROUTES['ROUTE 20'] = {
+ROUTES['SEA ROUTE 20'] = {
               'Tentacool':[[5,40],1]
 }
 
@@ -503,7 +531,7 @@ TRAINERS['SAFFRON CITY'] = [['Blackbelt', 900, [['Primeape', 36],
                             ['Blackbelt', 775, [['Machop', 31],
                                                 ['Mankey', 31],
                                                 ['Primeape', 31]]]]
-TRAINERS['ROUTE 19'] = [['Swimmer', 145, [['Goldeen', 29],
+TRAINERS['SEA ROUTE 19'] = [['Swimmer', 145, [['Goldeen', 29],
                                           ['Horsea', 29],
                                           ['Staryu', 29]]],
                         ['Swimmer', 150, [['Tentacool', 30],
@@ -688,7 +716,7 @@ TRAINERS['ROCKET HIDEOUT'] = [['Rocket', 630, [['Drowzee', 21],
                        ['Rocket', 690, [['Ekans', 23],
                                          ['Sandshrew', 23],
                                          ['Arbok', 23]]]]
-TRAINERS['S.S. ANNE'] = [['Gentleman', 1260, [['Growlithe', 18],
+TRAINERS['S.S.ANNE'] = [['Gentleman', 1260, [['Growlithe', 18],
                                          ['Growlithe', 18]]],
                        ['Gentleman', 1330, [['Nidoran=', 19],
                                          ['Nidoran=', 19]]],
@@ -752,7 +780,7 @@ TRAINERS['MT.MOON'] = [['Bug Catcher', 110, [['Weedle', 11],
                                          ['Zubat', 13]]],
                        ['Rocket', 390, [['Rattata', 13],
                                          ['Zubat', 13]]]]
-TRAINERS['VICTORY ROAD'] = [['Cooltrainer +', 1540, [['Persian', 44],
+TRAINERS['VICTORY ROAD TRAINERS'] = [['Cooltrainer +', 1540, [['Persian', 44],
                                          ['Ninetales', 44]]],
                        ['Cooltrainer =', 1470, [['Ivysaur', 42],
                                          ['Wartortle', 42],
@@ -858,7 +886,7 @@ TRAINERS['ROCK TUNNEL'] = [['Pok~maniac', 1150, [['Cubone', 23],
                        ['Hiker', 735, [['Geodude', 21],
                                          ['Geodude', 21],
                                          ['Graveler', 21]]]]
-TRAINERS['ROUTE 21'] = [['Fisherman', 980, [['Seaking', 28],
+TRAINERS['SEA ROUTE 21'] = [['Fisherman', 980, [['Seaking', 28],
                                          ['Goldeen', 28],
                                          ['Seaking', 28],
                                          ['Seaking', 28]]],
@@ -885,7 +913,7 @@ TRAINERS['ROUTE 21'] = [['Fisherman', 980, [['Seaking', 28],
                        ['Swimmer', 160, [['Poliwhirl', 32],
                                          ['Tentacool', 32],
                                          ['Seadra', 32]]]]
-TRAINERS['ROUTE 20'] = [['Beauty', 2170, [['Poliwag', 31],
+TRAINERS['SEA ROUTE 20'] = [['Beauty', 2170, [['Poliwag', 31],
                                          ['Seaking', 31]]],
                        ['Beauty', 2100, [['Shellder', 30],
                                          ['Shellder', 30],
@@ -1051,7 +1079,7 @@ TRAINERS['ROUTE 18'] = [['Birdkeeper', 725, [['Spearow', 29],
                                          ['Spearow', 26],
                                          ['Fearow', 26],
                                          ['Spearow', 26]]]]
-TRAINERS['POKEMON MANSION'] = [['Scientist', 1450, [['Electrode', 29],
+TRAINERS['POKEMON MANSION TRAINERS'] = [['Scientist', 1450, [['Electrode', 29],
                                          ['Weezing', 29]]],
                        ['Burglar', 3060, [['Charmander', 34],
                                          ['Charmeleon', 34]]],

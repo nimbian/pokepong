@@ -556,15 +556,14 @@ class Owned(Base):
         from pokepong.logic import write_btm
         #TODO keep sleep a bit OP?
         #TODO handle words here
-        #TODO finish confusion
         if 'FRZ' in self.buffs:
             return 'FRZ'
-        if 'PAR' in self.buffs:
+        elif 'PAR' in self.buffs:
             if get_random() < .25:
                 return 'OK'
             else:
                 return 'PAR'
-        if 'SLP' in self.buffs:
+        elif 'SLP' in self.buffs:
             if self.sleep == 0:
                 self.buffs.remove('SLP')
                 self.sleep -= 1
@@ -572,7 +571,7 @@ class Owned(Base):
             else:
                 self.sleep -= 1
                 return 'SLP'
-        if self.confused > 0:
+        elif self.confused > 0:
             display.update(write_btm(self.name, 'is confused'))
             self.confused -= 1
             if choice([True, False]):
@@ -585,11 +584,13 @@ class Owned(Base):
             display.update(write_btm(self.name, 'is confused no more'))
             self.confused -= 1
             return 'OK'
+        elif 'FLINCH' in self.buffs:
+            self.buffs.remove('FLINCH')
+            return 'FLINCH'
         return 'OK'
 
 
     def crit_hit(self, high_crit):
-        #TODO possible to deal less... keep or remove?
         if high_crit:
             threshold = 64.
         else:
@@ -728,7 +729,6 @@ class Owned(Base):
         self.evasion_stage = defend.evasion_stage
 
     def gain_exp(self,me, opp, multi):
-        #TODO test exp
         if self.id > 151:
             self.exp += (multi * opp.current.base.exp * opp.current.lvl)/ (7 * len(me.used))
             self.hpev += opp.current.base.hp
@@ -777,7 +777,6 @@ class OwnedItem(Base):
         self.count = count
 
     def use(self, me):
-        #TODO write to DB
         self.count -= 1
         if self.count == 0:
             if self.item.battle:
