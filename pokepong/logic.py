@@ -518,25 +518,25 @@ def update_choice(select):
     display.update(dirty)
 
 
-def draw_location(select):
+def draw_location(select, newroute, newlist):
     """
     function
     """
     draw_map()
     display.flip()
-    display.update(SCREEN.blit(MAPSELECTOR, MAPLIST[select]))
-    display.update(word_builder(MAPROUTE[select], 50, 10))
+    display.update(SCREEN.blit(MAPSELECTOR, newlist[select]))
+    display.update(word_builder(newroute[select], 50, 10))
 
 
-def draw_loc_update(old, new):
+def draw_loc_update(old, new, newroute, newlist):
     """
     function
     """
     draw_map()
     display.update(
-        MAPLIST[old] + [MAPSELECTOR.get_width(), MAPSELECTOR.get_height()])
-    display.update(SCREEN.blit(MAPSELECTOR, MAPLIST[new]))
-    word_builder(MAPROUTE[new], 50, 10)
+        newlist[old] + [MAPSELECTOR.get_width(), MAPSELECTOR.get_height()])
+    display.update(SCREEN.blit(MAPSELECTOR, newlist[new]))
+    word_builder(newroute[new], 50, 10)
     display.update(50, 10, 1280, 64)
 
 
@@ -1356,10 +1356,51 @@ def choose_loc(selector, me):
     """
     function
     """
-    draw_location(selector)
+    if me.e4:
+        newroute = MAPROUTE
+        newlist = MAPLIST
+    elif me.e3:
+        newroute = MAPROUTE[:58]
+        newlist = MAPLIST[:58]
+    elif me.e2:
+        newroute = MAPROUTE[:55] + MAPROUTE[57:58]
+        newlist = MAPLIST[:55] + MAPLIST[57:58]
+    elif me.e1:
+        newroute = MAPROUTE[:54] + MAPROUTE[57:58]
+        newlist = MAPLIST[:54] + MAPLIST[57:58]
+    elif me.eb:
+        newroute = MAPROUTE[:53] + MAPROUTE[57:58]
+        newlist = MAPLIST[:53] + MAPLIST[57:58]
+    elif me.vb:
+        newroute = MAPROUTE[:48] + MAPROUTE[57:58]
+        newlist = MAPLIST[:48] + MAPLIST[57:58]
+    elif me.mb:
+        newroute = MAPROUTE[:2] + MAPROUTE[3:48] + MAPROUTE[57:58]
+        newlist = MAPLIST[:2] + MAPLIST[3:48] + MAPLIST[57:58]
+    elif me.sb:
+        newroute = MAPROUTE[:2] + MAPROUTE[3:37]  + MAPROUTE[46:48]
+        newlist = MAPLIST[:2] + MAPLIST[3:37] + MAPLIST[46:48]
+    elif me.rb:
+        newroute = MAPROUTE[:2] + MAPROUTE[3:25] + MAPROUTE[46:48]
+        newlist = MAPLIST[:2] + MAPLIST[3:25] + MAPLIST[46:48]
+    elif me.tb:
+        newroute = MAPROUTE[:2] + MAPROUTE[3:20] + MAPROUTE[21:23] + MAPROUTE[46:48]
+        newlist = MAPLIST[:2] + MAPLIST[3:20] + MAPLIST[21:23] + MAPLIST[46:48]
+    elif me.cb:
+        newroute = MAPROUTE[:2] + MAPROUTE[3:17] + MAPROUTE[46:48]
+        newlist = MAPLIST[:2] + MAPLIST[3:17] + MAPLIST[46:48]
+    elif me.bb:
+        newroute = MAPROUTE[:2] + MAPROUTE[3:13] + MAPROUTE[46:48]
+        newlist = MAPLIST[:2] + MAPLIST[3:13] + MAPLIST[46:48]
+    else:
+        newroute = MAPROUTE[:2] + MAPROUTE[3:7] + MAPROUTE[46:48]
+        newlist = MAPLIST[:2] + MAPLIST[3:7] + MAPLIST[46:48]
+    draw_location(selector, newroute, newlist)
     pygame.event.clear()
     tmp = []
     flag = False
+
+
     while True:
         if r.get('leader'):
             return False, 'leader', False
@@ -1370,22 +1411,22 @@ def choose_loc(selector, me):
                     tmp.append('U')
                     tmp = tmp[-8:]
                     flag = False
-                    if selector < len(MAPROUTE) - 1:
+                    if selector < len(newroute) - 1:
                         selector += 1
-                        draw_loc_update(selector - 1, selector)
+                        draw_loc_update(selector - 1, selector, newroute, newlist)
                     else:
                         selector = 0
-                        draw_loc_update(len(MAPROUTE) - 1, selector)
+                        draw_loc_update(len(newroute) - 1, selector, newroute, newlist)
                 elif button == 'DOWN':
                     tmp.append('D')
                     tmp = tmp[-8:]
                     flag = False
                     if selector > 0:
                         selector -= 1
-                        draw_loc_update(selector + 1, selector)
+                        draw_loc_update(selector + 1, selector, newroute, newlist)
                     else:
-                        selector = len(MAPROUTE) - 1
-                        draw_loc_update(0, selector)
+                        selector = len(newroute) - 1
+                        draw_loc_update(0, selector, newroute, newlist)
                 elif button == 'LEFT':
                     tmp.append('L')
                     tmp = tmp[-8:]
@@ -1399,18 +1440,18 @@ def choose_loc(selector, me):
                         return ['S.S. ANNE TRUCK', 'wild', 0]
                     else:
                         if selector > 0:
-                            if ROUTES.has_key(MAPROUTE[selector]) and TRAINERS.has_key(MAPROUTE[selector]):
+                            if ROUTES.has_key(newroute[selector]) and TRAINERS.has_key(newroute[selector]):
                                 tmp2 = wild_or_trainer()
-                            elif ROUTES.has_key(MAPROUTE[selector]):
+                            elif ROUTES.has_key(newroute[selector]):
                                 tmp2 = 0
                             else:
                                 tmp2 = 1
                         else:
-                            return [MAPROUTE[selector], None, selector]
+                            return [newroute[selector], None, selector]
                         if tmp2 >= 0:
-                            return [MAPROUTE[selector], ['wild', 'random'][tmp2], selector]
+                            return [newroute[selector], ['wild', 'random'][tmp2], selector]
                         else:
-                            draw_location(selector)
+                            draw_location(selector, newroute, newlist)
                 elif button == 'B':
                     if tmp == ['U', 'U', 'D', 'D', 'L', 'R', 'L', 'R']:
                         flag = True
@@ -1418,7 +1459,7 @@ def choose_loc(selector, me):
                         return False
                 elif button == 'START':
                     pokedex(me)
-                    draw_location(selector)
+                    draw_location(selector, newroute, newlist)
                     pygame.event.clear()
                     tmp = []
                     flag = False
