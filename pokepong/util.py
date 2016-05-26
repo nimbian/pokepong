@@ -9,10 +9,11 @@ from math import floor
 from redis import StrictRedis
 from time import sleep
 from pygame.mixer import Sound
+from .config import _cfg
 pygame.mixer.init()
 
 CLIENT = False
-r = StrictRedis(host='127.0.0.1')
+r = StrictRedis(host=_cfg('redis'))
 
 SIZE = (1280, 1024)
 WHITE = (253, 236, 254)

@@ -33,7 +33,7 @@ def main():
     else:
         set_client(True)
     # TODO set to actual IP
-    r = StrictRedis(host='127.0.0.1')
+    r = StrictRedis(host=_cfg('redis'))
     r.delete('lock')
     r.delete('leader')
     poss = [1, 4, 7, 25, 143, 132, 129, 123, 95, 92, 77, 13, 17, 21, 35]
@@ -51,7 +51,21 @@ def main():
     new_game = True
     me = None
     remember = 0
+    r.incr('count')
+    while int(r.get('count')) < 2:
+        sleep(.5)
+    context = zmq.Context()
+    socket = context.socket(zmq.PAIR)
+    if get_client():
+        socket.connect("tcp://127.0.0.1:7777")
+    else:
+        socket.bind("tcp://*:7777")
+    sleep(1)
+    socket.send('')
+    socket.recv()
+    r.delete('count')
     while True:
+        gym = False
         oldmode = mode
         mode = r.get('mode')
         if not mode:
@@ -67,20 +81,6 @@ def main():
             else:
                 music = Sound("sounds/trainer_battle.ogg")
                 music_vict = Sound("sounds/trainer_victory.ogg")
-        if new_game:
-            r.incr('count')
-            while int(r.get('count')) < 2:
-                sleep(.5)
-            context = zmq.Context()
-            socket = context.socket(zmq.PAIR)
-            if get_client():
-                socket.connect("tcp://127.0.0.1:7777")
-            else:
-                socket.bind("tcp://*:7777")
-            sleep(1)
-            socket.send('')
-            socket.recv()
-            r.delete('count')
         if new_game or (not king and mode != 'wild'):
             MINI.play()
             intro(current)
@@ -89,6 +89,9 @@ def main():
             # sleep(5)
         OPENING.play(-1)
         while new_game or mode != 'wild':
+            if r.get('leader'):
+                gym = True
+                break
             tmp = None
             try:
                 if king != 'me':
@@ -106,26 +109,27 @@ def main():
             current = scrolling(current, possible)
             # TODO uncomment for PROD
             # sleep(5)
-        if mode == 'wild' or mode == 'battle':
-            me = Trainer.query.filter(Trainer.name == myname).one()
-            try:
-                me.pkmn
-            except AttributeError:
+        if not gym:
+            if mode == 'wild' or mode == 'battle':
+                me = Trainer.query.filter(Trainer.name == myname).one()
+                try:
+                    me.pkmn
+                except AttributeError:
+                    me.pkmn = []
+                    for mon in mypkmnlist:
+                        me.pkmn.append(Owned.query.get(mon))
+                me.current = me.pkmn[0]
+                me.used = set()
+                me.used.add(me.current)
+            else:
+                me = Trainer(myname)
+                me.initialize()
                 me.pkmn = []
                 for mon in mypkmnlist:
-                    me.pkmn.append(Owned.query.get(mon))
-            me.current = me.pkmn[0]
-            me.used = set()
-            me.used.add(me.current)
-        else:
-            me = Trainer(myname)
-            me.initialize()
-            me.pkmn = []
-            for mon in mypkmnlist:
-                me.pkmn.append(Owned(mon, lvl=10))
-                me.current = me.pkmn[0]
-            me.used = set()
-            me.used.add(me.current)
+                    me.pkmn.append(Owned(mon, lvl=10))
+                    me.current = me.pkmn[0]
+                me.used = set()
+                me.used.add(me.current)
 
         while mode != 'wild':
             try:
@@ -148,7 +152,12 @@ def main():
                 # TODO uncomment for PROD
                 # sleep(5)
         if mode == 'wild':
-            loc, wild, remember = choose_loc(remember, me)
+            if not gym:
+                loc, wild, remember = choose_loc(remember, me)
+                if loc == False:
+                    continue
+            else:
+                wild = 'leader'
             if wild == 'leader':
                 mode = 'gym'
                 challenger = False
@@ -187,6 +196,8 @@ def main():
                     if conf():
                         mode = 'gym'
                         r.set('leader', loc)
+                        r.delete('ptable1')
+                        r.delete('ptable2')
                         challenger = True
                         send_team(myname, mypkmnlist, socket, get_client())
                         while True:

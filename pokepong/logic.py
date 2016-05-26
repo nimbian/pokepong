@@ -1456,7 +1456,7 @@ def choose_loc(selector, me):
                     if tmp == ['U', 'U', 'D', 'D', 'L', 'R', 'L', 'R']:
                         flag = True
                     else:
-                        return False
+                        return False, False, False
                 elif button == 'START':
                     pokedex(me)
                     draw_location(selector, newroute, newlist)
@@ -2948,22 +2948,27 @@ def run_game(me, opp, mode, socket):
                             if item.item.name[-4:].upper() == 'BALL':
                                 display.update(
                                     write_btm(me.name + ' used', item.item.name.upper()))
-                                ret = catchem(
-                                    item.item.name.upper(), opp.current, me, opp)
-                                if ret:
-                                    return 5
+                                if mode == 'wild':
+                                    ret = catchem(
+                                        item.item.name.upper(), opp.current, me, opp)
+                                    if ret:
+                                        return 5
                                 else:
-                                    tmp, opp_move = wait_for_opp_move(
-                                        opp, ['swap', select], mode, socket)
-                                    draw_all_me(me.current)
-                                    if tmp == 'move':
-                                        opp_move = opp.current.moves[opp_move]
-                                        run_opp_move(me, opp, opp_move, True)
-                                        if not me.current.alive:
-                                            return 1
-                                    draw_all_me(me.current)
-                                    clearbtm()
-                                    selector = 0
+                                    display.update(write_btm('The trainer', 'blocked the BALL!'))
+                                    wait_for_button()
+                                    display.update(write_btm("Don't be a thief!"))
+                                    wait_for_button()
+                                tmp, opp_move = wait_for_opp_move(
+                                    opp, ['swap', select], mode, socket)
+                                draw_all_me(me.current)
+                                if tmp == 'move':
+                                    opp_move = opp.current.moves[opp_move]
+                                    run_opp_move(me, opp, opp_move, True)
+                                    if not me.current.alive:
+                                        return 1
+                                draw_all_me(me.current)
+                                clearbtm()
+                                selector = 0
                     draw_choice(0)
 
                 if selector == 2:
