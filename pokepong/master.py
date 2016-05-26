@@ -155,6 +155,7 @@ def main():
             if not gym:
                 loc, wild, remember = choose_loc(remember, me)
                 if loc == False:
+                    new_game = True
                     continue
             else:
                 wild = 'leader'
@@ -164,6 +165,11 @@ def main():
                 tmp = r.get('leader')
                 name = GYMS[tmp][0]
                 ret = enter_pin(name)
+                if ret:
+                    socket.send('ok')
+                else:
+                    socket.send('bad')
+                    continue
                 team = GYMS[tmp][1]
                 send_team(name, team, socket, get_client())
                 me = Trainer(name)
@@ -186,16 +192,17 @@ def main():
                     except zmq.Again:
                         pass
             else:
-
+                new_game = False
                 OPENING.stop()
                 if loc == 'PALLET TOWN':
                     shop(me)
-                    new_game = False
                     continue
                 elif loc in GYMS:
                     if conf():
                         mode = 'gym'
                         r.set('leader', loc)
+                        if socket.recv() == 'bad':
+                            continue
                         r.delete('ptable1')
                         r.delete('ptable2')
                         challenger = True
