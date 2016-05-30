@@ -289,20 +289,56 @@ def high_big():
 def big_3(attacker, defender):
     tmp = low_big()
     display.update(tmp)
+    sleep(.25)
     draw.rect(SCREEN, WHITE, tmp)
     draw_opp_pkmn_sprite(defender)
-    draw_my_pkmn_name(attacker)
-    sleep(.15)
+    draw_all_me(attacker)
+    
     tmp2 = mid_big()
     display.update([tmp, tmp2])
-    sleep(.15)
+    draw.rect(SCREEN, WHITE, tmp2)
+    sleep(.25)
     draw_opp_pkmn_sprite(defender)
     tmp = high_big()
     display.update([tmp, tmp2])
-    sleep(.15)
+    draw.rect(SCREEN, WHITE, tmp)
+    sleep(.25)
     draw_opp_pkmn_sprite(defender)
     display.update(tmp)
 
+
+def opp_low_big():
+    norm = loadalphaimg('moves/Bignorm.png')
+    return SCREEN.blit(norm, (20, 450))
+
+
+def opp_mid_big():
+    norm = loadalphaimg('moves/Bignorm.png')
+    return SCREEN.blit(norm, (156, 345))
+
+
+def opp_high_big():
+    norm = loadalphaimg('moves/Bignorm.png')
+    return SCREEN.blit(norm, (190, 222))
+
+
+def opp_big_3(attacker, defender):
+    tmp = opp_low_big()
+    display.update(tmp)
+    draw.rect(SCREEN, WHITE, tmp)
+    draw_my_pkmn_sprite(defender)
+    sleep(.25)
+    tmp2 = opp_mid_big()
+    display.update([tmp, tmp2])
+    draw.rect(SCREEN, WHITE, tmp2)
+    sleep(.25)
+    draw_my_pkmn_sprite(defender)
+    tmp = opp_high_big()
+    display.update([tmp, tmp2])
+    draw.rect(SCREEN, WHITE, tmp)
+    sleep(.25)
+    draw_my_pkmn_sprite(defender)
+    display.update(tmp)
 
 def right_med():
     norm = loadalphaimg('moves/Mednorm.png')
@@ -322,16 +358,52 @@ def mid_med():
 def med_3(attacker, defender):
     tmp = right_med()
     display.update(tmp)
+    draw.rect(SCREEN, WHITE, tmp)
     draw_opp_pkmn_sprite(defender)
-    sleep(.15)
+    sleep(.2)
     tmp2 = left_med()
     display.update([tmp, tmp2])
-    sleep(.15)
+    draw.rect(SCREEN, WHITE, tmp2)
+    sleep(.2)
     draw_opp_pkmn_sprite(defender)
     tmp = mid_med()
     display.update([tmp, tmp2])
-    sleep(.15)
+    draw.rect(SCREEN, WHITE, tmp)
+    sleep(.2)
     draw_opp_pkmn_sprite(defender)
+    display.update(tmp)
+
+def opp_right_med():
+    norm = loadalphaimg('moves/Mednorm.png')
+    return SCREEN.blit(norm, (350, 350))
+
+
+def opp_left_med():
+    norm = loadalphaimg('moves/Mednorm.png')
+    return SCREEN.blit(norm, (130, 386))
+
+
+def opp_mid_med():
+    norm = loadalphaimg('moves/Mednorm.png')
+    return SCREEN.blit(norm, (236, 445))
+
+
+def opp_med_3(attacker, defender):
+    tmp = opp_right_med()
+    display.update(tmp)
+    draw.rect(SCREEN, WHITE, tmp)
+    draw_my_pkmn_sprite(defender)
+    sleep(.2)
+    tmp2 = opp_left_med()
+    display.update([tmp, tmp2])
+    draw.rect(SCREEN, WHITE, tmp2)
+    sleep(.2)
+    draw_my_pkmn_sprite(defender)
+    tmp = opp_mid_med()
+    display.update([tmp, tmp2])
+    draw.rect(SCREEN, WHITE, tmp)
+    sleep(.2)
+    draw_my_pkmn_sprite(defender)
     display.update(tmp)
 
 
@@ -356,64 +428,84 @@ def double(attacker, defender):
     draw_opp_pkmn_sprite(defender)
     display.update(tmp2)
 
+def opp_left_double():
+    norm = loadalphaimg('moves/Mednorm.png')
+    return SCREEN.blit(norm, (170, 350))
 
-def high_arch_away(attacker, defender, img):
+
+def opp_right_double():
+    norm = loadalphaimg('moves/Mednorm.png')
+    return SCREEN.blit(norm, (280, 439))
+
+
+def opp_double(attacker, defender):
+    tmp = opp_left_double()
+    display.update(tmp)
+    draw_my_pkmn_sprite(defender)
+    sleep(.15)
+    tmp2 = opp_right_double()
+    display.update([tmp, tmp2])
+    sleep(.15)
+    draw_my_pkmn_sprite(defender)
+    display.update(tmp2)
+
+def high_arch_away(left, right, img):
     old = [[0, 0], [0, 0]]
     for x in HIGH_ARC:
-        draw_all_opp(defender)
-        draw_my_pkmn_sprite(attacker)
+        draw_all_opp(right)
+        draw_my_pkmn_sprite(left)
         tmp = SCREEN.blit(img, x)
         display.update([old, tmp])
-        sleep(.1)
+        sleep(.2)
         old = tmp
         draw.rect(SCREEN, WHITE, old)
-    sleep(.1)
-    draw_my_pkmn_sprite(attacker)
+    sleep(.2)
+    draw_opp_pkmn_sprite(left)
     display.update(old)
 
 
-def high_arch_towards(attacker, defender, img):
+def high_arch_towards(left, right, img):
     old = [0, 0, 0, 0]
     for x in HIGH_ARC[::-1]:
-        draw_all_opp(defender)
-        draw_my_pkmn_sprite(attacker)
+        draw_all_opp(right)
+        draw_my_pkmn_sprite(left)
         tmp = SCREEN.blit(img, x)
         display.update([old, tmp])
-        sleep(.1)
+        sleep(.2)
         old = tmp
         draw.rect(SCREEN, WHITE, old)
-    sleep(.1)
-    draw_my_pkmn_sprite(attacker)
+    sleep(.2)
+    draw_my_pkmn_sprite(left)
     display.update(old)
 
 
-def low_arch_away(attacker, defender, img):
+def low_arch_away(left, right, img):
     old = [0, 0, 0, 0]
     for x in LOW_ARC:
-        draw_all_opp(defender)
-        draw_my_pkmn_sprite(attacker)
+        draw_all_opp(right)
+        draw_my_pkmn_sprite(left)
         tmp = SCREEN.blit(img, x)
         display.update([old, tmp])
-        sleep(.1)
+        sleep(.15)
         old = tmp
         draw.rect(SCREEN, WHITE, old)
-    sleep(.1)
-    draw_my_pkmn_sprite(attacker)
+    sleep(.15)
+    draw_opp_pkmn_sprite(right)
     display.update(old)
 
 
-def low_arch_towards(attacker, defender, img):
+def low_arch_towards(left, right, img):
     old = [0, 0, 0, 0]
     for x in LOW_ARC[::-1]:
-        draw_all_opp(defender)
-        draw_my_pkmn_sprite(attacker)
+        draw_all_opp(right)
+        draw_my_pkmn_sprite(left)
         tmp = SCREEN.blit(img, x)
         display.update([old, tmp])
-        sleep(.1)
+        sleep(.15)
         old = tmp
         draw.rect(SCREEN, WHITE, old)
-    sleep(.1)
-    draw_my_pkmn_sprite(attacker)
+    sleep(.15)
+    draw_my_pkmn_sprite(left)
     display.update(old)
 
 
@@ -528,17 +620,7 @@ def new_move(pkmn, move):
                 continue
 
 
-def sandbox():
-    SCREEN.fill(WHITE)
-    SCREEN.blit(BTM, BTM_TUPLE)
-    display.flip()
-    me = trainer(Owned.query.get(152))
-    opp = trainer(Owned.query.get(152))
-    draw_all_opp(opp.current)
-    draw_all_me(me.current)
-    new_move(me.current, Move.query.get(1))
 
-    sleep(15)
 
 
 def wave(count):
@@ -594,27 +676,79 @@ def dmged():
     clear()
     SCREEN.blit(tmp, (0, 0))
     pygame.display.flip()
-    sleep(2)
 
 
-def beam(attacker, defender, type_=None):
+def beam(attacker, defender, attacking, type_=None):
     beams = []
-    for i in range(1, 7):
-        beams.append(loadalphaimg('moves/beam{0}.png'.format(i)))
-    x = SCREEN.blit(beams[0], (339, 232))
-    for i in beams:
-        pygame.draw.rect(SCREEN, WHITE, x)
+    if attacking:
+        if type_ == 'aurora':
+            for i in range(1, 7):
+                beams.append(loadalphaimg('moves/aurora{0}.png'.format(i)))
+        elif type_ == 'ice':
+            for i in range(1, 7):
+                beams.append(loadalphaimg('moves/icebeam{0}.png'.format(i)))
+        elif type_ == 'psy':
+            for i in range(1, 7):
+                beams.append(loadalphaimg('moves/psybeam{0}.png'.format(i)))
+        elif type_ == 'solar':
+            for i in range(1, 7):
+                beams.append(loadalphaimg('moves/solarbeam{0}.png'.format(i)))
+        else:
+            for i in range(1, 7):
+                beams.append(loadalphaimg('moves/beam{0}.png'.format(i)))
+        x = SCREEN.blit(beams[0], (339, 232))
+        for i in beams:
+            pygame.draw.rect(SCREEN, WHITE, x)
+            draw_all_me(attacker)
+            draw_all_opp(defender)
+            display.update(SCREEN.blit(i, (339, 232)))
+            sleep(.1)
+
+        display.update(pygame.draw.rect(SCREEN, WHITE, x))
         draw_all_me(attacker)
         draw_all_opp(defender)
-        display.update(SCREEN.blit(i, (339, 232)))
-        sleep(.1)
+    else:
+        if type_ == 'aurora':
+            for i in range(1, 7):
+                beams.append(loadalphaimg('moves/opp_aurora{0}.png'.format(i)))
+        elif type_ == 'ice':
+            for i in range(1, 7):
+                beams.append(loadalphaimg('moves/opp_icebeam{0}.png'.format(i)))
+        elif type_ == 'psy':
+            for i in range(1, 7):
+                beams.append(loadalphaimg('moves/opp_psybeam{0}.png'.format(i)))
+        elif type_ == 'solar':
+            for i in range(1, 7):
+                beams.append(loadalphaimg('moves/opp_solarbeam{0}.png'.format(i)))
+        else:
+            for i in range(1, 7):
+                beams.append(loadalphaimg('moves/opp_beam{0}.png'.format(i)))
+        x = SCREEN.blit(beams[0], (339, 232))
+        for i in beams:
+            pygame.draw.rect(SCREEN, WHITE, x)
+            draw_all_me(defender)
+            draw_all_opp(attacker)
+            display.update(SCREEN.blit(i, (339, 232)))
+            sleep(.1)
 
-    pygame.draw.rect(SCREEN, WHITE, x)
-    draw_all_me(attacker)
-    draw_all_opp(defender)
-    sleep(.1)
-    dmged()
+        display.update(pygame.draw.rect(SCREEN, WHITE, x))
+        draw_all_me(defender)
+        draw_all_opp(attacker)
+    
 
+def sandbox():
+    SCREEN.fill(WHITE)
+    SCREEN.blit(BTM, BTM_TUPLE)
+    display.flip()
+    me = trainer(Owned.query.get(153))
+    opp = trainer(Owned.query.get(152))
+    draw_all_opp(opp.current)
+    draw_all_me(me.current)
+    do_cut(me.current,opp.current,True)
+    sleep(2)
+    do_cut(opp.current,me.current,False)
+
+    sleep(15)
 
 def do_absorb(attacker, defender, attacking):
     s = Sound("sounds/Absorb.ogg")
@@ -628,11 +762,64 @@ def do_absorb(attacker, defender, attacking):
 
 def do_acid(attacker, defender, attacking):
     s = Sound("sounds/Acid.ogg")
+    tmp = loadalphaimg('moves/acid.png')
+    drop = loadalphaimg('moves/drop.png')
     s.play()
     if attacking:
-        pass  # TODO attacking
+        low_arch_away(attacker,defender,tmp)
+        display.update(SCREEN.blit(tmp,LOW_ARC[-1]))
+        display.update(SCREEN.blit(drop, (900,220)))
+        draw_opp_pkmn_sprite(defender)
+        sleep(.1)
+        display.update([900,220, drop.get_width(), drop.get_height()])
+        display.update(SCREEN.blit(drop, (900,270)))
+        draw_opp_pkmn_sprite(defender)
+        sleep(.1)  
+        display.update([900,270, drop.get_width(), drop.get_height()])
+   
+        display.update(SCREEN.blit(drop, (900,320)))
+        draw_opp_pkmn_sprite(defender)
+        sleep(.1)  
+        display.update([900,320, drop.get_width(), drop.get_height()])
+        display.update(SCREEN.blit(drop, (950,220)))
+        draw_opp_pkmn_sprite(defender)
+        sleep(.1)  
+        display.update([950,220, drop.get_width(), drop.get_height()])
+        display.update(SCREEN.blit(drop, (950,270)))
+        draw_opp_pkmn_sprite(defender)
+        sleep(.1)  
+        display.update([950,270, drop.get_width(), drop.get_height()])
+        display.update(SCREEN.blit(drop, (950,320)))   
+        sleep(.1)  
+        display.update(draw_opp_pkmn_sprite(defender))
     else:
-        pass  # TODO defending
+        low_arch_towards(defender,attacker,tmp)
+        display.update(SCREEN.blit(tmp,(200,400)))
+        display.update(SCREEN.blit(drop, (220,510)))
+        draw_my_pkmn_sprite(defender)
+        sleep(.1)
+        display.update([220,510, drop.get_width(), drop.get_height()])
+        display.update(SCREEN.blit(drop, (220,560)))
+        draw_my_pkmn_sprite(defender)
+        sleep(.1)  
+        display.update([220,560, drop.get_width(), drop.get_height()])
+   
+        display.update(SCREEN.blit(drop, (220,610)))
+        draw_my_pkmn_sprite(defender)
+        sleep(.1)  
+        display.update([220,610, drop.get_width(), drop.get_height()])
+        display.update(SCREEN.blit(drop, (270,510)))
+        draw_my_pkmn_sprite(defender)
+        sleep(.1)  
+        display.update([270,510, drop.get_width(), drop.get_height()])
+        display.update(SCREEN.blit(drop, (270,560)))
+        draw_my_pkmn_sprite(defender)
+        sleep(.1)  
+        display.update([270,560, drop.get_width(), drop.get_height()])
+        display.update(SCREEN.blit(drop, (270,610)))   
+        sleep(.1)  
+        display.update(draw_my_pkmn_sprite(defender))
+    dmged()
     s.stop()
 
 
@@ -640,29 +827,75 @@ def do_acid_armor(attacker, defender, attacking):
     s = Sound("sounds/Acid Armor.ogg")
     s.play()
     if attacking:
-        pass  # TODO attacking
+        for i in range(0, 400, 2):
+            draw.rect(SCREEN, WHITE, [59, SIZE[1] - 740, 392, 398])
+            SCREEN.blit(
+                attacker.backimg, (59, SIZE[1] - 740 + i), (0, 0, 392, 392 - i))
+            display.update(59, SIZE[1] - 742 + i, 392, 398 - i)
+        display.update(draw_my_pkmn_sprite(attacker))
     else:
-        pass  # TODO defending
+        for i in range(0, 393, 2):
+            draw.rect(SCREEN, WHITE, [SIZE[0] - 500, 0, 392, 398])
+            SCREEN.blit(
+                attacker.frontimg, (SIZE[0] - 500, i), (0, 0, 392, 392 - i))
+            display.update([SIZE[0] - 500, i - 2, 392, 398 - i])
+        display.update(draw_opp_pkmn_sprite(attacker))
     s.stop()
 
 
 def do_agility(attacker, defender, attacking):
     s = Sound("sounds/Agility.ogg")
     s.play()
-    if attacking:
-        pass  # TODO attacking
-    else:
-        pass  # TODO defending
+    sleep(s.get_length())
     s.stop()
 
 
 def do_amnesia(attacker, defender, attacking):
     s = Sound("sounds/Amnesia.ogg")
+    tmp = loadalphaimg('moves/amnesia.png')
     s.play()
     if attacking:
-        pass  # TODO attacking
+        display.update(SCREEN.blit(tmp,(300,300)))
+        sleep(.2)
+        draw.rect(SCREEN, WHITE, [300,300,tmp.get_width(),tmp.get_height()])
+        draw_my_pkmn_sprite(attacker)
+        display.update([300,300,tmp.get_width(),tmp.get_height()])
+        display.update(SCREEN.blit(tmp,(500,350)))
+        sleep(.2)
+        draw.rect(SCREEN, WHITE, [500,350,tmp.get_width(),tmp.get_height()])
+        draw_my_pkmn_sprite(attacker)
+        display.update([500,350,tmp.get_width(),tmp.get_height()])
+        display.update(SCREEN.blit(tmp,(300,300)))
+        sleep(.2)
+        draw.rect(SCREEN, WHITE, [300,300,tmp.get_width(),tmp.get_height()])
+        draw_my_pkmn_sprite(attacker)
+        display.update([300,300,tmp.get_width(),tmp.get_height()])
+        display.update(SCREEN.blit(tmp,(500,350)))
+        sleep(.2)
+        draw.rect(SCREEN, WHITE, [500,350,tmp.get_width(),tmp.get_height()])
+        draw_my_pkmn_sprite(attacker)
+        display.update([500,350,tmp.get_width(),tmp.get_height()])
     else:
-        pass  # TODO defending
+        display.update(SCREEN.blit(tmp,(900,20)))
+        sleep(.2)
+        draw.rect(SCREEN, WHITE, [900,20,tmp.get_width(),tmp.get_height()])
+        draw_opp_pkmn_sprite(attacker)
+        display.update([900,20,tmp.get_width(),tmp.get_height()])
+        display.update(SCREEN.blit(tmp,(1100,70)))
+        sleep(.2)
+        draw.rect(SCREEN, WHITE, [1100,70,tmp.get_width(),tmp.get_height()])
+        draw_opp_pkmn_sprite(attacker)
+        display.update([1100,70,tmp.get_width(),tmp.get_height()])
+        display.update(SCREEN.blit(tmp,(900,20)))
+        sleep(.2)
+        draw.rect(SCREEN, WHITE, [900,20,tmp.get_width(),tmp.get_height()])
+        draw_opp_pkmn_sprite(attacker)
+        display.update([900,20,tmp.get_width(),tmp.get_height()])
+        display.update(SCREEN.blit(tmp,(1100,70)))
+        sleep(.2)
+        draw.rect(SCREEN, WHITE, [1100,70,tmp.get_width(),tmp.get_height()])
+        draw_opp_pkmn_sprite(attacker)
+        display.update([1100,70,tmp.get_width(),tmp.get_height()])
     s.stop()
 
 
@@ -670,29 +903,108 @@ def do_aurora_beam(attacker, defender, attacking):
     s = Sound("sounds/Aurora Beam.ogg")
     s.play()
     if attacking:
-        beam(attacker, defender, type_='aurora')
+        beam(attacker, defender, attacking, type_='aurora')
     else:
-        pass  # TODO defending
+        beam(defender, attacker, attacking, type_='aurora')
+    dmged()
     s.stop()
 
 
 def do_barrage(attacker, defender, attacking):
     s = Sound("sounds/Barrage.ogg")
+    tmp = loadalphaimg('moves/barrage.png')
     s.play()
     if attacking:
-        pass  # TODO attacking
+        low_arch_away(attacker, defender, tmp)
     else:
-        pass  # TODO defending
+        low_arch_towards(defender, attacker, tmp)
+    dmged()
     s.stop()
 
 
 def do_barrier(attacker, defender, attacking):
     s = Sound("sounds/Barrier.ogg")
+    if attacking:
+        tmp = loadalphaimg('moves/barrier.png')
+    else:
+        tmp = loadalphaimg('moves/opp_barrier.png')
     s.play()
     if attacking:
-        pass  # TODO attacking
+        
+        display.update(SCREEN.blit(tmp,(470,285)))
+        sleep(.15)
+        draw.rect(SCREEN, WHITE, (470,285, tmp.get_width(), tmp.get_height()))
+        draw_my_pkmn_sprite(attacker)
+        display.update([470,285, tmp.get_width(), tmp.get_height()])
+        sleep(.15)
+        display.update(SCREEN.blit(tmp,(470,285)))
+        sleep(.15)
+        draw.rect(SCREEN, WHITE, (470,285, tmp.get_width(), tmp.get_height()))
+        draw_my_pkmn_sprite(attacker)
+        display.update([470,285, tmp.get_width(), tmp.get_height()])
+        sleep(.15)
+        display.update(SCREEN.blit(tmp,(470,285)))
+        sleep(.15)
+        draw.rect(SCREEN, WHITE, (470,285, tmp.get_width(), tmp.get_height()))
+        draw_my_pkmn_sprite(attacker)
+        display.update([470,285, tmp.get_width(), tmp.get_height()])
+        sleep(.15)
+        display.update(SCREEN.blit(tmp,(470,285)))
+        sleep(.15)
+        draw.rect(SCREEN, WHITE, (470,285, tmp.get_width(), tmp.get_height()))
+        draw_my_pkmn_sprite(attacker)
+        display.update([470,285, tmp.get_width(), tmp.get_height()])
+        sleep(.15)
+        display.update(SCREEN.blit(tmp,(470,285)))
+        sleep(.15)
+        draw.rect(SCREEN, WHITE, (470,285, tmp.get_width(), tmp.get_height()))
+        draw_my_pkmn_sprite(attacker)
+        display.update([470,285, tmp.get_width(), tmp.get_height()])
+        sleep(.15)
+        display.update(SCREEN.blit(tmp,(470,285)))
+        sleep(.15)
+        draw.rect(SCREEN, WHITE, (470,285, tmp.get_width(), tmp.get_height()))
+        draw_my_pkmn_sprite(attacker)
+        display.update([470,285, tmp.get_width(), tmp.get_height()])
+        sleep(.15)
     else:
-        pass  # TODO defending
+        
+        display.update(SCREEN.blit(tmp,(700,0)))
+        sleep(.15)
+        draw.rect(SCREEN, WHITE, (700,0, tmp.get_width(), tmp.get_height()))
+        draw_my_pkmn_sprite(attacker)
+        display.update([700,0, tmp.get_width(), tmp.get_height()])
+        sleep(.15)
+        display.update(SCREEN.blit(tmp,(700,0)))
+        sleep(.15)
+        draw.rect(SCREEN, WHITE, (700,0, tmp.get_width(), tmp.get_height()))
+        draw_my_pkmn_sprite(attacker)
+        display.update([700,0, tmp.get_width(), tmp.get_height()])
+        sleep(.15)
+        display.update(SCREEN.blit(tmp,(700,0)))
+        sleep(.15)
+        draw.rect(SCREEN, WHITE, (700,0, tmp.get_width(), tmp.get_height()))
+        draw_my_pkmn_sprite(attacker)
+        display.update([700,0, tmp.get_width(), tmp.get_height()])
+        sleep(.15)
+        display.update(SCREEN.blit(tmp,(700,0)))
+        sleep(.15)
+        draw.rect(SCREEN, WHITE, (700,0, tmp.get_width(), tmp.get_height()))
+        draw_my_pkmn_sprite(attacker)
+        display.update([700,0, tmp.get_width(), tmp.get_height()])
+        sleep(.15)
+        display.update(SCREEN.blit(tmp,(700,0)))
+        sleep(.15)
+        draw.rect(SCREEN, WHITE, (700,0, tmp.get_width(), tmp.get_height()))
+        draw_my_pkmn_sprite(attacker)
+        display.update([700,0, tmp.get_width(), tmp.get_height()])
+        sleep(.15)
+        display.update(SCREEN.blit(tmp,(700,0)))
+        sleep(.15)
+        draw.rect(SCREEN, WHITE, (700,0, tmp.get_width(), tmp.get_height()))
+        draw_my_pkmn_sprite(attacker)
+        display.update([700,0, tmp.get_width(), tmp.get_height()])
+        sleep(.15)
     s.stop()
 
 
@@ -714,11 +1026,36 @@ def do_bide(attacker, defender, attacking):
 
 def do_bind(attacker, defender, attacking):
     s = Sound("sounds/Bind.ogg")
+    tmp = loadalphaimg('moves/bind.png')
+    
     s.play()
     if attacking:
-        pass  # TODO attacking
+        display.update(SCREEN.blit(tmp,(720,100)))
+        sleep(.2)
+        draw.rect(SCREEN, WHITE, (720,100, tmp.get_width(), tmp.get_height()))
+        draw_opp_pkmn_sprite(defender)
+        display.update([720,100, tmp.get_width(), tmp.get_height()])
+        sleep(.2)
+        display.update(SCREEN.blit(tmp,(720,100)))
+        sleep(.2)
+        draw.rect(SCREEN, WHITE, (720,100, tmp.get_width(), tmp.get_height()))
+        draw_opp_pkmn_sprite(defender)
+        display.update([720,100, tmp.get_width(), tmp.get_height()])
+        sleep(.2)
     else:
-        pass  # TODO defending
+        display.update(SCREEN.blit(tmp,(40,450)))
+        sleep(.2)
+        draw.rect(SCREEN, WHITE, (40,450, tmp.get_width(), tmp.get_height()))
+        draw_my_pkmn_sprite(defender)
+        display.update([40,450, tmp.get_width(), tmp.get_height()])
+        sleep(.2)
+        display.update(SCREEN.blit(tmp,(40,450)))
+        sleep(.2)
+        draw.rect(SCREEN, WHITE, (40,450, tmp.get_width(), tmp.get_height()))
+        draw_my_pkmn_sprite(defender)
+        display.update([40,450, tmp.get_width(), tmp.get_height()])
+        sleep(.2)
+    dmged()
     s.stop()
 
 
@@ -726,9 +1063,10 @@ def do_bite(attacker, defender, attacking):
     s = Sound("sounds/Bite.ogg")
     s.play()
     if attacking:
-        pass  # TODO attacking
+        med_3(attacker, defender)
     else:
-        pass  # TODO defending
+        opp_med_3(attacker, defender)
+    dmged()
     s.stop()
 
 
@@ -756,9 +1094,10 @@ def do_bone_club(attacker, defender, attacking):
     s = Sound("sounds/Bone Club.ogg")
     s.play()
     if attacking:
-        pass  # TODO attacking
+        med_3(attacker, defender)
     else:
-        pass  # TODO defending
+        opp_med_3(attacker, defender)
+    dmged()
     s.stop()
 
 
@@ -766,29 +1105,60 @@ def do_bonemerang(attacker, defender, attacking):
     s = Sound("sounds/Bonmerang.ogg")
     s.play()
     if attacking:
-        pass  # TODO attacking
+        med_3(attacker, defender)
     else:
-        pass  # TODO defending
+        opp_med_3(attacker, defender)
+    dmged()
     s.stop()
 
 
 def do_bubble(attacker, defender, attacking):
-    s = Sound("sounds/Bubble Beam.ogg")
+    s = Sound("sounds/Bubble.ogg")
+    tmp = SCREEN.copy()
+    bubble = []
+    if attacking:
+        for i in range(1, 5):
+            bubble.append(loadalphaimg('moves/bubble{0}.png'.format(i)))
+    else:
+        for i in range(1, 5):
+            bubble.append(loadalphaimg('moves/opp_bubble{0}.png'.format(i)))
     s.play()
     if attacking:
-        pass  # TODO attacking
+        for i in range(4):
+            display.update(SCREEN.blit(bubble[i],(450,50)))
+            sleep(.3)
     else:
-        pass  # TODO defending
+        for i in range(4):
+            display.update(SCREEN.blit(bubble[i],(200,200)))
+            sleep(.3)
+    dmged()
+    SCREEN.blit(tmp,(0,0))
+    display.flip()
     s.stop()
 
 
 def do_bubblebeam(attacker, defender, attacking):
-    s = Sound("sounds/Bubble.ogg")
+    s = Sound("sounds/Bubble Beam.ogg")
+    tmp = SCREEN.copy()
+    bubble = []
+    if attacking:
+        for i in range(1, 5):
+            bubble.append(loadalphaimg('moves/bubble{0}.png'.format(i)))
+    else:
+        for i in range(1, 5):
+            bubble.append(loadalphaimg('moves/opp_bubble{0}.png'.format(i)))
     s.play()
     if attacking:
-        pass  # TODO attacking
+        for i in range(4):
+            display.update(SCREEN.blit(bubble[i],(450,50)))
+            sleep(.3)
     else:
-        pass  # TODO defending
+        for i in range(4):
+            display.update(SCREEN.blit(bubble[i],(200,200)))
+            sleep(.3)
+    dmged()
+    SCREEN.blit(tmp,(0,0))
+    display.flip()
     s.stop()
 
 
@@ -806,9 +1176,12 @@ def do_comet_punch(attacker, defender, attacking):
     s = Sound("sounds/Comet Punch.ogg")
     s.play()
     if attacking:
-        pass  # TODO attacking
+        med_3(attacker, defender)
+        med_3(attacker, defender)
     else:
-        pass  # TODO defending
+        opp_med_3(attacker, defender)
+        opp_med_3(attacker, defender)
+    dmged()
     s.stop()
 
 
@@ -874,11 +1247,24 @@ def do_crabhammer(attacker, defender, attacking):
 
 def do_cut(attacker, defender, attacking):
     s = Sound("sounds/Cut.ogg")
+    tmp = loadalphaimg('moves/cut1.png')
+    tmp2 = loadalphaimg('moves/cut2.png')
     s.play()
     if attacking:
-        pass  # TODO attacking
+        display.update(SCREEN.blit(tmp,(800,10)))
+        sleep(.15)
+        display.update(draw_opp_pkmn_sprite(defender))
+        display.update(SCREEN.blit(tmp2,(800,10)))
+        sleep(.15)
+        display.update(draw_opp_pkmn_sprite(defender))
     else:
-        pass  # TODO defending
+        display.update(SCREEN.blit(tmp,(70,300)))
+        sleep(.15)
+        display.update(draw_my_pkmn_sprite(defender))
+        display.update(SCREEN.blit(tmp2,(70,300)))
+        sleep(.15)
+        display.update(draw_my_pkmn_sprite(defender))
+    dmged()
     s.stop()
 
 
@@ -896,9 +1282,12 @@ def do_dig(attacker, defender, attacking):
     s = Sound("sounds/Dig1.ogg")
     s.play()
     if attacking:
-        pass  # TODO attacking
+        draw_my_pkmn_sprite(attacker)
+        med_3(attacker,defender)
     else:
-        pass  # TODO defending
+        draw_opp_pkmn_sprite(attacker)
+        opp_med_3(attacker,defender)
+    dmged()
     s.stop()
 
 
@@ -906,9 +1295,9 @@ def do_dig_prep(attacker, defender, attacking):
     s = Sound("sounds/Dig2.ogg")
     s.play()
     if attacking:
-        pass  # TODO attacking
+        display.update(draw.rect(SCREEN, WHITE, MYPKMN + [attacker.backimg.get_width(),attacker.backimg.get_width()]))
     else:
-        pass  # TODO defending
+        display.update(draw.rect(SCREEN, WHITE, OPPPKMN + [attacker.backimg.get_width(),attacker.backimg.get_width()]))
     s.stop()
 
 
@@ -936,9 +1325,14 @@ def do_double_kick(attacker, defender, attacking):
     s = Sound("sounds/Double-Egde.ogg")
     s.play()
     if attacking:
-        pass  # TODO attacking
+        double(attacker, defender)
+        sleep(.15)
+        double(attacker, defender)
     else:
-        pass  # TODO defending
+        opp_double(attacker, defender)
+        sleep(.15)
+        opp_double(attacker, defender)
+    dmged()
     s.stop()
 
 
@@ -953,7 +1347,7 @@ def do_double_team(attacker, defender, attacking):
 
 
 def do_double_edge(attacker, defender, attacking):
-    s = Sound("sounds/DoubleSlap.ogg")
+    s = Sound("sounds/Double Team.ogg")
     s.play()
     if attacking:
         pass  # TODO attacking
@@ -963,12 +1357,17 @@ def do_double_edge(attacker, defender, attacking):
 
 
 def do_doubleslap(attacker, defender, attacking):
-    s = Sound("sounds/Double Team.ogg")
+    s = Sound("sounds/DoubleSlap.ogg")
     s.play()
     if attacking:
-        pass  # TODO attacking
+        double(attacker, defender)
+        sleep(.15)
+        double(attacker, defender)
     else:
-        pass  # TODO defending
+        opp_double(attacker, defender)
+        sleep(.15)
+        opp_double(attacker, defender)
+    dmged()
     s.stop()
 
 
@@ -983,7 +1382,7 @@ def do_dragon_rage(attacker, defender, attacking):
 
 
 def do_dream_eater(attacker, defender, attacking):
-    s = Sound("sounds/Dream Eater.mp")
+    s = Sound("sounds/Dream Eater.ogg")
     s.play()
     if attacking:
         pass  # TODO attacking
@@ -993,22 +1392,25 @@ def do_dream_eater(attacker, defender, attacking):
 
 
 def do_drill_peck(attacker, defender, attacking):
-    s = Sound("sounds/Drill Peck.mp")
+    s = Sound("sounds/Drill Peck.ogg")
     s.play()
     if attacking:
-        pass  # TODO attacking
+        big_3(attacker, defender)
     else:
-        pass  # TODO defending
+        opp_big_3(attacker, defender)
+    dmged()
     s.stop()
 
 
 def do_earthquake(attacker, defender, attacking):
     s = Sound("sounds/Earthquake.ogg")
     s.play()
-    if attacking:
-        pass  # TODO attacking
-    else:
-        pass  # TODO defending
+    dmged()
+    dmged()
+    dmged()
+    dmged()
+    dmged()
+    dmged()
     s.stop()
 
 
@@ -1024,11 +1426,48 @@ def do_egg_bomb(attacker, defender, attacking):
 
 def do_ember(attacker, defender, attacking):
     s = Sound("sounds/Ember.ogg")
+    small = loadalphaimg('moves/smallfire.png')
+    big = loadalphaimg('moves/bigfire.png')
     s.play()
     if attacking:
-        pass  # TODO attacking
+        display.update(SCREEN.blit(small,(800,280)))
+        sleep(.2)
+        display.update(draw_opp_pkmn_sprite(defender))
+        display.update(SCREEN.blit(big,(800,280)))
+        sleep(.2)
+        display.update(draw_opp_pkmn_sprite(defender))
+        display.update(SCREEN.blit(small,(1000,280)))
+        sleep(.2)
+        display.update(draw_opp_pkmn_sprite(defender))
+        display.update(SCREEN.blit(big,(1000,280)))
+        sleep(.2)
+        display.update(draw_opp_pkmn_sprite(defender))
+        display.update(SCREEN.blit(small,(900,280)))
+        sleep(.2)
+        display.update(draw_opp_pkmn_sprite(defender))
+        display.update(SCREEN.blit(big,(900,280)))
+        sleep(.2)
+        display.update(draw_opp_pkmn_sprite(defender))
     else:
-        pass  # TODO defending
+        display.update(SCREEN.blit(small,(100,568)))
+        sleep(.2)
+        display.update(draw_my_pkmn_sprite(defender))
+        display.update(SCREEN.blit(big,(100,568)))
+        sleep(.2)
+        display.update(draw_my_pkmn_sprite(defender))
+        display.update(SCREEN.blit(small,(300,568)))
+        sleep(.2)
+        display.update(draw_my_pkmn_sprite(defender))
+        display.update(SCREEN.blit(big,(300,568)))
+        sleep(.2)
+        display.update(draw_my_pkmn_sprite(defender))
+        display.update(SCREEN.blit(small,(200,568)))
+        sleep(.2)
+        display.update(draw_my_pkmn_sprite(defender))
+        display.update(SCREEN.blit(big,(200,568)))
+        sleep(.2)
+        display.update(draw_my_pkmn_sprite(defender))
+    dmged()
     s.stop()
 
 
@@ -1044,61 +1483,352 @@ def do_explosion(attacker, defender, attacking):
 
 def do_fire_blast(attacker, defender, attacking):
     s = Sound("sounds/Fire Blast.ogg")
+    orig = SCREEN.copy()
     s.play()
+    big = loadalphaimg('moves/bigfire.png')
+    smallblast = loadalphaimg('moves/smallblast.png')
+    bigblast = loadalphaimg('moves/bigblast.png')
+
     if attacking:
-        pass  # TODO attacking
+        display.update(SCREEN.blit(big,(230,500)))
+        sleep(.15)
+        display.update(SCREEN.blit(big,(380,425)))
+        sleep(.15)
+        display.update(SCREEN.blit(big,(530,350)))
+        sleep(.15)
+        display.update(SCREEN.blit(big,(680,275)))
+        sleep(.15)
+        display.update(SCREEN.blit(big,(830,200)))
+        sleep(.15)
+        display.update(SCREEN.blit(orig,(0,0)))
+        display.update(SCREEN.blit(smallblast, (800,50)))
+        sleep(.15)
+        display.update(SCREEN.blit(bigblast, (800,50)))
+        sleep(.15)
+        display.update(draw_opp_pkmn_sprite(defender))
+        sleep(.1)
+        display.update(SCREEN.blit(smallblast, (800,50)))
+        sleep(.15)
+        display.update(SCREEN.blit(bigblast, (800,50)))
+        sleep(.15)
+        display.update(draw_opp_pkmn_sprite(defender))
+        sleep(.15)
+        display.update(SCREEN.blit(big,(800,280)))
+        sleep(.15)
+        display.update(draw_opp_pkmn_sprite(defender))
+        display.update(SCREEN.blit(big,(900,280)))
+        sleep(.15)
+        display.update(draw_opp_pkmn_sprite(defender))
+        display.update(SCREEN.blit(big,(1000,280)))
+        sleep(.15)
+        display.update(draw_opp_pkmn_sprite(defender))
+        display.update(SCREEN.blit(big,(800,168)))
+        display.update(SCREEN.blit(big,(800,280)))
+        sleep(.15)
+        display.update(draw_opp_pkmn_sprite(defender))
+        display.update(SCREEN.blit(big,(900,168)))
+        display.update(SCREEN.blit(big,(900,280)))
+        sleep(.15)
+        display.update(draw_opp_pkmn_sprite(defender))
+        display.update(SCREEN.blit(big,(1000,168)))
+        display.update(SCREEN.blit(big,(1000,280)))
+        sleep(.15)
+        display.update(draw_opp_pkmn_sprite(defender))
+
     else:
-        pass  # TODO defending
+        display.update(SCREEN.blit(big,(830,200)))
+        sleep(.15)
+        display.update(SCREEN.blit(big,(680,275)))
+        sleep(.15)
+        display.update(SCREEN.blit(big,(530,350)))
+        sleep(.15)
+        display.update(SCREEN.blit(big,(380,425)))
+        sleep(.15)
+        display.update(SCREEN.blit(big,(230,500)))
+        sleep(.15)
+        display.update(SCREEN.blit(orig,(0,0)))
+        display.update(SCREEN.blit(smallblast, (150,350)))
+        sleep(.15)
+        display.update(SCREEN.blit(bigblast, (150,350)))
+        sleep(.15)
+        display.update(draw_my_pkmn_sprite(defender))
+        sleep(.1)
+        display.update(SCREEN.blit(smallblast, (150,350)))
+        sleep(.15)
+        display.update(SCREEN.blit(bigblast, (150,350)))
+        sleep(.15)
+        display.update(draw_my_pkmn_sprite(defender))
+        sleep(.15)
+        display.update(SCREEN.blit(big,(100,568)))
+        sleep(.15)
+        display.update(draw_my_pkmn_sprite(defender))
+        display.update(SCREEN.blit(big,(200,568)))
+        sleep(.15)
+        display.update(draw_my_pkmn_sprite(defender))
+        display.update(SCREEN.blit(big,(300,568)))
+        sleep(.15)
+        display.update(draw_my_pkmn_sprite(defender))
+        display.update(SCREEN.blit(big,(100,456)))
+        display.update(SCREEN.blit(big,(100,568)))
+        sleep(.15)
+        display.update(draw_my_pkmn_sprite(defender))
+        display.update(SCREEN.blit(big,(200,456)))
+        display.update(SCREEN.blit(big,(200,568)))
+        sleep(.15)
+        display.update(draw_my_pkmn_sprite(defender))
+        display.update(SCREEN.blit(big,(300,456)))
+        display.update(SCREEN.blit(big,(300,568)))
+        sleep(.15)
+        display.update(draw_my_pkmn_sprite(defender))
+    dmged()
     s.stop()
 
 
 def do_fire_punch(attacker, defender, attacking):
     s = Sound("sounds/Fire Punch.ogg")
     s.play()
+    small = loadalphaimg('moves/smallfire.png')
+    big = loadalphaimg('moves/bigfire.png')
+    s.play()
     if attacking:
-        pass  # TODO attacking
+        med_3(attacker,defender)
+        display.update(SCREEN.blit(small,(800,280)))
+        sleep(.2)
+        display.update(draw_opp_pkmn_sprite(defender))
+        display.update(SCREEN.blit(big,(800,280)))
+        sleep(.2)
+        display.update(draw_opp_pkmn_sprite(defender))
+        display.update(SCREEN.blit(small,(1000,280)))
+        sleep(.2)
+        display.update(draw_opp_pkmn_sprite(defender))
+        display.update(SCREEN.blit(big,(1000,280)))
+        sleep(.2)
+        display.update(draw_opp_pkmn_sprite(defender))
+        display.update(SCREEN.blit(small,(900,280)))
+        sleep(.2)
+        display.update(draw_opp_pkmn_sprite(defender))
+        display.update(SCREEN.blit(big,(900,280)))
+        sleep(.2)
+        display.update(draw_opp_pkmn_sprite(defender))
     else:
-        pass  # TODO defending
-    s.stop()
+        opp_med_3(attacker,defender)
+        display.update(SCREEN.blit(small,(100,568)))
+        sleep(.2)
+        display.update(draw_my_pkmn_sprite(defender))
+        display.update(SCREEN.blit(big,(100,568)))
+        sleep(.2)
+        display.update(draw_my_pkmn_sprite(defender))
+        display.update(SCREEN.blit(small,(300,568)))
+        sleep(.2)
+        display.update(draw_my_pkmn_sprite(defender))
+        display.update(SCREEN.blit(big,(300,568)))
+        sleep(.2)
+        display.update(draw_my_pkmn_sprite(defender))
+        display.update(SCREEN.blit(small,(200,568)))
+        sleep(.2)
+        display.update(draw_my_pkmn_sprite(defender))
+        display.update(SCREEN.blit(big,(200,568)))
+        sleep(.2)
+        display.update(draw_my_pkmn_sprite(defender))
+    dmged()
 
 
 def do_fire_spin(attacker, defender, attacking):
     s = Sound("sounds/Fire Spin.ogg")
     s.play()
+    big = loadalphaimg('moves/bigfire.png')
+    smallblast = loadalphaimg('moves/smallblast.png')
+    bigblast = loadalphaimg('moves/bigblast.png')
+
     if attacking:
-        pass  # TODO attacking
+        display.update(SCREEN.blit(big,(800,280)))
+        sleep(.2)
+        display.update(draw_opp_pkmn_sprite(defender))
+        display.update(SCREEN.blit(big,(900,280)))
+        sleep(.2)
+        display.update(draw_opp_pkmn_sprite(defender))
+        display.update(SCREEN.blit(big,(1000,280)))
+        sleep(.2)
+        display.update(draw_opp_pkmn_sprite(defender))
+        display.update(SCREEN.blit(big,(800,168)))
+        display.update(SCREEN.blit(big,(800,280)))
+        sleep(.2)
+        display.update(draw_opp_pkmn_sprite(defender))
+        display.update(SCREEN.blit(big,(900,168)))
+        display.update(SCREEN.blit(big,(900,280)))
+        sleep(.2)
+        display.update(draw_opp_pkmn_sprite(defender))
+        display.update(SCREEN.blit(big,(1000,168)))
+        display.update(SCREEN.blit(big,(1000,280)))
+        sleep(.2)
+        display.update(draw_opp_pkmn_sprite(defender))
+        display.update(SCREEN.blit(big,(800,56)))
+        display.update(SCREEN.blit(big,(800,168)))
+        display.update(SCREEN.blit(big,(800,280)))
+        sleep(.2)
+        display.update(draw_opp_pkmn_sprite(defender))
+        display.update(SCREEN.blit(big,(900,56)))
+        display.update(SCREEN.blit(big,(900,168)))
+        display.update(SCREEN.blit(big,(900,280)))
+        sleep(.2)
+        display.update(draw_opp_pkmn_sprite(defender))
+        display.update(SCREEN.blit(big,(1000,56)))
+        display.update(SCREEN.blit(big,(1000,168)))
+        display.update(SCREEN.blit(big,(1000,280)))
+        sleep(.2)
+        display.update(draw_opp_pkmn_sprite(defender))
+
     else:
-        pass  # TODO defending
+        display.update(SCREEN.blit(big,(100,568)))
+        sleep(.2)
+        display.update(draw_my_pkmn_sprite(defender))
+        display.update(SCREEN.blit(big,(200,568)))
+        sleep(.2)
+        display.update(draw_my_pkmn_sprite(defender))
+        display.update(SCREEN.blit(big,(300,568)))
+        sleep(.2)
+        display.update(draw_my_pkmn_sprite(defender))
+        display.update(SCREEN.blit(big,(100,456)))
+        display.update(SCREEN.blit(big,(100,568)))
+        sleep(.2)
+        display.update(draw_my_pkmn_sprite(defender))
+        display.update(SCREEN.blit(big,(200,456)))
+        display.update(SCREEN.blit(big,(200,568)))
+        sleep(.2)
+        display.update(draw_my_pkmn_sprite(defender))
+        display.update(SCREEN.blit(big,(300,456)))
+        display.update(SCREEN.blit(big,(300,568)))
+        sleep(.2)
+        display.update(draw_my_pkmn_sprite(defender))
+        display.update(SCREEN.blit(big,(100,344)))
+        display.update(SCREEN.blit(big,(100,456)))
+        display.update(SCREEN.blit(big,(100,568)))
+        sleep(.2)
+        display.update(draw_my_pkmn_sprite(defender))
+        display.update(SCREEN.blit(big,(200,344)))
+        display.update(SCREEN.blit(big,(200,456)))
+        display.update(SCREEN.blit(big,(200,568)))
+        sleep(.2)
+        display.update(draw_my_pkmn_sprite(defender))
+        display.update(SCREEN.blit(big,(300,344)))
+        display.update(SCREEN.blit(big,(300,456)))
+        display.update(SCREEN.blit(big,(300,568)))
+        sleep(.2)
+        display.update(draw_my_pkmn_sprite(defender))
+    dmged()
     s.stop()
 
 
 def do_fissure(attacker, defender, attacking):
     s = Sound("sounds/Fissure.ogg")
+    orig = SCREEN.copy()
     s.play()
-    if attacking:
-        pass  # TODO attacking
-    else:
-        pass  # TODO defending
+    dmged()
+    dmged()
+    SCREEN.fill(BLACK)
+    display.flip()
+    sleep(.2)
+    display.update(SCREEN.blit(orig,(0,0)))
+    dmged()
+    dmged()
     s.stop()
 
 
 def do_flamethrower(attacker, defender, attacking):
     s = Sound("sounds/Flamethrower.ogg")
+    orig = SCREEN.copy()
     s.play()
+    big = loadalphaimg('moves/bigfire.png')
     if attacking:
-        pass  # TODO attacking
+        display.update(SCREEN.blit(big,(230,500)))
+        sleep(.15)
+        display.update(SCREEN.blit(big,(380,425)))
+        sleep(.15)
+        display.update(SCREEN.blit(big,(530,350)))
+        sleep(.15)
+        display.update(SCREEN.blit(big,(680,275)))
+        sleep(.15)
+        display.update(SCREEN.blit(big,(830,200)))
+        sleep(.15)
+        display.update(SCREEN.blit(orig,(0,0)))
+        sleep(.15)
+        display.update(SCREEN.blit(big,(900,280)))
+        sleep(.15)
+        display.update(draw_opp_pkmn_sprite(defender))
+        display.update(SCREEN.blit(big,(1000,280)))
+        sleep(.15)
+        display.update(draw_opp_pkmn_sprite(defender))
+        display.update(SCREEN.blit(big,(800,168)))
+        display.update(SCREEN.blit(big,(800,280)))
+        sleep(.15)
+        display.update(draw_opp_pkmn_sprite(defender))
+        display.update(SCREEN.blit(big,(900,168)))
+        display.update(SCREEN.blit(big,(900,280)))
+        sleep(.15)
+        display.update(draw_opp_pkmn_sprite(defender))
+        display.update(SCREEN.blit(big,(1000,168)))
+        display.update(SCREEN.blit(big,(1000,280)))
+        sleep(.15)
+        display.update(draw_opp_pkmn_sprite(defender))
+
     else:
-        pass  # TODO defending
+        display.update(SCREEN.blit(big,(830,200)))
+        sleep(.15)
+        display.update(SCREEN.blit(big,(680,275)))
+        sleep(.15)
+        display.update(SCREEN.blit(big,(530,350)))
+        sleep(.15)
+        display.update(SCREEN.blit(big,(380,425)))
+        sleep(.15)
+        display.update(SCREEN.blit(big,(230,500)))
+        sleep(.15)
+        display.update(SCREEN.blit(orig,(0,0)))
+        sleep(.15)
+        display.update(draw_my_pkmn_sprite(defender))
+        sleep(.15)
+        display.update(SCREEN.blit(big,(100,568)))
+        sleep(.15)
+        display.update(draw_my_pkmn_sprite(defender))
+        display.update(SCREEN.blit(big,(200,568)))
+        sleep(.15)
+        display.update(draw_my_pkmn_sprite(defender))
+        display.update(SCREEN.blit(big,(300,568)))
+        sleep(.15)
+        display.update(draw_my_pkmn_sprite(defender))
+        display.update(SCREEN.blit(big,(100,456)))
+        display.update(SCREEN.blit(big,(100,568)))
+        sleep(.15)
+        display.update(draw_my_pkmn_sprite(defender))
+        display.update(SCREEN.blit(big,(200,456)))
+        display.update(SCREEN.blit(big,(200,568)))
+        sleep(.15)
+        display.update(draw_my_pkmn_sprite(defender))
+        display.update(SCREEN.blit(big,(300,456)))
+        display.update(SCREEN.blit(big,(300,568)))
+        sleep(.15)
+        display.update(draw_my_pkmn_sprite(defender))
+    dmged()
     s.stop()
 
 
 def do_flash(attacker, defender, attacking):
     s = Sound("sounds/Flash.ogg")
     s.play()
-    if attacking:
-        pass  # TODO attacking
-    else:
-        pass  # TODO defending
+    orig = SCREEN.copy()
+    SCREEN.fill(BLACK)
+    display.flip()
+    sleep(.2)
+    display.update(SCREEN.blit(orig,(0,0)))
+    sleep(.2)
+    SCREEN.fill(BLACK)
+    display.flip()
+    sleep(.2)
+    display.update(SCREEN.blit(orig,(0,0)))
+    sleep(.2)
+    SCREEN.fill(BLACK)
+    display.flip()
+    sleep(.2)
+    display.update(SCREEN.blit(orig,(0,0)))
     s.stop()
 
 
@@ -1106,9 +1836,12 @@ def do_fly(attacker, defender, attacking):
     s = Sound("sounds/Fly.ogg")
     s.play()
     if attacking:
-        pass  # TODO attacking
+        draw_my_pkmn_sprite(attacker)
+        med_3(attacker,defender)
     else:
-        pass  # TODO defending
+        draw_opp_pkmn_sprite(attacker)
+        opp_med_3(attacker,defender)
+    dmged()
     s.stop()
 
 
@@ -1116,9 +1849,9 @@ def do_fly_prep(attacker, defender, attacking):
     s = Sound("sounds/Fly_prep.ogg")
     s.play()
     if attacking:
-        pass  # TODO attacking
+        display.update(draw.rect(SCREEN, WHITE, MYPKMN + [attacker.backimg.get_width(),attacker.backimg.get_width()]))
     else:
-        pass  # TODO defending
+        display.update(draw.rect(SCREEN, WHITE, OPPPKMN + [attacker.backimg.get_width(),attacker.backimg.get_width()]))
     s.stop()
 
 
@@ -1155,10 +1888,16 @@ def do_fury_swipes(attacker, defender, attacking):
 def do_glare(attacker, defender, attacking):
     s = Sound("sounds/Glare.ogg")
     s.play()
-    if attacking:
-        pass  # TODO attacking
-    else:
-        pass  # TODO defending
+    orig = SCREEN.copy()
+    SCREEN.fill(BLACK)
+    display.flip()
+    sleep(.2)
+    display.update(SCREEN.blit(orig,(0,0)))
+    sleep(.2)
+    SCREEN.fill(BLACK)
+    display.flip()
+    sleep(.2)
+    display.update(SCREEN.blit(orig,(0,0)))
     s.stop()
 
 
@@ -1226,9 +1965,14 @@ def do_headbutt(attacker, defender, attacking):
     s = Sound("sounds/HeadButt.ogg")
     s.play()
     if attacking:
-        pass  # TODO attacking
+        display.update(mid_big())
+        sleep(.15)
+        display.update(draw_opp_pkmn_sprite(defender))
     else:
-        pass  # TODO defending
+        display.update(opp_mid_big())
+        sleep(.15)
+        display.update(draw_my_pkmn_sprite(defender))
+    dmged()
     s.stop()
 
 
@@ -1236,9 +1980,10 @@ def do_hi_jump_kick(attacker, defender, attacking):
     s = Sound("sounds/Hi Jump Kick.ogg")
     s.play()
     if attacking:
-        pass  # TODO attacking
+        big_3(attacker, defender)
     else:
-        pass  # TODO defending
+        opp_big_3(attacker, defender)
+    dmged()
     s.stop()
 
 
@@ -1256,19 +2001,84 @@ def do_horn_drill(attacker, defender, attacking):
     s = Sound("sounds/Horn Drill.ogg")
     s.play()
     if attacking:
-        pass  # TODO attacking
+        display.update(mid_big())
+        sleep(.1)
+        display.update(draw_opp_pkmn_sprite(defender))
+        sleep(.1)
+        display.update(mid_big())
+        sleep(.1)
+        display.update(draw_opp_pkmn_sprite(defender))
+        sleep(.1)
+        display.update(mid_big())
+        sleep(.1)
+        display.update(draw_opp_pkmn_sprite(defender))
+        sleep(.1)
+        display.update(mid_big())
+        sleep(.1)
+        display.update(draw_opp_pkmn_sprite(defender))
     else:
-        pass  # TODO defending
+        display.update(opp_mid_big())
+        sleep(.1)
+        display.update(draw_my_pkmn_sprite(defender))
+        sleep(.1)
+        display.update(opp_mid_big())
+        sleep(.1)
+        display.update(draw_my_pkmn_sprite(defender))
+        sleep(.1)
+        display.update(opp_mid_big())
+        sleep(.1)
+        display.update(draw_my_pkmn_sprite(defender))
+        sleep(.1)
+        display.update(opp_mid_big())
+        sleep(.1)
+        display.update(draw_my_pkmn_sprite(defender))
+    dmged()
     s.stop()
 
 
 def do_hydro_pump(attacker, defender, attacking):
     s = Sound("sounds/Hydro Pump.ogg")
+    pumps = []
+    for i in range(1,7):
+        pumps.append(loadalphaimg('moves/hydro{0}.png'.format(i)))
     s.play()
     if attacking:
-        pass  # TODO attacking
+        for i in range(6):
+            display.update(SCREEN.blit(pumps[i],(820,75)))
+            sleep(.15)
+            display.update(draw_opp_pkmn_sprite(defender))
+        for i in range(6):
+            display.update(SCREEN.blit(pumps[i],(940,75)))
+            sleep(.15)
+            display.update(draw_opp_pkmn_sprite(defender))
+        sleep(.3)
+        for i in range(6):
+            display.update(SCREEN.blit(pumps[i],(820,75)))
+            sleep(.15)
+            display.update(draw_opp_pkmn_sprite(defender))
+        for i in range(6):
+            display.update(SCREEN.blit(pumps[i],(940,75)))
+            sleep(.15)
+            display.update(draw_opp_pkmn_sprite(defender))
     else:
-        pass  # TODO defending
+        for i in range(6):
+            display.update(SCREEN.blit(pumps[i],(150,365)))
+            sleep(.15)
+            display.update(draw_my_pkmn_sprite(defender))
+        for i in range(6):
+            display.update(SCREEN.blit(pumps[i],(270,365)))
+            sleep(.15)
+            display.update(draw_my_pkmn_sprite(defender))
+        sleep(.3)
+        for i in range(6):
+            display.update(SCREEN.blit(pumps[i],(150,365)))
+            sleep(.15)
+            display.update(draw_my_pkmn_sprite(defender))
+        for i in range(6):
+            display.update(SCREEN.blit(pumps[i],(270,365)))
+            sleep(.15)
+            display.update(draw_my_pkmn_sprite(defender))
+    dmged()
     s.stop()
 
 
@@ -1286,9 +2096,9 @@ def do_hyper_fang(attacker, defender, attacking):
     s = Sound("sounds/Hyper Fang.ogg")
     s.play()
     if attacking:
-        pass  # TODO attacking
+        med_3(attacker, defender)
     else:
-        pass  # TODO defending
+        opp_med_3(attacker, defender)
     s.stop()
 
 
@@ -1304,21 +2114,45 @@ def do_hypnosis(attacker, defender, attacking):
 
 def do_ice_beam(attacker, defender, attacking):
     s = Sound("sounds/Ice Beam.ogg")
+    ice = []
+    for i in range(1,5):
+        ice.append(loadalphaimg('moves/ice{0}.png'.format(i)))
     s.play()
     if attacking:
-        beam(attacker, defender, type_='ice')
+        beam(attacker, defender, attacking, type_='ice')
+        for i in range(4):
+            display.update(SCREEN.blit(ice[i],(780,150)))
+            sleep(.15)
+            display.update(draw_opp_pkmn_sprite(defender))
     else:
-        pass  # TODO defending
+        beam(attacker, defender, attacking, type_='ice')
+        for i in range(4):
+            display.update(SCREEN.blit(ice[i],(59,456)))
+            sleep(.15)
+            display.update(draw_my_pkmn_sprite(defender))
+    dmged()
     s.stop()
 
 
 def do_ice_punch(attacker, defender, attacking):
     s = Sound("sounds/Ice Punch.ogg")
+    ice = []
+    for i in range(1,5):
+        ice.append(loadalphaimg('moves/ice{0}.png'.format(i)))
     s.play()
     if attacking:
-        pass  # TODO attacking
+        med_3(attacker, defender)
+        for i in range(4):
+            display.update(SCREEN.blit(ice[i],(780,150)))
+            sleep(.15)
+            display.update(draw_opp_pkmn_sprite(defender))
     else:
-        pass  # TODO defending
+        opp_med_3(attacker, defender)
+        for i in range(4):
+            display.update(SCREEN.blit(ice[i],(59,456)))
+            sleep(.15)
+            display.update(draw_my_pkmn_sprite(defender))
+    dmged()
     s.stop()
 
 
@@ -1326,9 +2160,10 @@ def do_jump_kick(attacker, defender, attacking):
     s = Sound("sounds/Jump Kick.ogg")
     s.play()
     if attacking:
-        pass  # TODO attacking
+        big_3(attacker, defender)
     else:
-        pass  # TODO defending
+        opp_big_3(attacker, defender)
+    dmged()
     s.stop()
 
 
@@ -1346,9 +2181,9 @@ def do_kinesis(attacker, defender, attacking):
     s = Sound("sounds/Kinesis.ogg")
     s.play()
     if attacking:
-        pass  # TODO attacking
+        double(attacker, defender)
     else:
-        pass  # TODO defending
+        opp_double(attacker, defender)
     s.stop()
 
 
@@ -1356,9 +2191,10 @@ def do_leech_life(attacker, defender, attacking):
     s = Sound("sounds/Leach Kiss.ogg")
     s.play()
     if attacking:
-        pass  # TODO attacking
+        med_3(attacker, defender)
     else:
-        pass  # TODO defending
+        opp_med_3(attacker, defender)
+    dmged()
     s.stop()
 
 
@@ -1374,21 +2210,75 @@ def do_leech_seed(attacker, defender, attacking):
 
 def do_leer(attacker, defender, attacking):
     s = Sound("sounds/Leer.ogg")
+    orig = SCREEN.copy()
     s.play()
-    if attacking:
-        pass  # TODO attacking
-    else:
-        pass  # TODO defending
+    SCREEN.fill(BLACK)
+    display.flip()
+    sleep(.15)
+    SCREEN.blit(orig,(0,0))
+    sleep(.15)
+    dmged()
     s.stop()
 
 
 def do_lick(attacker, defender, attacking):
     s = Sound("sounds/Lick.ogg")
+    tmp = loadalphaimg('moves/acid.png')
+    drop = loadalphaimg('moves/drop.png')
     s.play()
     if attacking:
-        pass  # TODO attacking
+        display.update(SCREEN.blit(tmp,LOW_ARC[-1]))
+        display.update(SCREEN.blit(drop, (900,220)))
+        draw_opp_pkmn_sprite(defender)
+        sleep(.15)
+        display.update([900,220, drop.get_width(), drop.get_height()])
+        display.update(SCREEN.blit(drop, (900,270)))
+        draw_opp_pkmn_sprite(defender)
+        sleep(.15)  
+        display.update([900,270, drop.get_width(), drop.get_height()])
+   
+        display.update(SCREEN.blit(drop, (900,320)))
+        draw_opp_pkmn_sprite(defender)
+        sleep(.15)  
+        display.update([900,320, drop.get_width(), drop.get_height()])
+        display.update(SCREEN.blit(drop, (950,220)))
+        draw_opp_pkmn_sprite(defender)
+        sleep(.15)  
+        display.update([950,220, drop.get_width(), drop.get_height()])
+        display.update(SCREEN.blit(drop, (950,270)))
+        draw_opp_pkmn_sprite(defender)
+        sleep(.15)  
+        display.update([950,270, drop.get_width(), drop.get_height()])
+        display.update(SCREEN.blit(drop, (950,320)))   
+        sleep(.15)  
+        display.update(draw_opp_pkmn_sprite(defender))
     else:
-        pass  # TODO defending
+        display.update(SCREEN.blit(tmp,(200,400)))
+        display.update(SCREEN.blit(drop, (220,510)))
+        draw_my_pkmn_sprite(defender)
+        sleep(.15)
+        display.update([220,510, drop.get_width(), drop.get_height()])
+        display.update(SCREEN.blit(drop, (220,560)))
+        draw_my_pkmn_sprite(defender)
+        sleep(.15)  
+        display.update([220,560, drop.get_width(), drop.get_height()])
+   
+        display.update(SCREEN.blit(drop, (220,610)))
+        draw_my_pkmn_sprite(defender)
+        sleep(.15)  
+        display.update([220,610, drop.get_width(), drop.get_height()])
+        display.update(SCREEN.blit(drop, (270,510)))
+        draw_my_pkmn_sprite(defender)
+        sleep(.15)  
+        display.update([270,510, drop.get_width(), drop.get_height()])
+        display.update(SCREEN.blit(drop, (270,560)))
+        draw_my_pkmn_sprite(defender)
+        sleep(.15)  
+        display.update([270,560, drop.get_width(), drop.get_height()])
+        display.update(SCREEN.blit(drop, (270,610)))   
+        sleep(.15)  
+        display.update(draw_my_pkmn_sprite(defender))
+    dmged()
     s.stop()
 
 
@@ -1396,9 +2286,84 @@ def do_light_screen(attacker, defender, attacking):
     s = Sound("sounds/Light Screen.ogg")
     s.play()
     if attacking:
-        pass  # TODO attacking
+        tmp = loadalphaimg('moves/screen.png')
     else:
-        pass  # TODO defending
+        tmp = loadalphaimg('moves/opp_screen.png')
+    if attacking: 
+        display.update(SCREEN.blit(tmp,(470,285)))
+        sleep(.15)
+        draw.rect(SCREEN, WHITE, (470,285, tmp.get_width(), tmp.get_height()))
+        draw_my_pkmn_sprite(attacker)
+        display.update([470,285, tmp.get_width(), tmp.get_height()])
+        sleep(.15)
+        display.update(SCREEN.blit(tmp,(470,285)))
+        sleep(.15)
+        draw.rect(SCREEN, WHITE, (470,285, tmp.get_width(), tmp.get_height()))
+        draw_my_pkmn_sprite(attacker)
+        display.update([470,285, tmp.get_width(), tmp.get_height()])
+        sleep(.15)
+        display.update(SCREEN.blit(tmp,(470,285)))
+        sleep(.15)
+        draw.rect(SCREEN, WHITE, (470,285, tmp.get_width(), tmp.get_height()))
+        draw_my_pkmn_sprite(attacker)
+        display.update([470,285, tmp.get_width(), tmp.get_height()])
+        sleep(.15)
+        display.update(SCREEN.blit(tmp,(470,285)))
+        sleep(.15)
+        draw.rect(SCREEN, WHITE, (470,285, tmp.get_width(), tmp.get_height()))
+        draw_my_pkmn_sprite(attacker)
+        display.update([470,285, tmp.get_width(), tmp.get_height()])
+        sleep(.15)
+        display.update(SCREEN.blit(tmp,(470,285)))
+        sleep(.15)
+        draw.rect(SCREEN, WHITE, (470,285, tmp.get_width(), tmp.get_height()))
+        draw_my_pkmn_sprite(attacker)
+        display.update([470,285, tmp.get_width(), tmp.get_height()])
+        sleep(.15)
+        display.update(SCREEN.blit(tmp,(470,285)))
+        sleep(.15)
+        draw.rect(SCREEN, WHITE, (470,285, tmp.get_width(), tmp.get_height()))
+        draw_my_pkmn_sprite(attacker)
+        display.update([470,285, tmp.get_width(), tmp.get_height()])
+        sleep(.15)
+    else:
+        
+        display.update(SCREEN.blit(tmp,(700,0)))
+        sleep(.15)
+        draw.rect(SCREEN, WHITE, (700,0, tmp.get_width(), tmp.get_height()))
+        draw_my_pkmn_sprite(attacker)
+        display.update([700,0, tmp.get_width(), tmp.get_height()])
+        sleep(.15)
+        display.update(SCREEN.blit(tmp,(700,0)))
+        sleep(.15)
+        draw.rect(SCREEN, WHITE, (700,0, tmp.get_width(), tmp.get_height()))
+        draw_my_pkmn_sprite(attacker)
+        display.update([700,0, tmp.get_width(), tmp.get_height()])
+        sleep(.15)
+        display.update(SCREEN.blit(tmp,(700,0)))
+        sleep(.15)
+        draw.rect(SCREEN, WHITE, (700,0, tmp.get_width(), tmp.get_height()))
+        draw_my_pkmn_sprite(attacker)
+        display.update([700,0, tmp.get_width(), tmp.get_height()])
+        sleep(.15)
+        display.update(SCREEN.blit(tmp,(700,0)))
+        sleep(.15)
+        draw.rect(SCREEN, WHITE, (700,0, tmp.get_width(), tmp.get_height()))
+        draw_my_pkmn_sprite(attacker)
+        display.update([700,0, tmp.get_width(), tmp.get_height()])
+        sleep(.15)
+        display.update(SCREEN.blit(tmp,(700,0)))
+        sleep(.15)
+        draw.rect(SCREEN, WHITE, (700,0, tmp.get_width(), tmp.get_height()))
+        draw_my_pkmn_sprite(attacker)
+        display.update([700,0, tmp.get_width(), tmp.get_height()])
+        sleep(.15)
+        display.update(SCREEN.blit(tmp,(700,0)))
+        sleep(.15)
+        draw.rect(SCREEN, WHITE, (700,0, tmp.get_width(), tmp.get_height()))
+        draw_my_pkmn_sprite(attacker)
+        display.update([700,0, tmp.get_width(), tmp.get_height()])
+        sleep(.15)
     s.stop()
 
 
@@ -1416,10 +2381,10 @@ def do_low_kick(attacker, defender, attacking):
     s = Sound("sounds/Low Kick.ogg")
     s.play()
     if attacking:
-        pass  # TODO attacking
+        big_3(attacker, defender)
     else:
-        pass  # TODO defending
-    s.stop()
+        opp_big_3(attacker, defender)
+    dmged()
 
 
 def do_meditate(attacker, defender, attacking):
@@ -1446,9 +2411,9 @@ def do_mega_kick(attacker, defender, attacking):
     s = Sound("sounds/Mega Kick.ogg")
     s.play()
     if attacking:
-        pass  # TODO attacking
+        big_3(attacker, defender)
     else:
-        pass  # TODO defending
+        opp_big_3(attacker, defender)
     s.stop()
 
 
@@ -1456,9 +2421,9 @@ def do_mega_punch(attacker, defender, attacking):
     s = Sound("sounds/Mega Punch.ogg")
     s.play()
     if attacking:
-        pass  # TODO attacking
+        big_3(attacker, defender)
     else:
-        pass  # TODO defending
+        opp_big_3(attacker, defender)
     s.stop()
 
 
@@ -1505,10 +2470,16 @@ def do_mist(attacker, defender, attacking):
 def do_night_shade(attacker, defender, attacking):
     s = Sound("sounds/Night Shade.ogg")
     s.play()
-    if attacking:
-        pass  # TODO attacking
-    else:
-        pass  # TODO defending
+    invert()
+    sleep(.1)
+    invert()
+    sleep(.1)
+    invert()
+    sleep(.1)
+    invert()
+    sleep(.1)
+    wave(10)
+    dmged()
     s.stop()
 
 
@@ -1526,9 +2497,9 @@ def do_peck(attacker, defender, attacking):
     s = Sound("sounds/Peck.ogg")
     s.play()
     if attacking:
-        pass  # TODO attacking
+        double(attacker, defender)
     else:
-        pass  # TODO defending
+        opp_double(attacker, defender)
     s.stop()
 
 
@@ -1546,9 +2517,9 @@ def do_pin_missile(attacker, defender, attacking):
     s = Sound("sounds/Pin Missle.ogg")
     s.play()
     if attacking:
-        pass  # TODO attacking
+        double(attacker, defender)
     else:
-        pass  # TODO defending
+        opp_double(attacker, defender)
     s.stop()
 
 
@@ -1586,9 +2557,9 @@ def do_pound(attacker, defender, attacking):
     s = Sound("sounds/Pound.ogg")
     s.play()
     if attacking:
-        pass  # TODO attacking
+        double(attacker, defender)
     else:
-        pass  # TODO defending
+        opp_double(attacker, defender)
     s.stop()
 
 
@@ -1596,19 +2567,33 @@ def do_psybeam(attacker, defender, attacking):
     s = Sound("sounds/Psybeam.ogg")
     s.play()
     if attacking:
-        pass  # TODO attacking
+        beam(attacker, defender, attacking, type_='psy')
     else:
-        pass  # TODO defending
+        beam(attacker, defender, attacking, type_='psy')
+    invert()
+    sleep(.15)
+    invert()
+    dmged()
     s.stop()
 
 
 def do_psychic(attacker, defender, attacking):
     s = Sound("sounds/Psychic.ogg")
     s.play()
-    if attacking:
-        pass  # TODO attacking
-    else:
-        pass  # TODO defending
+    invert()
+    sleep(.15)
+    invert()
+    sleep(.15)
+    invert()
+    sleep(.15)
+    invert()
+    sleep(.15)
+    invert()
+    sleep(.15)
+    invert()
+    sleep(.15)
+    wave(10)
+    dmged()
     s.stop()
 
 
@@ -1636,9 +2621,10 @@ def do_rage(attacker, defender, attacking):
     s = Sound("sounds/Rage.ogg")
     s.play()
     if attacking:
-        pass  # TODO attacking
+        double(attacker, defender)
     else:
-        pass  # TODO defending
+        opp_double(attacker, defender)
+    dmged()
     s.stop()
 
 
@@ -1682,11 +2668,135 @@ def do_recover(attacker, defender, attacking):
 
 def do_reflect(attacker, defender, attacking):
     s = Sound("sounds/Reflect.ogg")
-    s.play()
     if attacking:
-        pass  # TODO attacking
+        tmp = loadalphaimg('moves/barrier.png')
     else:
-        pass  # TODO defending
+        tmp = loadalphaimg('moves/opp_barrier.png')
+    s.play()
+    invert()
+    if attacking:
+        invert()
+        display.update(SCREEN.blit(tmp,(470,285)))
+        invert()
+        sleep(.15)
+        invert()
+        draw.rect(SCREEN, WHITE, (470,285, tmp.get_width(), tmp.get_height()))
+        draw_my_pkmn_sprite(attacker)
+        display.update([470,285, tmp.get_width(), tmp.get_height()])
+        invert()
+        sleep(.15)
+        invert()
+        display.update(SCREEN.blit(tmp,(470,285)))
+        invert()
+        sleep(.15)
+        invert()
+        draw.rect(SCREEN, WHITE, (470,285, tmp.get_width(), tmp.get_height()))
+        draw_my_pkmn_sprite(attacker)
+        display.update([470,285, tmp.get_width(), tmp.get_height()])
+        invert()
+        sleep(.15)
+        invert()
+        display.update(SCREEN.blit(tmp,(470,285)))
+        invert()
+        sleep(.15)
+        invert()
+        draw.rect(SCREEN, WHITE, (470,285, tmp.get_width(), tmp.get_height()))
+        draw_my_pkmn_sprite(attacker)
+        display.update([470,285, tmp.get_width(), tmp.get_height()])
+        invert()
+        sleep(.15)
+        invert()
+        display.update(SCREEN.blit(tmp,(470,285)))
+        invert()
+        sleep(.15)
+        invert()
+        draw.rect(SCREEN, WHITE, (470,285, tmp.get_width(), tmp.get_height()))
+        draw_my_pkmn_sprite(attacker)
+        display.update([470,285, tmp.get_width(), tmp.get_height()])
+        invert()
+        sleep(.15)
+        invert()
+        display.update(SCREEN.blit(tmp,(470,285)))
+        invert()
+        sleep(.15)
+        invert()
+        draw.rect(SCREEN, WHITE, (470,285, tmp.get_width(), tmp.get_height()))
+        draw_my_pkmn_sprite(attacker)
+        display.update([470,285, tmp.get_width(), tmp.get_height()])
+        invert()
+        sleep(.15)
+        invert()
+        display.update(SCREEN.blit(tmp,(470,285)))
+        invert()
+        sleep(.15)
+        invert()
+        draw.rect(SCREEN, WHITE, (470,285, tmp.get_width(), tmp.get_height()))
+        draw_my_pkmn_sprite(attacker)
+        display.update([470,285, tmp.get_width(), tmp.get_height()])
+        invert()
+        sleep(.15)
+    else:
+        invert()
+        display.update(SCREEN.blit(tmp,(700,0)))
+        invert()
+        sleep(.15)
+        invert()
+        draw.rect(SCREEN, WHITE, (700,0, tmp.get_width(), tmp.get_height()))
+        draw_opp_pkmn_sprite(attacker)
+        display.update([700,0, tmp.get_width(), tmp.get_height()])
+        invert()
+        sleep(.15)
+        invert()
+        display.update(SCREEN.blit(tmp,(700,0)))
+        invert()
+        sleep(.15)
+        invert()
+        draw.rect(SCREEN, WHITE, (700,0, tmp.get_width(), tmp.get_height()))
+        draw_opp_pkmn_sprite(attacker)
+        display.update([700,0, tmp.get_width(), tmp.get_height()])
+        invert()
+        sleep(.15)
+        invert()
+        display.update(SCREEN.blit(tmp,(700,0)))
+        invert()
+        sleep(.15)
+        invert()
+        draw.rect(SCREEN, WHITE, (700,0, tmp.get_width(), tmp.get_height()))
+        draw_opp_pkmn_sprite(attacker)
+        display.update([700,0, tmp.get_width(), tmp.get_height()])
+        invert()
+        sleep(.15)
+        invert()
+        display.update(SCREEN.blit(tmp,(700,0)))
+        invert()
+        sleep(.15)
+        invert()
+        draw.rect(SCREEN, WHITE, (700,0, tmp.get_width(), tmp.get_height()))
+        draw_opp_pkmn_sprite(attacker)
+        display.update([700,0, tmp.get_width(), tmp.get_height()])
+        invert()
+        sleep(.15)
+        invert()
+        display.update(SCREEN.blit(tmp,(700,0)))
+        invert()
+        sleep(.15)
+        invert()
+        draw.rect(SCREEN, WHITE, (700,0, tmp.get_width(), tmp.get_height()))
+        draw_opp_pkmn_sprite(attacker)
+        display.update([700,0, tmp.get_width(), tmp.get_height()])
+        invert()
+        sleep(.15)
+        invert()
+        display.update(SCREEN.blit(tmp,(700,0)))
+        invert()
+        sleep(.15)
+        invert()
+        draw.rect(SCREEN, WHITE, (700,0, tmp.get_width(), tmp.get_height()))
+        draw_opp_pkmn_sprite(attacker)
+        display.update([700,0, tmp.get_width(), tmp.get_height()])
+        invert()
+        sleep(.15)
+    invert()
     s.stop()
 
 
@@ -1734,9 +2844,9 @@ def do_rolling_kick(attacker, defender, attacking):
     s = Sound("sounds/Rolling Kick.ogg")
     s.play()
     if attacking:
-        pass  # TODO attacking
+        big_3(attacker, defender)
     else:
-        pass  # TODO defending
+        opp_big_3(attacker, defender)
     s.stop()
 
 
@@ -1814,9 +2924,13 @@ def do_skull_bash(attacker, defender, attacking):
     s = Sound("sounds/Skull Bash.ogg")
     s.play()
     if attacking:
-        pass  # TODO attacking
+        display.update(mid_big())
+        sleep(.15)
+        display.update(draw_opp_pkmn_sprite(defender))
     else:
-        pass  # TODO defending
+        display.update(opp_mid_big())
+        sleep(.15)
+        display.update(draw_my_pkmn_sprite(defender))
     s.stop()
 
 
@@ -1832,9 +2946,10 @@ def do_sky_attack(attacker, defender, attacking):
     s = Sound("sounds/Sky Attack.ogg")
     s.play()
     if attacking:
-        pass  # TODO attacking
+        big_3(attacker, defender)
     else:
-        pass  # TODO defending
+        opp_big_3(attacker, defender)
+    dmged()
     s.stop()
 
 
@@ -1850,9 +2965,9 @@ def do_slam(attacker, defender, attacking):
     s = Sound("sounds/Slam.ogg")
     s.play()
     if attacking:
-        pass  # TODO attacking
+        med_3(attacker, defender)
     else:
-        pass  # TODO defending
+        opp_med_3(attacker, defender)
     s.stop()
 
 
@@ -1878,11 +2993,64 @@ def do_sleep_powder(attacker, defender, attacking):
 
 def do_sludge(attacker, defender, attacking):
     s = Sound("sounds/Sludge.ogg")
+    tmp = loadalphaimg('moves/acid.png')
+    drop = loadalphaimg('moves/drop.png')
     s.play()
     if attacking:
-        pass  # TODO attacking
+        low_arch_away(attacker,defender,tmp)
+        display.update(SCREEN.blit(tmp,LOW_ARC[-1]))
+        display.update(SCREEN.blit(drop, (900,220)))
+        draw_opp_pkmn_sprite(defender)
+        sleep(.1)
+        display.update([900,220, drop.get_width(), drop.get_height()])
+        display.update(SCREEN.blit(drop, (900,270)))
+        draw_opp_pkmn_sprite(defender)
+        sleep(.1)  
+        display.update([900,270, drop.get_width(), drop.get_height()])
+   
+        display.update(SCREEN.blit(drop, (900,320)))
+        draw_opp_pkmn_sprite(defender)
+        sleep(.1)  
+        display.update([900,320, drop.get_width(), drop.get_height()])
+        display.update(SCREEN.blit(drop, (950,220)))
+        draw_opp_pkmn_sprite(defender)
+        sleep(.1)  
+        display.update([950,220, drop.get_width(), drop.get_height()])
+        display.update(SCREEN.blit(drop, (950,270)))
+        draw_opp_pkmn_sprite(defender)
+        sleep(.1)  
+        display.update([950,270, drop.get_width(), drop.get_height()])
+        display.update(SCREEN.blit(drop, (950,320)))   
+        sleep(.1)  
+        display.update(draw_opp_pkmn_sprite(defender))
     else:
-        pass  # TODO defending
+        low_arch_towards(defender,attacker,tmp)
+        display.update(SCREEN.blit(tmp,(200,400)))
+        display.update(SCREEN.blit(drop, (220,510)))
+        draw_my_pkmn_sprite(defender)
+        sleep(.1)
+        display.update([220,510, drop.get_width(), drop.get_height()])
+        display.update(SCREEN.blit(drop, (220,560)))
+        draw_my_pkmn_sprite(defender)
+        sleep(.1)  
+        display.update([220,560, drop.get_width(), drop.get_height()])
+   
+        display.update(SCREEN.blit(drop, (220,610)))
+        draw_my_pkmn_sprite(defender)
+        sleep(.1)  
+        display.update([220,610, drop.get_width(), drop.get_height()])
+        display.update(SCREEN.blit(drop, (270,510)))
+        draw_my_pkmn_sprite(defender)
+        sleep(.1)  
+        display.update([270,510, drop.get_width(), drop.get_height()])
+        display.update(SCREEN.blit(drop, (270,560)))
+        draw_my_pkmn_sprite(defender)
+        sleep(.1)  
+        display.update([270,560, drop.get_width(), drop.get_height()])
+        display.update(SCREEN.blit(drop, (270,610)))   
+        sleep(.1)  
+        display.update(draw_my_pkmn_sprite(defender))
+    dmged()
     s.stop()
 
 
@@ -1928,9 +3096,12 @@ def do_solarbeam(attacker, defender, attacking):
     s = Sound("sounds/SolarBeam.ogg")
     s.play()
     if attacking:
-        beam(attacker, defender, type_='solar')
+        beam(attacker, defender, attacking, type_='solar')
+        double(attacker, defender)  
     else:
-        pass  # TODO defending
+        beam(attacker, defender, attacking, type_='solar')
+        opp_double(attacker, defender)
+    dmged()
     s.stop()
 
 
@@ -1948,9 +3119,10 @@ def do_spike_cannon(attacker, defender, attacking):
     s = Sound("sounds/Spike Cannon.ogg")
     s.play()
     if attacking:
-        pass  # TODO attacking
+        big_3(attacker, defender)
     else:
-        pass  # TODO defending
+        opp_big_3(attacker, defender)
+    dmged()
     s.stop()
 
 
@@ -1978,9 +3150,14 @@ def do_stomp(attacker, defender, attacking):
     s = Sound("sounds/Stomp.ogg")
     s.play()
     if attacking:
-        pass  # TODO attacking
+        display.update(mid_big())
+        sleep(.15)
+        display.update(draw_opp_pkmn_sprite(defender))
     else:
-        pass  # TODO defending
+        display.update(opp_mid_big())
+        sleep(.15)
+        display.update(draw_my_pkmn_sprite(defender))
+    dmged()
     s.stop()
 
 
@@ -1988,9 +3165,9 @@ def do_strength(attacker, defender, attacking):
     s = Sound("sounds/Strength.ogg")
     s.play()
     if attacking:
-        pass  # TODO attacking
+        big_3(attacker, defender)
     else:
-        pass  # TODO defending
+        opp_big_3(attacker, defender)
     s.stop()
 
 
@@ -2008,9 +3185,10 @@ def do_struggle(attacker, defender, attacking):
     s = Sound("sounds/Struggle.ogg")
     s.play()
     if attacking:
-        pass  # TODO attacking
+        double(attacker, defender)
     else:
-        pass  # TODO defending
+        opp_double(attacker, defender)
+    dmged()
     s.stop()
 
 
@@ -2028,19 +3206,23 @@ def do_submission(attacker, defender, attacking):
     s = Sound("sounds/Submission.ogg")
     s.play()
     if attacking:
-        pass  # TODO attacking
+        double(attacker, defender)
     else:
-        pass  # TODO defending
+        opp_double(attacker, defender)
+    dmged()
     s.stop()
 
 
 def do_substitute(attacker, defender, attacking):
     s = Sound("sounds/Substitute.ogg")
     s.play()
+    invert()
     if attacking:
-        pass  # TODO attacking
+        big_3(attacker, defender)
     else:
-        pass  # TODO defending
+        opp_big_3(attacker, defender)
+    invert()
+    dmged()
     s.stop()
 
 
@@ -2088,7 +3270,7 @@ def do_swords_dance(attacker, defender, attacking):
     s = Sound("sounds/Swords Dance.ogg")
     s.play()
     if attacking:
-        pass  # TODO attacking
+        pass
     else:
         pass  # TODO defending
     s.stop()
@@ -2098,9 +3280,20 @@ def do_tackle(attacker, defender, attacking):
     s = Sound("sounds/Tackle.ogg")
     s.play()
     if attacking:
-        pass  # TODO attacking
+        display.update(draw.rect(SCREEN, WHITE, MYPKMN + SSIZE))
+        display.update(SCREEN.blit(attacker.backimg, tuple(map(sum,zip(tuple(MYPKMN),(28,0))))))
+        sleep(.25)
+        display.update(draw.rect(SCREEN, WHITE, tuple(map(sum,zip(tuple(MYPKMN + SSIZE),(28,0,0,0))))))
+        display.update(SCREEN.blit(attacker.backimg, MYPKMN))
+        sleep(.25)
     else:
-        pass  # TODO defending
+        display.update(draw.rect(SCREEN, WHITE, OPPPKMN + SSIZE))
+        display.update(SCREEN.blit(attacker.frontimg, tuple(map(sum,zip(tuple(OPPPKMN),(-28,0))))))
+        sleep(.25)
+        display.update(draw.rect(SCREEN, WHITE, tuple(map(sum,zip(tuple(OPPPKMN + SSIZE),(-28,0,0,0))))))
+        display.update(SCREEN.blit(attacker.frontimg, OPPPKMN))
+        sleep(.25)
+    dmged()
     s.stop()
 
 
@@ -2108,9 +3301,31 @@ def do_tail_whip(attacker, defender, attacking):
     s = Sound("sounds/Tail Whip.ogg")
     s.play()
     if attacking:
-        pass  # TODO attacking
+        display.update(draw.rect(SCREEN, WHITE, MYPKMN + SSIZE))
+        display.update(SCREEN.blit(attacker.backimg, tuple(map(sum,zip(tuple(MYPKMN),(28,0))))))
+        sleep(.25)
+        display.update(draw.rect(SCREEN, WHITE, tuple(map(sum,zip(tuple(MYPKMN + SSIZE),(28,0,0,0))))))
+        display.update(SCREEN.blit(attacker.backimg, MYPKMN))
+        sleep(.25)
+        display.update(draw.rect(SCREEN, WHITE, MYPKMN + SSIZE))
+        display.update(SCREEN.blit(attacker.backimg, tuple(map(sum,zip(tuple(MYPKMN),(28,0))))))
+        sleep(.25)
+        display.update(draw.rect(SCREEN, WHITE, tuple(map(sum,zip(tuple(MYPKMN + SSIZE),(28,0,0,0))))))
+        display.update(SCREEN.blit(attacker.backimg, MYPKMN))
+        sleep(.25)
     else:
-        pass  # TODO defending
+        display.update(draw.rect(SCREEN, WHITE, OPPPKMN + SSIZE))
+        display.update(SCREEN.blit(attacker.frontimg, tuple(map(sum,zip(tuple(OPPPKMN),(-28,0))))))
+        sleep(.25)
+        display.update(draw.rect(SCREEN, WHITE, tuple(map(sum,zip(tuple(OPPPKMN + SSIZE),(-28,0,0,0))))))
+        display.update(SCREEN.blit(attacker.frontimg, OPPPKMN))
+        sleep(.25)
+        display.update(draw.rect(SCREEN, WHITE, OPPPKMN + SSIZE))
+        display.update(SCREEN.blit(attacker.frontimg, tuple(map(sum,zip(tuple(OPPPKMN),(-28,0))))))
+        sleep(.25)
+        display.update(draw.rect(SCREEN, WHITE, tuple(map(sum,zip(tuple(OPPPKMN + SSIZE),(-28,0,0,0))))))
+        display.update(SCREEN.blit(attacker.frontimg, OPPPKMN))
+        sleep(.25)
     s.stop()
 
 
@@ -2118,9 +3333,25 @@ def do_take_down(attacker, defender, attacking):
     s = Sound("sounds/Take Down.ogg")
     s.play()
     if attacking:
-        pass  # TODO attacking
+        display.update(draw.rect(SCREEN, WHITE, MYPKMN + SSIZE))
+        display.update(SCREEN.blit(attacker.backimg, tuple(map(sum,zip(tuple(MYPKMN),(28,0))))))
+        sleep(.15)
+        display.update(draw.rect(SCREEN, WHITE, tuple(map(sum,zip(tuple(MYPKMN + SSIZE),(28,0,0,0))))))
+        display.update(SCREEN.blit(attacker.backimg, MYPKMN))
+        invert()
+        sleep(.15)
+        invert()
+        
     else:
-        pass  # TODO defending
+        display.update(draw.rect(SCREEN, WHITE, OPPPKMN + SSIZE))
+        display.update(SCREEN.blit(attacker.frontimg, tuple(map(sum,zip(tuple(OPPPKMN),(-28,0))))))
+        sleep(.15)
+        display.update(draw.rect(SCREEN, WHITE, tuple(map(sum,zip(tuple(OPPPKMN + SSIZE),(-28,0,0,0))))))
+        display.update(SCREEN.blit(attacker.frontimg, OPPPKMN))
+        invert()
+        sleep(.15)
+        invert()
+    dmged()
     s.stop()
 
 
@@ -2228,9 +3459,14 @@ def do_twineedle(attacker, defender, attacking):
     s = Sound("sounds/Twineedle.ogg")
     s.play()
     if attacking:
-        pass  # TODO attacking
+        double(attacker, defender)
+        sleep(.15)
+        double(attacker, defender)
     else:
-        pass  # TODO defending
+        opp_double(attacker, defender)
+        sleep(.15)
+        opp_double(attacker, defender)
+    dmged()
     s.stop()
 
 
@@ -2247,10 +3483,28 @@ def do_vicegrip(attacker, defender, attacking):
 def do_vine_whip(attacker, defender, attacking):
     s = Sound("sounds/Vine Whip.ogg")
     s.play()
+    s = Sound("sounds/Cut.ogg")
+    tmp = loadalphaimg('moves/cut1.png')
+    tmp2 = loadalphaimg('moves/cut2.png')
+    s.play()
     if attacking:
-        pass  # TODO attacking
+        display.update(SCREEN.blit(tmp,(800,10)))
+        sleep(.15)
+        display.update(draw_opp_pkmn_sprite(defender))
+        display.update(SCREEN.blit(tmp2,(800,10)))
+        sleep(.15)
+        display.update(draw_opp_pkmn_sprite(defender))
+        double(attacker, defender)
     else:
-        pass  # TODO defending
+        display.update(SCREEN.blit(tmp,(70,300)))
+        sleep(.15)
+        display.update(draw_my_pkmn_sprite(defender))
+        display.update(SCREEN.blit(tmp2,(70,300)))
+        sleep(.15)
+        display.update(draw_my_pkmn_sprite(defender))
+        opp_double(attacker, defender)
+    dmged()
+    s.stop()
     s.stop()
 
 
@@ -2266,11 +3520,36 @@ def do_water_gun(attacker, defender, attacking):
 
 def do_waterfall(attacker, defender, attacking):
     s = Sound("sounds/Waterfall.ogg")
+
+    pumps =  []
+    for i in range(1,7):
+        pumps.append(loadalphaimg('moves/hydro{0}.png'.format(i)))
     s.play()
     if attacking:
-        pass  # TODO attacking
+        for i in range(6):
+            display.update(SCREEN.blit(pumps[i],(820,75)))
+            sleep(.15)
+            display.update(draw_opp_pkmn_sprite(defender))
+        for i in range(6):
+            display.update(SCREEN.blit(pumps[i],(940,75)))
+            sleep(.15)
+            display.update(draw_opp_pkmn_sprite(defender))
+        sleep(.3)
+        double(attacker, defender)
+        
     else:
-        pass  # TODO defending
+        for i in range(6):
+            display.update(SCREEN.blit(pumps[i],(150,365)))
+            sleep(.15)
+            display.update(draw_my_pkmn_sprite(defender))
+        for i in range(6):
+            display.update(SCREEN.blit(pumps[i],(270,365)))
+            sleep(.15)
+            display.update(draw_my_pkmn_sprite(defender))
+        sleep(.3)
+        opp_double(attacker, defender)
+        
+    dmged()
     s.stop()
 
 
@@ -2288,9 +3567,10 @@ def do_wing_attack(attacker, defender, attacking):
     s = Sound("sounds/Wing Attack.ogg")
     s.play()
     if attacking:
-        pass  # TODO attacking
+        big_3(attacker, defender)
     else:
-        pass  # TODO defending
+        opp_big_3(attacker, defender)
+    dmged()
     s.stop()
 
 
@@ -2307,8 +3587,34 @@ def do_withdraw(attacker, defender, attacking):
 def do_wrap(attacker, defender, attacking):
     s = Sound("sounds/Wrap.ogg")
     s.play()
+    tmp = loadalphaimg('moves/bind.png')
+    
+    s.play()
     if attacking:
-        pass  # TODO attacking
+        display.update(SCREEN.blit(tmp,(720,100)))
+        sleep(.2)
+        draw.rect(SCREEN, WHITE, (720,100, tmp.get_width(), tmp.get_height()))
+        draw_opp_pkmn_sprite(defender)
+        display.update([720,100, tmp.get_width(), tmp.get_height()])
+        sleep(.2)
+        display.update(SCREEN.blit(tmp,(720,100)))
+        sleep(.2)
+        draw.rect(SCREEN, WHITE, (720,100, tmp.get_width(), tmp.get_height()))
+        draw_opp_pkmn_sprite(defender)
+        display.update([720,100, tmp.get_width(), tmp.get_height()])
+        sleep(.2)
     else:
-        pass  # TODO defending
+        display.update(SCREEN.blit(tmp,(40,450)))
+        sleep(.2)
+        draw.rect(SCREEN, WHITE, (40,450, tmp.get_width(), tmp.get_height()))
+        draw_my_pkmn_sprite(defender)
+        display.update([40,450, tmp.get_width(), tmp.get_height()])
+        sleep(.2)
+        display.update(SCREEN.blit(tmp,(40,450)))
+        sleep(.2)
+        draw.rect(SCREEN, WHITE, (40,450, tmp.get_width(), tmp.get_height()))
+        draw_my_pkmn_sprite(defender)
+        display.update([40,450, tmp.get_width(), tmp.get_height()])
+        sleep(.2)
+    dmged()
     s.stop()
