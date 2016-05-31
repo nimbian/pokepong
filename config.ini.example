@@ -2,10 +2,6 @@
 # SQL connection string
 #connection-string=postgresql://postgres:password@localhost/pong
 connection-string=sqlite:///pong
-
+redis=127.0.0.1
 table-number=1
-
-
-# Redis connection string
-# http://docs.celeryproject.org/en/3.0/getting-started/brokers/redis.html
-redis-connection=redis://localhost:6379/0
+zmq=127.0.0.1

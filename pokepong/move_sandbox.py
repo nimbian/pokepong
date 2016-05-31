@@ -293,7 +293,7 @@ def big_3(attacker, defender):
     draw.rect(SCREEN, WHITE, tmp)
     draw_opp_pkmn_sprite(defender)
     draw_all_me(attacker)
-    
+
     tmp2 = mid_big()
     display.update([tmp, tmp2])
     draw.rect(SCREEN, WHITE, tmp2)
@@ -734,7 +734,7 @@ def beam(attacker, defender, attacking, type_=None):
         display.update(pygame.draw.rect(SCREEN, WHITE, x))
         draw_all_me(defender)
         draw_all_opp(attacker)
-    
+
 
 def sandbox():
     SCREEN.fill(WHITE)
@@ -774,23 +774,23 @@ def do_acid(attacker, defender, attacking):
         display.update([900,220, drop.get_width(), drop.get_height()])
         display.update(SCREEN.blit(drop, (900,270)))
         draw_opp_pkmn_sprite(defender)
-        sleep(.1)  
+        sleep(.1)
         display.update([900,270, drop.get_width(), drop.get_height()])
-   
+
         display.update(SCREEN.blit(drop, (900,320)))
         draw_opp_pkmn_sprite(defender)
-        sleep(.1)  
+        sleep(.1)
         display.update([900,320, drop.get_width(), drop.get_height()])
         display.update(SCREEN.blit(drop, (950,220)))
         draw_opp_pkmn_sprite(defender)
-        sleep(.1)  
+        sleep(.1)
         display.update([950,220, drop.get_width(), drop.get_height()])
         display.update(SCREEN.blit(drop, (950,270)))
         draw_opp_pkmn_sprite(defender)
-        sleep(.1)  
+        sleep(.1)
         display.update([950,270, drop.get_width(), drop.get_height()])
-        display.update(SCREEN.blit(drop, (950,320)))   
-        sleep(.1)  
+        display.update(SCREEN.blit(drop, (950,320)))
+        sleep(.1)
         display.update(draw_opp_pkmn_sprite(defender))
     else:
         low_arch_towards(defender,attacker,tmp)
@@ -801,23 +801,23 @@ def do_acid(attacker, defender, attacking):
         display.update([220,510, drop.get_width(), drop.get_height()])
         display.update(SCREEN.blit(drop, (220,560)))
         draw_my_pkmn_sprite(defender)
-        sleep(.1)  
+        sleep(.1)
         display.update([220,560, drop.get_width(), drop.get_height()])
-   
+
         display.update(SCREEN.blit(drop, (220,610)))
         draw_my_pkmn_sprite(defender)
-        sleep(.1)  
+        sleep(.1)
         display.update([220,610, drop.get_width(), drop.get_height()])
         display.update(SCREEN.blit(drop, (270,510)))
         draw_my_pkmn_sprite(defender)
-        sleep(.1)  
+        sleep(.1)
         display.update([270,510, drop.get_width(), drop.get_height()])
         display.update(SCREEN.blit(drop, (270,560)))
         draw_my_pkmn_sprite(defender)
-        sleep(.1)  
+        sleep(.1)
         display.update([270,560, drop.get_width(), drop.get_height()])
-        display.update(SCREEN.blit(drop, (270,610)))   
-        sleep(.1)  
+        display.update(SCREEN.blit(drop, (270,610)))
+        sleep(.1)
         display.update(draw_my_pkmn_sprite(defender))
     dmged()
     s.stop()
@@ -930,7 +930,7 @@ def do_barrier(attacker, defender, attacking):
         tmp = loadalphaimg('moves/opp_barrier.png')
     s.play()
     if attacking:
-        
+
         display.update(SCREEN.blit(tmp,(470,285)))
         sleep(.15)
         draw.rect(SCREEN, WHITE, (470,285, tmp.get_width(), tmp.get_height()))
@@ -968,7 +968,7 @@ def do_barrier(attacker, defender, attacking):
         display.update([470,285, tmp.get_width(), tmp.get_height()])
         sleep(.15)
     else:
-        
+
         display.update(SCREEN.blit(tmp,(700,0)))
         sleep(.15)
         draw.rect(SCREEN, WHITE, (700,0, tmp.get_width(), tmp.get_height()))
@@ -1027,7 +1027,7 @@ def do_bide(attacker, defender, attacking):
 def do_bind(attacker, defender, attacking):
     s = Sound("sounds/Bind.ogg")
     tmp = loadalphaimg('moves/bind.png')
-    
+
     s.play()
     if attacking:
         display.update(SCREEN.blit(tmp,(720,100)))
@@ -2234,23 +2234,23 @@ def do_lick(attacker, defender, attacking):
         display.update([900,220, drop.get_width(), drop.get_height()])
         display.update(SCREEN.blit(drop, (900,270)))
         draw_opp_pkmn_sprite(defender)
-        sleep(.15)  
+        sleep(.15)
         display.update([900,270, drop.get_width(), drop.get_height()])
-   
+
         display.update(SCREEN.blit(drop, (900,320)))
         draw_opp_pkmn_sprite(defender)
-        sleep(.15)  
+        sleep(.15)
         display.update([900,320, drop.get_width(), drop.get_height()])
         display.update(SCREEN.blit(drop, (950,220)))
         draw_opp_pkmn_sprite(defender)
-        sleep(.15)  
+        sleep(.15)
         display.update([950,220, drop.get_width(), drop.get_height()])
         display.update(SCREEN.blit(drop, (950,270)))
         draw_opp_pkmn_sprite(defender)
-        sleep(.15)  
+        sleep(.15)
         display.update([950,270, drop.get_width(), drop.get_height()])
-        display.update(SCREEN.blit(drop, (950,320)))   
-        sleep(.15)  
+        display.update(SCREEN.blit(drop, (950,320)))
+        sleep(.15)
         display.update(draw_opp_pkmn_sprite(defender))
     else:
         display.update(SCREEN.blit(tmp,(200,400)))
@@ -2260,23 +2260,23 @@ def do_lick(attacker, defender, attacking):
         display.update([220,510, drop.get_width(), drop.get_height()])
         display.update(SCREEN.blit(drop, (220,560)))
         draw_my_pkmn_sprite(defender)
-        sleep(.15)  
+        sleep(.15)
         display.update([220,560, drop.get_width(), drop.get_height()])
-   
+
         display.update(SCREEN.blit(drop, (220,610)))
         draw_my_pkmn_sprite(defender)
-        sleep(.15)  
+        sleep(.15)
         display.update([220,610, drop.get_width(), drop.get_height()])
         display.update(SCREEN.blit(drop, (270,510)))
         draw_my_pkmn_sprite(defender)
-        sleep(.15)  
+        sleep(.15)
         display.update([270,510, drop.get_width(), drop.get_height()])
         display.update(SCREEN.blit(drop, (270,560)))
         draw_my_pkmn_sprite(defender)
-        sleep(.15)  
+        sleep(.15)
         display.update([270,560, drop.get_width(), drop.get_height()])
-        display.update(SCREEN.blit(drop, (270,610)))   
-        sleep(.15)  
+        display.update(SCREEN.blit(drop, (270,610)))
+        sleep(.15)
         display.update(draw_my_pkmn_sprite(defender))
     dmged()
     s.stop()
@@ -2289,7 +2289,7 @@ def do_light_screen(attacker, defender, attacking):
         tmp = loadalphaimg('moves/screen.png')
     else:
         tmp = loadalphaimg('moves/opp_screen.png')
-    if attacking: 
+    if attacking:
         display.update(SCREEN.blit(tmp,(470,285)))
         sleep(.15)
         draw.rect(SCREEN, WHITE, (470,285, tmp.get_width(), tmp.get_height()))
@@ -2327,7 +2327,7 @@ def do_light_screen(attacker, defender, attacking):
         display.update([470,285, tmp.get_width(), tmp.get_height()])
         sleep(.15)
     else:
-        
+
         display.update(SCREEN.blit(tmp,(700,0)))
         sleep(.15)
         draw.rect(SCREEN, WHITE, (700,0, tmp.get_width(), tmp.get_height()))
@@ -3005,23 +3005,23 @@ def do_sludge(attacker, defender, attacking):
         display.update([900,220, drop.get_width(), drop.get_height()])
         display.update(SCREEN.blit(drop, (900,270)))
         draw_opp_pkmn_sprite(defender)
-        sleep(.1)  
+        sleep(.1)
         display.update([900,270, drop.get_width(), drop.get_height()])
-   
+
         display.update(SCREEN.blit(drop, (900,320)))
         draw_opp_pkmn_sprite(defender)
-        sleep(.1)  
+        sleep(.1)
         display.update([900,320, drop.get_width(), drop.get_height()])
         display.update(SCREEN.blit(drop, (950,220)))
         draw_opp_pkmn_sprite(defender)
-        sleep(.1)  
+        sleep(.1)
         display.update([950,220, drop.get_width(), drop.get_height()])
         display.update(SCREEN.blit(drop, (950,270)))
         draw_opp_pkmn_sprite(defender)
-        sleep(.1)  
+        sleep(.1)
         display.update([950,270, drop.get_width(), drop.get_height()])
-        display.update(SCREEN.blit(drop, (950,320)))   
-        sleep(.1)  
+        display.update(SCREEN.blit(drop, (950,320)))
+        sleep(.1)
         display.update(draw_opp_pkmn_sprite(defender))
     else:
         low_arch_towards(defender,attacker,tmp)
@@ -3032,23 +3032,23 @@ def do_sludge(attacker, defender, attacking):
         display.update([220,510, drop.get_width(), drop.get_height()])
         display.update(SCREEN.blit(drop, (220,560)))
         draw_my_pkmn_sprite(defender)
-        sleep(.1)  
+        sleep(.1)
         display.update([220,560, drop.get_width(), drop.get_height()])
-   
+
         display.update(SCREEN.blit(drop, (220,610)))
         draw_my_pkmn_sprite(defender)
-        sleep(.1)  
+        sleep(.1)
         display.update([220,610, drop.get_width(), drop.get_height()])
         display.update(SCREEN.blit(drop, (270,510)))
         draw_my_pkmn_sprite(defender)
-        sleep(.1)  
+        sleep(.1)
         display.update([270,510, drop.get_width(), drop.get_height()])
         display.update(SCREEN.blit(drop, (270,560)))
         draw_my_pkmn_sprite(defender)
-        sleep(.1)  
+        sleep(.1)
         display.update([270,560, drop.get_width(), drop.get_height()])
-        display.update(SCREEN.blit(drop, (270,610)))   
-        sleep(.1)  
+        display.update(SCREEN.blit(drop, (270,610)))
+        sleep(.1)
         display.update(draw_my_pkmn_sprite(defender))
     dmged()
     s.stop()
@@ -3097,7 +3097,7 @@ def do_solarbeam(attacker, defender, attacking):
     s.play()
     if attacking:
         beam(attacker, defender, attacking, type_='solar')
-        double(attacker, defender)  
+        double(attacker, defender)
     else:
         beam(attacker, defender, attacking, type_='solar')
         opp_double(attacker, defender)
@@ -3341,7 +3341,7 @@ def do_take_down(attacker, defender, attacking):
         invert()
         sleep(.15)
         invert()
-        
+
     else:
         display.update(draw.rect(SCREEN, WHITE, OPPPKMN + SSIZE))
         display.update(SCREEN.blit(attacker.frontimg, tuple(map(sum,zip(tuple(OPPPKMN),(-28,0))))))
@@ -3536,7 +3536,7 @@ def do_waterfall(attacker, defender, attacking):
             display.update(draw_opp_pkmn_sprite(defender))
         sleep(.3)
         double(attacker, defender)
-        
+
     else:
         for i in range(6):
             display.update(SCREEN.blit(pumps[i],(150,365)))
@@ -3548,7 +3548,7 @@ def do_waterfall(attacker, defender, attacking):
             display.update(draw_my_pkmn_sprite(defender))
         sleep(.3)
         opp_double(attacker, defender)
-        
+
     dmged()
     s.stop()
 
@@ -3588,7 +3588,7 @@ def do_wrap(attacker, defender, attacking):
     s = Sound("sounds/Wrap.ogg")
     s.play()
     tmp = loadalphaimg('moves/bind.png')
-    
+
     s.play()
     if attacking:
         display.update(SCREEN.blit(tmp,(720,100)))

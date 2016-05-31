@@ -2493,7 +2493,7 @@ def run_opp_move(me, opp, move, first):
     elif tmp == 1:
         return
     if opp.current.alive():
-        opp.current.do_status(opp.current, True)
+        opp.current.do_status(opp.current, False)
     return
 
 

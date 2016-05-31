@@ -152,6 +152,9 @@ class Trainer(Base):
     __tablename__ = 'trainer'
     id = Column(Integer, primary_key=True)
     name = Column(String, unique=True, nullable=False)
+    password = Column(String)
+    admin = Column(Boolean)
+    created = Column(DateTime)
     money = Column(Integer, default=1500)
     bb = Column(Boolean, default=False)
     cb = Column(Boolean, default=False)
@@ -512,7 +515,7 @@ class Owned(Base):
         from pokepong.domove import dmg_pkmn
         from pokepong.logic import write_btm, wait_for_button
         if 'BRN' in self.buffs:
-            retval = dmg_pkmn(self, int(self.maxhp*(1/8.)), not me)
+            retval = dmg_pkmn(self, int(self.maxhp*(1/8.)), me)
             if me:
                 display.update(write_btm(self.name + ' was', 'hurt by the burn'))
             else:
@@ -521,7 +524,7 @@ class Owned(Base):
             if retval:
                 return 1
         if 'PSN' in self.buffs:
-            retval = dmg_pkmn(self, int(self.maxhp*(1/8.)), not me)
+            retval = dmg_pkmn(self, int(self.maxhp*(1/8.)), me)
             if me:
                 display.update(write_btm(self.name + ' was', 'hurt by the poison'))
             else:
@@ -530,8 +533,8 @@ class Owned(Base):
             if retval:
                 return 1
         if 'SEED' in self.buffs:
-            retval = dmg_pkmn(self, int(self.maxhp*(1/16.)), not me)
-            dmg_pkmn(opppkmn, (int(self.maxhp*(1/16.)) * -1), me)
+            retval = dmg_pkmn(self, int(self.maxhp*(1/16.)), me)
+            dmg_pkmn(opppkmn, (int(self.maxhp*(1/16.)) * -1), not me)
             #TODO leech words
             display.update(write_btm('Leeched'))
             wait_for_button()
@@ -539,7 +542,7 @@ class Owned(Base):
                 return 1
         if 'TOXIC' in self.buffs:
             self.hp -= self.maxhp*(tticks/8.)
-            retval = dmg_pkmn(self, int(self.maxhp*(1/8.)), not me)
+            retval = dmg_pkmn(self, int(self.maxhp*(1/8.)), me)
             if me:
                 display.update(write_btm(self.name + ' was', 'hurt by the poison'))
             else:

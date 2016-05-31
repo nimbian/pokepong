@@ -10,6 +10,7 @@ from redis import StrictRedis
 from time import sleep
 from pygame.mixer import Sound
 from .config import _cfg
+from pokepong.joy import get_input
 pygame.mixer.init()
 
 CLIENT = False
@@ -278,7 +279,7 @@ def wait_for_button():
         if r.get('lock'):
             raise OppMoveOccuring
         for event_ in pygame.event.get():
-            if event_.type == pygame.KEYDOWN:
+            if get_input(event_):
                 return
         if c % 4 == 0:
             if tmp:

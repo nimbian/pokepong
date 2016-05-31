@@ -57,7 +57,7 @@ def main():
     context = zmq.Context()
     socket = context.socket(zmq.PAIR)
     if get_client():
-        socket.connect("tcp://127.0.0.1:7777")
+        socket.connect("tcp://{0}:7777".format(_cfg('zmq')))
     else:
         socket.bind("tcp://*:7777")
     sleep(1)
