@@ -1,10 +1,8 @@
 # TODO remove when done testing
-from time import sleep
-sleep(1)
 from pygame import display, joystick
 from pokepong.util import send_move, recv_move, MyMoveOccuring, OppMoveOccuring
 from pokepong.util import send_team, get_team, loadimg, set_client, get_client
-from pokepong.util import Sound, GYMS, get_prize, write_btm
+from pokepong.util import Sound, GYMS, get_prize, write_btm, sleep
 from pokepong.logic import shop, get_wild_mon, draw_all_opp, draw_all_me, enter_pin
 from pokepong.logic import win, lost, opp_next_mon, gain_exp, evolve, play_again
 from pokepong.logic import battle_logic, run_opp_faint, run_me_faint, get_badge
@@ -17,6 +15,7 @@ from .config import _cfg
 import json
 import zmq
 joystick.init()
+sleep(1)
 try:
         tmp = joystick.Joystick(0)
         tmp.init()

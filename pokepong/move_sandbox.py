@@ -4,9 +4,8 @@ from pygame.mixer import Sound
 from pokepong.models import Move, Owned
 from pokepong.database import db
 import pygame
-from pokepong.util import loadalphaimg, loadimg, alphabet, HIGH_ARC, LOW_ARC
+from pokepong.util import loadalphaimg, loadimg, alphabet, HIGH_ARC, LOW_ARC, sleep
 from math import floor
-from time import sleep
 pygame.mixer.init()
 sleep(1)
 
@@ -3483,7 +3482,6 @@ def do_vicegrip(attacker, defender, attacking):
 def do_vine_whip(attacker, defender, attacking):
     s = Sound("sounds/Vine Whip.ogg")
     s.play()
-    s = Sound("sounds/Cut.ogg")
     tmp = loadalphaimg('moves/cut1.png')
     tmp2 = loadalphaimg('moves/cut2.png')
     s.play()

@@ -7,7 +7,6 @@ import sys
 import zmq
 from math import floor
 from redis import StrictRedis
-from time import sleep
 from pygame.mixer import Sound
 from .config import _cfg
 from pokepong.joy import get_input
@@ -46,6 +45,9 @@ GYMS = {'PEWTER CITY': ['BROCK',[152,153]], 'CERULEAN CITY': ['MISTY',[154,155]]
 
 PRIZES = {'LITTLE':['Bulbasaur', 'Charmander', 'Squirtle', 'Eevee'], 'MEDIUM':['Porygon', 'Nugget', 'Rare Candy'], 'BIG':['Master Ball']}
 
+
+def sleep(tmp):
+    pygame.time.wait(int(tmp * 1000))
 
 def set_client(tmp):
     global CLIENT

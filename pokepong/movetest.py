@@ -1,4 +1,4 @@
-from time import sleep
+from pokepong.util import sleep
 sleep(1)
 from logic import *
 from classes import trainer

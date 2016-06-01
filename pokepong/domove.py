@@ -1,8 +1,7 @@
 from pygame import display
-from pokepong.util import choice, randint, get_random
+from pokepong.util import choice, randint, get_random, sleep
 from pokepong.util import write_btm, draw_opp_hp, draw_my_hp, wait_for_button
 from pokepong.models import Move, Pokemon, tmpMove
-from time import sleep
 from copy import deepcopy
 from math import floor
 import pokepong.move_sandbox

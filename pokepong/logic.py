@@ -3,8 +3,7 @@ import pygame
 import textwrap
 from sqlalchemy.orm.exc import NoResultFound
 from pokepong.util import MyMoveOccuring, OppMoveOccuring, loadalphaimg, loadimg
-from pokepong.util import alphabet, randint, choice, HIGH_ARC
-from time import sleep
+from pokepong.util import alphabet, randint, choice, HIGH_ARC, sleep
 from math import floor
 import json
 from pokepong.routes import ROUTES, MAPLIST, MAPROUTE, TRAINERS
