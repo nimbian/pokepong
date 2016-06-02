@@ -24,6 +24,10 @@ except:
 
 MINI = Sound("sounds/miniOpening.ogg")
 OPENING = Sound("sounds/intro.ogg")
+WILD = Sound("sounds/wild_battle.ogg")
+WILD_VICT = Sound("sounds/wild_victory.ogg")
+TRAIN = Sound("sounds/trainer_battle.ogg")
+TRAIN_VICT = Sound("sounds/trainer_victory.ogg")
 
 
 def main():
@@ -74,13 +78,7 @@ def main():
             me = None
             opp = None
             count = 0
-            if mode == 'wild':
-                music = Sound("sounds/wild_battle.ogg")
-                music_vict = Sound("sounds/wild_victory.ogg")
-            else:
-                music = Sound("sounds/trainer_battle.ogg")
-                music_vict = Sound("sounds/trainer_victory.ogg")
-        if new_game or (not king and mode != 'wild'):
+        if new_game or not king:
             MINI.play()
             intro(current)
             MINI.stop()
@@ -88,6 +86,8 @@ def main():
             # sleep(5)
         OPENING.play(-1)
         while new_game or mode != 'wild':
+            if mode != r.get('mode'):
+                break
             if r.get('leader'):
                 gym = True
                 break
@@ -131,6 +131,8 @@ def main():
                 me.used.add(me.current)
 
         while mode != 'wild':
+            if mode != r.get('mode'):
+                break
             try:
                 oppname, opppkmnlist = get_team(socket, get_client())
                 if mode != 'pong':
@@ -150,6 +152,8 @@ def main():
                 current = scrolling(current, possible)
                 # TODO uncomment for PROD
                 # sleep(5)
+        if mode != r.get('mode'):
+            continue
         if mode == 'wild':
             if not gym:
                 loc, wild, remember = choose_loc(remember, me)
@@ -239,8 +243,15 @@ def main():
         if mode != 'wild' and mode != 'random':
             socket.send('')
             socket.recv()
-        OPENING.stop()
+            OPENING.stop()
+            trainer_intro()
         opp.initialize()
+        if mode == 'wild':
+            music = WILD
+            music_vict = WILD_VICT
+        else:
+            music = TRAIN
+            music_vict = TRAIN_VICT
         music.play()
         if mode == 'battle':
             prize = get_prize(me, opp)
@@ -339,6 +350,7 @@ def main():
             mode = 'wild'
             r.delete('leader')
         if mode == 'wild':
+            king = None
             for mon in me.pkmn:
                 mon.clean()
                 tmp = mon.check_evolve()
