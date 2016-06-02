@@ -1,5 +1,5 @@
 # TODO remove when done testing
-from pygame import display, joystick
+from pygame import display, joystick, mixer
 from pokepong.util import send_move, recv_move, MyMoveOccuring, OppMoveOccuring
 from pokepong.util import send_team, get_team, loadimg, set_client, get_client
 from pokepong.util import Sound, GYMS, get_prize, write_btm, sleep
@@ -11,6 +11,7 @@ from pokepong.logic import draw_choice, scrolling, choose_loc, intro, trainer_in
 from pokepong.logic import clearbtm, run_game, get_trainers, get_mon, wild_intro, overtime
 from pokepong.models import Trainer, Owned
 from redis import StrictRedis
+from threading import Timer
 from .config import _cfg
 import json
 import zmq
@@ -24,10 +25,20 @@ except:
 
 MINI = Sound("sounds/miniOpening.ogg")
 OPENING = Sound("sounds/intro.ogg")
-WILD = Sound("sounds/wild_battle.ogg")
+WILD = Sound("sounds/wild_battle_nointro.ogg")
+WILD_INTRO = Sound("sounds/wild_battle_intro.ogg")
 WILD_VICT = Sound("sounds/wild_victory.ogg")
-TRAIN = Sound("sounds/trainer_battle.ogg")
+TRAIN = Sound("sounds/trainer_battle_nointro.ogg")
+TRAIN_INTRO = Sound("sounds/trainer_battle_intro.ogg")
 TRAIN_VICT = Sound("sounds/trainer_victory.ogg")
+
+def play_trainer():
+    TRAIN.play(-1)
+    TRAIN.set_volume(.3)
+
+def play_wild():
+    WILD.play(-1)
+    WILD.set_volume(.3)
 
 
 def main():
@@ -53,6 +64,7 @@ def main():
     king = None
     new_game = True
     me = None
+    challenger = None
     remember = 0
     r.incr('count')
     while int(r.get('count')) < 2:
@@ -78,7 +90,7 @@ def main():
             me = None
             opp = None
             count = 0
-        if new_game or not king:
+        if new_game or (not king and mode != 'wild'):
             MINI.play()
             intro(current)
             MINI.stop()
@@ -201,6 +213,8 @@ def main():
                     shop(me)
                     continue
                 elif loc in GYMS:
+                    new_game = False
+                    display.update(write_btm('Want to challenge', GYMS[loc][0] + '?'))
                     if conf():
                         mode = 'gym'
                         r.set('leader', loc)
@@ -229,7 +243,9 @@ def main():
                         opp = Trainer('')
                         opp.pkmn = [get_wild_mon(loc)]
                         opp.current = opp.pkmn[0]
+                        WILD_INTRO.play()
                         wild_intro()
+                        Timer(10, play_wild).start()
                     else:
                         mode = 'random'
                         trainer = get_trainers(loc)
@@ -239,12 +255,16 @@ def main():
                         for i in trainer[2]:
                             opp.pkmn.append(get_mon(i[0], i[1]))
                         opp.current = opp.pkmn[0]
+                        TRAIN_INTRO.play()
                         trainer_intro()
+            Timer(10, play_trainer).start()
         if mode != 'wild' and mode != 'random':
             socket.send('')
             socket.recv()
             OPENING.stop()
+            TRAIN_INTRO.play()
             trainer_intro()
+            Timer(10, play_trainer).start()
         opp.initialize()
         if mode == 'wild':
             music = WILD
@@ -252,7 +272,7 @@ def main():
         else:
             music = TRAIN
             music_vict = TRAIN_VICT
-        music.play()
+        #music.play()
         if mode == 'battle':
             prize = get_prize(me, opp)
             clear()
@@ -275,7 +295,7 @@ def main():
             try:
                 clearbtm()
                 draw_choice(0)
-                tmp = run_game(me, opp, mode, socket)
+                tmp = run_game(me, opp, mode, socket, challenger)
             except OppMoveOccuring:
                 clear()
                 display.flip()

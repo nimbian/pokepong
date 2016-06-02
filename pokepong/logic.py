@@ -699,12 +699,23 @@ def new_game_start(me, opp, mode):
     """
     clear()
     display.flip()
+    if mode != 'wild' and mode != 'random' and mode != 'gym':
+        if mode != 'pong':
+            display.update(write_btm(me.name + ' is on', 'this side'))
+        else:
+            display.update(write_btm('Team ' + me.name, 'is on this side'))
+        sleep(5)
+    clear()
+    display.flip()
     dirty = []
     dirty.extend(draw_my_poke_balls(me.pkmn))
     dirty.extend(draw_my_trainer())
     if mode != 'wild':
         dirty.extend(draw_opp_poke_balls(opp.pkmn))
-        dirty.extend(write_btm(opp.name + ' wants', 'to fight!'))
+        if mode != 'pong':
+            dirty.extend(write_btm(opp.name + ' wants', 'to fight!'))
+        else:
+            dirty.extend(write_btm('Team ' + opp.name,  'wants to fight!'))
         display.update(dirty)
         move_opp_trainer_in(opp.name)
         sleep(2)
@@ -2799,16 +2810,17 @@ def battle_logic(me, opp, move, my):
     return 4
 
 
-def run_game(me, opp, mode, socket):
+def run_game(me, opp, mode, socket, challenger):
     """
     function
     """
     if mode in ['gym', 'battle', 'wild', 'random']:
-        try:
-            Caught.query.filter(Caught.trainer == me).filter(Caught.pokemon_id == opp.current.base_id).one()
-        except NoResultFound:
-            db.add(Caught(me, opp.current.base_id))
-            db.commit()
+        if mode != 'gym' or challenger:
+            try:
+                Caught.query.filter(Caught.trainer == me).filter(Caught.pokemon_id == opp.current.base_id).one()
+            except NoResultFound:
+                db.add(Caught(me, opp.current.base_id))
+                db.commit()
     selector = 0
     pygame.event.clear()
     if mode == 'pong':
