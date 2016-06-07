@@ -14,6 +14,7 @@ from pokepong.util import WHITE, GREEN, YELLOW, RED, GREY, BLACK, SCREEN, SIZE
 from pokepong.util import BTM, BTM_TUPLE, get_client
 from pokepong.util import r, Sound, PINS
 from pokepong.joy import get_input
+from .config import _cfg
 
 SHOP = Sound("sounds/shop.ogg")
 EVOLVE = Sound("sounds/evolve.ogg")
@@ -378,18 +379,18 @@ def intro(current):
                     [640, 512, TRAINER.get_width(), TRAINER.get_height()]])
     width = LOGO.get_width()
     height = LOGO.get_height()
-    for i in range(-470, 50, 1):
-        draw.rect(SCREEN, WHITE, [130, i - 1, width, height])
+    for i in range(-470, 50, 4):
+        draw.rect(SCREEN, WHITE, [130, i - 4, width, height+4])
         SCREEN.blit(LOGO, (130, i))
-        display.update([130, i - 1, width, height + 1])
-    for i in range(50, -20, -1):
-        draw.rect(SCREEN, WHITE, [130, i + 1, width, height])
+        display.update([130, i - 4, width, height + 4])
+    for i in range(50, -20, -4):
+        draw.rect(SCREEN, WHITE, [130, i + 4, width, height+4])
         SCREEN.blit(LOGO, (130, i))
-        display.update([130, i + 1, width, height + 1])
-    for i in range(-20, 50, 1):
-        draw.rect(SCREEN, WHITE, [130, i - 1, width, height])
+        display.update([130, i + 4, width, height + 4])
+    for i in range(-20, 50, 4):
+        draw.rect(SCREEN, WHITE, [130, i - 4, width, height+4])
         SCREEN.blit(LOGO, (130, i))
-        display.update([130, i - 1, width, height + 1])
+        display.update([130, i - 4, width, height + 4])
 
 
 def scrolling(current, possible):
@@ -398,19 +399,19 @@ def scrolling(current, possible):
     """
     width = current.get_width()
     height = current.get_height()
-    for x in range(305, -392, -1):
-        draw.rect(SCREEN, WHITE, [x + 1, 520, width, height])
+    for x in range(305, -392, -4):
+        draw.rect(SCREEN, WHITE, [x + 1, 520, width+4, height])
         SCREEN.blit(current, (x, 520))
         SCREEN.blit(TRAINER, (640, 512))
-        display.update([x + 1, 520, width + 1, height])
+        display.update([x + 1, 520, width + 4, height])
     old = current
     while old == current:
         current = choice(possible)
-    for x in range(1280, 304, -1):
-        draw.rect(SCREEN, WHITE, [x + 1, 520, width, height])
+    for x in range(1280, 304, -4):
+        draw.rect(SCREEN, WHITE, [x + 4, 520, width+4, height])
         SCREEN.blit(current, (x, 520))
         SCREEN.blit(TRAINER, (640, 512))
-        display.update([x + 1, 520, width + 1, height])
+        display.update([x + 4, 520, width + 4, height])
     return current
 
 
@@ -2289,6 +2290,15 @@ def shop(me):
 
 def overtime(alive, me, opp, socket):
     if alive:
+        display.update(write_btm('Overtime?', 'A-Yes B-No'))
+        sleep(1)
+        x = 0
+        while x == 0:
+            x = int(r.get('overtime'+_cfg('table-number')) or 0)
+            sleep(.1)
+        if x == 2:
+            socket.send('False')
+            return False
         socket.send('True')
         me.pkmn[0].hp = 0
         me.pkmn[1].hp = 0
@@ -2330,6 +2340,15 @@ def overtime(alive, me, opp, socket):
 
 def play_again(alive, socket):
     if alive:
+        display.update(write_btm('King of the table?', 'A-Yes B-No'))
+        sleep(1)
+        x = 0
+        while x == 0:
+            x = int(r.get('overtime'+_cfg('table-number')) or 0)
+            sleep(.1)
+        if x == 2:
+            socket.send('False')
+            return False
         socket.send('True')
         return True
     else:
@@ -2417,7 +2436,7 @@ def draw_choose_pkmn(me, opp, mode, oppdeath=False, mydeath=False):
                             else:
                                 x = 'table2'
                             if int(r.get(x) or 0) > 0:
-                                if r.lock('lock').acquire():
+                                if r.lock('lock').acquire(blocking=False):
                                     r.decr(x)
                                     raise MyMoveOccuring('swap', str(select))
                                 else:
@@ -2586,7 +2605,7 @@ def run_attack(me, mode):
                                 else:
                                     x = 'table2'
                                 if int(r.get(x) or 0) > 0:
-                                    if r.lock('lock').acquire():
+                                    if r.lock('lock').acquire(blocking=False):
                                         r.decr(x)
                                         raise MyMoveOccuring('move', str(select))
                                     else:
@@ -2756,32 +2775,38 @@ def run_pong(me, opp):
     """
     draw_choice(0)
     while True:
+        for event in pygame.event.get():
+                button = get_input(event)
         if get_client():
             if opp.num_fainted() < int(r.get('ptable1') or 0):
                 attacking(me)
                 sleep(2)
                 clean_me_up(me)
-                do_move(
+                tmp = do_move(
                     me.current, opp.current, me.current.moves[0], 'pong', True, True)
-                return 0
+                if tmp == 1:
+                    return 0
             elif me.num_fainted() < int(r.get('ptable2') or 0):
                 sleep(2)
-                do_move(
+                tmp = do_move(
                     opp.current, me.current, opp.current.moves[0], 'pong', False, True)
-                return 1
+                if tmp == 1:
+                    return 1
         else:
             if me.num_fainted() < int(r.get('ptable1') or 0):
                 sleep(2)
-                do_move(
+                tmp = do_move(
                     opp.current, me.current, opp.current.moves[0], 'pong', False, True)
-                return 1
+                if tmp == 1:
+                    return 1
             elif opp.num_fainted() < int(r.get('ptable2') or 0):
                 attacking(me)
                 sleep(2)
                 clean_me_up(me)
                 do_move(
                     me.current, opp.current, me.current.moves[0], 'pong', True, True)
-                return 0
+                if tmp == 1
+                    return 0
         sleep(.1)
 
 

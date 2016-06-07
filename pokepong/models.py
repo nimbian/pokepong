@@ -712,10 +712,10 @@ class Owned(Base):
         return moves
 
     def transform(self, defend):
-        self.attack = defend.base.attack
-        self.defense = defend.base.defense
-        self.speed = defend.base.speed
-        self.special = defend.base.special
+        self.attack = self.calcstat(defend.base.attack, self.attackev, self.attackiv)
+        self.defense = self.calcstat(defend.base.defense, self.defenseev, self.defenseiv)
+        self.special = self.calcstat(defend.base.special, self.specialev, self.specialiv)
+        self.speed = self.calcstat(defend.base.speed, self.speedev, self.speediv)
         self.type1 = defend.base.type1
         self.type2 = defend.base.type2
         moves = defend.moves

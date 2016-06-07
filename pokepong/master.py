@@ -1,8 +1,9 @@
-# TODO remove when done testing
-from pygame import display, joystick, mixer
+import pygame
+from pygame import display, joystick
 from pokepong.util import send_move, recv_move, MyMoveOccuring, OppMoveOccuring
 from pokepong.util import send_team, get_team, loadimg, set_client, get_client
 from pokepong.util import Sound, GYMS, get_prize, write_btm, sleep
+sleep(1)
 from pokepong.logic import shop, get_wild_mon, draw_all_opp, draw_all_me, enter_pin
 from pokepong.logic import win, lost, opp_next_mon, gain_exp, evolve, play_again
 from pokepong.logic import battle_logic, run_opp_faint, run_me_faint, get_badge
@@ -10,13 +11,13 @@ from pokepong.logic import me_next_mon, new_game_start, clear, conf, recv_prize
 from pokepong.logic import draw_choice, scrolling, choose_loc, intro, trainer_intro
 from pokepong.logic import clearbtm, run_game, get_trainers, get_mon, wild_intro, overtime
 from pokepong.models import Trainer, Owned
-from redis import StrictRedis
+from pokepong.joy import get_input
 from threading import Timer
+from redis import StrictRedis
 from .config import _cfg
 import json
 import zmq
 joystick.init()
-sleep(1)
 try:
         tmp = joystick.Joystick(0)
         tmp.init()
@@ -40,13 +41,11 @@ def play_wild():
     WILD.play(-1)
     WILD.set_volume(.3)
 
-
 def main():
     if int(_cfg('table-number')) == 1:
         set_client(False)
     else:
         set_client(True)
-    # TODO set to actual IP
     r = StrictRedis(host=_cfg('redis'))
     r.delete('lock')
     r.delete('leader')
@@ -72,7 +71,7 @@ def main():
     context = zmq.Context()
     socket = context.socket(zmq.PAIR)
     if get_client():
-        socket.connect("tcp://{0}:7777".format(_cfg('zmq')))
+        socket.connect("tcp://" + _cfg('zmq') + ":7777")
     else:
         socket.bind("tcp://*:7777")
     sleep(1)
@@ -93,13 +92,18 @@ def main():
         if new_game or (not king and mode != 'wild'):
             MINI.play()
             intro(current)
-            MINI.stop()
-            # TODO uncomment for PROD
-            # sleep(5)
+            sleep(5)
+        MINI.stop()
         OPENING.play(-1)
         while new_game or mode != 'wild':
             if mode != r.get('mode'):
-                break
+                new_game = True
+                me = None
+                king = None
+                challenger = None
+                continue
+            for event in pygame.event.get():
+                button = get_input(event)
             if r.get('leader'):
                 gym = True
                 break
@@ -118,8 +122,7 @@ def main():
                     send_team(myname, mypkmnlist, socket, get_client())
                 break
             current = scrolling(current, possible)
-            # TODO uncomment for PROD
-            # sleep(5)
+            sleep(5)
         if not gym:
             if mode == 'wild' or mode == 'battle':
                 me = Trainer.query.filter(Trainer.name == myname).one()
@@ -144,7 +147,11 @@ def main():
 
         while mode != 'wild':
             if mode != r.get('mode'):
-                break
+                new_game = True
+                me = None
+                king = None
+                challenger = None
+                continue
             try:
                 oppname, opppkmnlist = get_team(socket, get_client())
                 if mode != 'pong':
@@ -162,10 +169,7 @@ def main():
                 break
             except zmq.Again:
                 current = scrolling(current, possible)
-                # TODO uncomment for PROD
-                # sleep(5)
-        if mode != r.get('mode'):
-            continue
+                sleep(5)
         if mode == 'wild':
             if not gym:
                 loc, wild, remember = choose_loc(remember, me)
@@ -243,9 +247,10 @@ def main():
                         opp = Trainer('')
                         opp.pkmn = [get_wild_mon(loc)]
                         opp.current = opp.pkmn[0]
+                        OPENING.stop()
                         WILD_INTRO.play()
                         wild_intro()
-                        Timer(10, play_wild).start()
+                        Timer(10, play_wild()).start()
                     else:
                         mode = 'random'
                         trainer = get_trainers(loc)
@@ -255,24 +260,18 @@ def main():
                         for i in trainer[2]:
                             opp.pkmn.append(get_mon(i[0], i[1]))
                         opp.current = opp.pkmn[0]
+                        OPENING.stop()
                         TRAIN_INTRO.play()
                         trainer_intro()
-            Timer(10, play_trainer).start()
+                        Timer(12, play_trainer()).start()
         if mode != 'wild' and mode != 'random':
             socket.send('')
             socket.recv()
             OPENING.stop()
             TRAIN_INTRO.play()
             trainer_intro()
-            Timer(10, play_trainer).start()
+            Timer(12, play_trainer()).start()
         opp.initialize()
-        if mode == 'wild':
-            music = WILD
-            music_vict = WILD_VICT
-        else:
-            music = TRAIN
-            music_vict = TRAIN_VICT
-        #music.play()
         if mode == 'battle':
             prize = get_prize(me, opp)
             clear()
@@ -322,15 +321,22 @@ def main():
                         if overtime(me.alive(), me, opp, socket):
                             new_game_start(me, opp, mode)
                             continue
-                    music.stop()
-                    #TODO fade in
-                    music_vict.play()
+                    if mode == 'wild':
+                        WILD.stop()
+                        WILD_VICT.play()
+                    else:
+                        TRAIN.stop()
+                        TRAIN_VICT.play()
                     win(me, opp, mode)
                     if mode == 'gym' and challenger:
                         get_badge(me, opp)
                     elif mode == 'battle':
                         recv_prize(me, prize)
-                    music_vict.stop()
+                    if mode == 'wild':
+                        WILD_VICT.stop()
+                    else:
+                        TRAIN.stop()
+                        TRAIN_VICT.stop()
             elif tmp == 1:
                 run_me_faint(me)
                 if me.alive():
@@ -340,7 +346,10 @@ def main():
                         if overtime(me.alive(), me, opp, socket):
                             new_game_start(me, opp, mode)
                             continue
-                    music.stop()
+                    if mode == 'wild':
+                        WILD.stop()
+                    else:
+                        TRAIN.stop()
                     if mode == 'gym' and challenger:
                         if not(me.e1 == me.e2 == me.e3 == me.e4):
                             me.e1 = me.e2 = me.e3 = me.e4 = False
@@ -350,7 +359,6 @@ def main():
                 break
             elif tmp == 5:
                 break
-        music.stop()
         if mode == 'pong':
             if play_again(me.alive(), socket):
                 if me.alive():
@@ -362,7 +370,6 @@ def main():
                 king = None
             socket.send('')
             socket.recv()
-            intro(current)
         new_game = False
         if mode == 'random':
             mode = 'wild'
@@ -370,7 +377,6 @@ def main():
             mode = 'wild'
             r.delete('leader')
         if mode == 'wild':
-            king = None
             for mon in me.pkmn:
                 mon.clean()
                 tmp = mon.check_evolve()

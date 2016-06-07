@@ -277,7 +277,7 @@ def wait_for_button():
     c = 1
     tmp = False
     display.update(word_builder('^',SIZE[0]-120, SIZE[1]-120))
-    while True:
+    while True and r.get('mode') != 'battle':
         if r.get('lock'):
             raise OppMoveOccuring
         for event_ in pygame.event.get():
@@ -293,6 +293,8 @@ def wait_for_button():
         else:
             c += 1
         sleep(.1)
+    if r.get('mode') == 'battle':
+        sleep(2)
 
 def get_prize(me, opp):
     lvls = []

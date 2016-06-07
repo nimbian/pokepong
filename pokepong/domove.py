@@ -113,6 +113,9 @@ def do_move(attack, defend, move, mode, me, first):
         else:
             display.update(
                 write_btm('Enemy ' + attack.name, 'used {0}'.format(move.name.upper())))
+        meth = getattr(
+            pokepong.move_sandbox, 'do_' + move.name.lower().replace(' ', '_').replace('-', '_'))
+        meth(attack, defend, me)
         return dmg_pkmn(defend, defend.hp, me)
 
     if attack.wrapped > 0:
